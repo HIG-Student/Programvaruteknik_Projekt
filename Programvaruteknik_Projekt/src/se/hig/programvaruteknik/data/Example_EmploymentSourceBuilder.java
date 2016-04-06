@@ -18,6 +18,7 @@ import se.hig.programvaruteknik.model.DataSource;
  */
 public class Example_EmploymentSourceBuilder extends JSONDataSourceBuilder
 {
+    @SuppressWarnings("javadoc") // Only an primitive example, thus no javadoc
     public Example_EmploymentSourceBuilder()
     {
 	setSourceSupplier(
