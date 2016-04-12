@@ -1,5 +1,6 @@
 package se.hig.programvaruteknik.model;
 
+import java.lang.reflect.Field;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -50,4 +51,55 @@ public interface MergeType
      * @return merged {@link MatchedDataPair}
      */
     public Double merge(List<Double> data);
+
+    /**
+     * Gets a MergeType from a string
+     * 
+     * @param name
+     *            The string to cast to a MergeType
+     * @return the MergeType
+     * @throws NotAMergeTypeException
+     *             If the string cannot be casted to an MergeType
+     */
+    public static MergeType fromString(String name)
+    {
+	try
+	{
+	    for (Field field : MergeType.class.getDeclaredFields())
+	    {
+		if (field.getType() == MergeType.class && field
+			.getName()
+			.equalsIgnoreCase(name)) return (MergeType) field.get(null);
+	    }
+	}
+	catch (Exception e)
+	{
+	    throw new NotAMergeTypeException("'" + name + "' cannot be resolved to a MergeType");
+	}
+	throw new NotAMergeTypeException("'" + name + "' is not a MergeType");
+    }
+
+    /**
+     * A exception that represent that the supplied value is not a MergeType
+     * 
+     * @author Viktor Hanstorp (ndi14vhp@student.hig.se)
+     */
+    public class NotAMergeTypeException extends RuntimeException
+    {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
+	 * Makes an exception with an message
+	 * 
+	 * @param message
+	 *            The message to use
+	 */
+	public NotAMergeTypeException(String message)
+	{
+	    super(message);
+	}
+    }
 }
