@@ -22,6 +22,9 @@ public class StockSourceBuilder extends CSVDataSourceBuilder
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("MM/dd/yyyy");
     private static final String URL = "http://api.kibot.com/?action=history&symbol=%s&interval=daily&period=%d";
 
+    private String stockName;
+    private String stockType;
+
     /**
      * The information to get about the stock
      */
@@ -271,6 +274,8 @@ public class StockSourceBuilder extends CSVDataSourceBuilder
     {
 	setSourceName("kibot");
 	setSourceLink("http://http://www.kibot.com");
+
+	setNameExtractor((source) -> stockName + " , " + stockType);
     }
 
     /**
@@ -294,7 +299,7 @@ public class StockSourceBuilder extends CSVDataSourceBuilder
      */
     public StockSourceBuilder setStockInfo(StockInfo info)
     {
-	setName(info.getName());
+	stockType = info.getName();
 	setUnit(info.getUnit());
 
 	setRowExtractor(DEFAULT_ROWEXTRACTOR);
@@ -317,6 +322,7 @@ public class StockSourceBuilder extends CSVDataSourceBuilder
      */
     public StockSourceBuilder setStock(StockName stock, Integer amount)
     {
+	stockName = stock.name();
 	setSourceSupplier(() -> getData(stock, amount));
 	return this;
     }
@@ -335,6 +341,7 @@ public class StockSourceBuilder extends CSVDataSourceBuilder
      */
     public StockSourceBuilder setStock(String stock, Integer amount)
     {
+	stockName = stock;
 	setSourceSupplier(() -> getData(stock, amount));
 	return this;
     }
