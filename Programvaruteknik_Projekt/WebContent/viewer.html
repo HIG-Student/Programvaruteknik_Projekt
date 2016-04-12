@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>Servlet viewer</title>
+		<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+	</head>
+	<body>
+		<textarea style="width: 100%; height: 300px;" rows="" cols="" id="json">
+{
+	"type": "data-source",
+	"data":
+	{
+		"source":
+		{
+			"source-type": "stock",
+			"stock-info": "PRICE",
+			"stock-name": "IBM"
+		}
+	}
+}</textarea>
+		<br>
+		<button id="button">POST</button>
+		<pre id="out"></pre>
+		<script>
+			$(function()
+			{
+				$("#button").click(function()
+				{
+					console.log("Click!");
+					console.log("Text",$("#json").val());
+					console.log("JSON",$.parseJSON($("#json").val()));
+					$.post( "SampleServlet", $("#json").val() )
+						.done(function(data)
+						{
+							console.log("yo",data);
+							$("#out").html(JSON.stringify(data, undefined, 4));
+						})
+						.error(function(data)
+						{
+							$("#out").html(data.responseText);
+						});
+				});
+			});
+		</script>
+	</body>
+</html>

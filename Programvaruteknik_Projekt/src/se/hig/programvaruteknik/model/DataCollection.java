@@ -7,21 +7,22 @@ import java.util.TreeMap;
 import com.owlike.genson.Genson;
 
 import se.hig.programvaruteknik.JSONFormatter;
+import se.hig.programvaruteknik.JSONOutputter;
 
 /**
  * A collection of data
  * 
  * @author Viktor Hanstorp (ndi14vhp@student.hig.se)
  */
-public class DataCollection
+public class DataCollection implements JSONOutputter
 {
     private Map<String, MatchedDataPair> data;
-    
+
     private String title;
-    
+
     private String xName;
     private String yName;
-    
+
     private String xUnit;
     private String yUnit;
 
@@ -112,7 +113,7 @@ public class DataCollection
 
 	xUnit = sourceX.getUnit();
 	yUnit = sourceY.getUnit();
-	
+
 	xName = sourceX.getName();
 	yName = sourceY.getName();
 
@@ -152,7 +153,7 @@ public class DataCollection
     {
 	return yUnit;
     }
-    
+
     /**
      * Get the name for the x values
      * 
@@ -192,23 +193,13 @@ public class DataCollection
     /**
      * Returns a JSON representation of this collection
      * 
-     * @return The JSON string
-     */
-    public String asJSON()
-    {
-	return asJSON(new JSONFormatter());
-    }
-
-    /**
-     * Returns a JSON representation of this collection
-     * 
      * @param formatter
      *            A formatter to format the JSON string with<br>
      *            If null, it is not formatted
      * 
      * @return The JSON string
      */
-    @SuppressWarnings("serial")
+    @Override
     public String asJSON(JSONFormatter formatter)
     {
 	if (formatter == null) formatter = new JSONFormatter()

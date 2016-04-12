@@ -82,14 +82,14 @@ export class CorrView
 					{  
 						label:
 						{  
-							text: data.a_source_name + " (" + data.a_name + ")"
+							text: data.a_name + " (" + data.a_unit + ")"
 						}
 					},
 					"scale-y":
 					{  
 						label:
 						{  
-							text: data.b_source_name + " (" + data.b_name + ")"
+							text: data.b_name + " (" + data.b_unit + ")"
 						}
 					},
 					plotarea:

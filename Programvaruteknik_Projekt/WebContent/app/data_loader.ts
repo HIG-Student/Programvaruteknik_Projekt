@@ -10,7 +10,27 @@ export class DataLoader
 	getDataSource(params)
 	{
 		return this.http
-		.post("SampleServlet?sourceA=Weather,GÄVLE_A&sourceB=Stock,MSFT,Value&resolution=YEAR", JSON.stringify(null))
+		.post("SampleServlet", JSON.stringify(
+		{
+			"type": "data-correlation",
+			"resolution": "YEAR",
+			"merge-type-x": "AVERAGE",
+			"merge-type-y": "AVERAGE",
+			"data":
+			{
+				"sourceA":
+				{
+					"source-type": "weather",
+					"weather-location": "GÄVLE_A"
+				},
+				"sourceB":
+				{
+					"source-type": "stock",
+					"stock-info": "PRICE",
+					"stock-name": "MSFT",
+				}
+			}
+		}))
 		.map(res => res.json().data);
 	}
 }
