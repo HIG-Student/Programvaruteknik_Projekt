@@ -65,12 +65,7 @@ export class CorrView
 	
 	ngOnInit()
 	{
-		this.name = 'Angular2';
-		
-		function getV()
-		{
-			return "yo";
-		}
+		this.name = 'Angular2'
 		
 		this.dataLoader.getDataSource().subscribe(data =>
 		{
@@ -97,10 +92,6 @@ export class CorrView
 					plotarea:
 					{
 						margin: "75px"
-					},
-					"tooltip":
-					{
-						"text": "%k ; %v"
 					},
 					series: 
 					[{
