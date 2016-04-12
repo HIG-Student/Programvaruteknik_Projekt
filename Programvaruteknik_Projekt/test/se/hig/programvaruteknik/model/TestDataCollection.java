@@ -61,11 +61,13 @@ public class TestDataCollection
 
 	assertEquals("[title]", data.get("name"));
 
-	assertEquals("[A:unit]", data.get("a_name"));
+	assertEquals("[A:name]", data.get("a_name"));
+	assertEquals("[A:unit]", data.get("a_unit"));
 	assertEquals("[A:source_name]", data.get("a_source_name"));
 	assertEquals("[A:source_link]", data.get("a_source_link"));
 
-	assertEquals("[B:unit]", data.get("b_name"));
+	assertEquals("[B:name]", data.get("b_name"));
+	assertEquals("[B:unit]", data.get("b_unit"));
 	assertEquals("[B:source_name]", data.get("b_source_name"));
 	assertEquals("[B:source_link]", data.get("b_source_link"));
 

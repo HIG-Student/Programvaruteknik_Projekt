@@ -16,7 +16,12 @@ import se.hig.programvaruteknik.JSONFormatter;
 public class DataCollection
 {
     private Map<String, MatchedDataPair> data;
+    
     private String title;
+    
+    private String xName;
+    private String yName;
+    
     private String xUnit;
     private String yUnit;
 
@@ -107,6 +112,9 @@ public class DataCollection
 
 	xUnit = sourceX.getUnit();
 	yUnit = sourceY.getUnit();
+	
+	xName = sourceX.getName();
+	yName = sourceY.getName();
 
 	xSourceName = sourceX.getSourceName();
 	xSourceLink = sourceX.getSourceLink();
@@ -143,6 +151,26 @@ public class DataCollection
     public String getYUnit()
     {
 	return yUnit;
+    }
+    
+    /**
+     * Get the name for the x values
+     * 
+     * @return The name for the x values
+     */
+    public String getXName()
+    {
+	return xName;
+    }
+
+    /**
+     * Get the name for the y values
+     * 
+     * @return The name for the y values
+     */
+    public String getYName()
+    {
+	return yName;
     }
 
     /**
@@ -199,10 +227,12 @@ public class DataCollection
 		{
 		    {
 			put("name", getTitle());
-			put("a_name", getXUnit());
+			put("a_name", getXName());
+			put("a_unit", getXUnit());
 			put("a_source_name", getXSourceName());
 			put("a_source_link", getXSourceLink());
-			put("b_name", getYUnit());
+			put("b_name", getYName());
+			put("b_unit", getYUnit());
 			put("b_source_name", getYSourceName());
 			put("b_source_link", getYSourceLink());
 			put("data", new TreeMap<String, Object>()

@@ -59,8 +59,8 @@ export class DataView
 {
 	@Input("chart-id") id: string;
 	
-	@Input("chart-type") type: string;
-	
+	@Input("value-type") key: string;
+
 	charts: Chart[];
 	
 	constructor(private dataLoader: DataLoader) { }
@@ -76,10 +76,14 @@ export class DataView
 				id: "chart-" + this.id,
 				data:
 				{
-					type: this.type,
+					type: "line",
+					plot:
+					{ 
+						aspect: "spline" 
+					}, 
 					series: 
 					[{
-						values: Object.keys(data.data).map(k=>[data.data[k].a,data.data[k].b])
+						values: Object.keys(data.data).map(k=>data.data[k][this.key])
 					}],
 				},
 				height: 400,
