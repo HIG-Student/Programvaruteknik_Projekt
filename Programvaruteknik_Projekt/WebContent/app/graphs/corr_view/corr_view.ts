@@ -66,14 +66,12 @@ export class CorrView
 	ngOnInit()
 	{
 		this.name = 'Angular2';
-		
-		function getV()
-		{
-			return "yo";
-		}
-		
+
 		this.dataLoader.getDataSource().subscribe(data =>
 		{
+			window.data = data;
+			console.log(data);
+			
 			this.charts = 
 			[{
 				id: "chart-" + this.id,
@@ -100,11 +98,20 @@ export class CorrView
 					},
 					"tooltip":
 					{
-						"text": "%k ; %v"
+						"html-mode": true,
+						"border-width":2,
+						"border-radius":5,
+						"border-color":"#000",
+						"text": "<table><tr><td>Datum:</td><td>%data-dates</td></tr><tr><td>%data-name-a:</td><td>%v %data-unit-a</td></tr><tr><td>%data-name-b:</td><td>%k %data-unit-b</td></tr></table>" 
 					},
 					series: 
 					[{
-						values: Object.keys(data.data).map(k=>[data.data[k].a,data.data[k].b])
+						values: Object.keys(data.data).map(k=>[data.data[k].a,data.data[k].b]),
+						"data-dates": Object.keys(data.data),
+						"data-name-a": data.a_name,
+						"data-name-b": data.b_name,
+						"data-unit-a": data.a_unit,
+						"data-unit-b": data.b_unit
 					}],
 				},
 				height: 400,
