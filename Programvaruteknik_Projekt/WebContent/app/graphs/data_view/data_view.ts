@@ -58,6 +58,8 @@ class ZingChart implements AfterView, OnDestroy
 export class DataView 
 {
 	@Input("chart-id") id: string;
+	
+	@Input("value-type") key: string;
 
 	charts: Chart[];
 	
@@ -81,7 +83,7 @@ export class DataView
 					}, 
 					series: 
 					[{
-						values: Object.keys(data.data).map(k=>[data.data[k].a,data.data[k].b])
+						values: Object.keys(data.data).map(k=>data.data[k][this.key])
 					}],
 				},
 				height: 400,
