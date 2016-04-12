@@ -34,6 +34,7 @@ public class TestStockSourceBuilder
     public void testGetVolume()
     {
 	StockSourceBuilder builder = new StockSourceBuilder(StockInfo.VOLUME);
+	builder.setStock("TEST", 0);
 	builder.setSourceSupplier(DataSupplierFactory.createFileFetcher("data/test/TestStockData.txt"));
 	DataSource source = builder.build();
 	assertEquals(source.getData(), new TreeMap<LocalDate, Double>()
@@ -43,7 +44,7 @@ public class TestStockSourceBuilder
 		put(LocalDate.of(2015, 1, 14), new Double(29454208));
 	    }
 	});
-	assertEquals("Volym", source.getName());
+	assertEquals("TEST , Volym", source.getName());
 	assertEquals("st", source.getUnit());
     }
 
@@ -51,6 +52,7 @@ public class TestStockSourceBuilder
     public void testGetPrice()
     {
 	StockSourceBuilder builder = new StockSourceBuilder(StockInfo.PRICE);
+	builder.setStock("TEST", 0);
 	builder.setSourceSupplier(DataSupplierFactory.createFileFetcher("data/test/TestStockData.txt"));
 	DataSource source = builder.build();
 	assertEquals(source.getData(), new TreeMap<LocalDate, Double>()
@@ -60,7 +62,7 @@ public class TestStockSourceBuilder
 		put(LocalDate.of(2015, 1, 14), new Double(44.42));
 	    }
 	});
-	assertEquals("Pris", source.getName());
+	assertEquals("TEST , Pris", source.getName());
 	assertEquals("$", source.getUnit());
     }
 
@@ -68,6 +70,7 @@ public class TestStockSourceBuilder
     public void testGetChange()
     {
 	StockSourceBuilder builder = new StockSourceBuilder(StockInfo.CHANGE);
+	builder.setStock("TEST", 0);
 	builder.setSourceSupplier(DataSupplierFactory.createFileFetcher("data/test/TestStockData.txt"));
 	DataSource source = builder.build();
 	assertEquals(source.getData(), new TreeMap<LocalDate, Double>()
@@ -77,7 +80,7 @@ public class TestStockSourceBuilder
 		put(LocalDate.of(2015, 1, 14), new Double(44.42 - 44.43));
 	    }
 	});
-	assertEquals("Ändring", source.getName());
+	assertEquals("TEST , Ändring", source.getName());
 	assertEquals("$", source.getUnit());
     }
 
@@ -85,6 +88,7 @@ public class TestStockSourceBuilder
     public void testGetFluctuation()
     {
 	StockSourceBuilder builder = new StockSourceBuilder(StockInfo.FLUCTUATION);
+	builder.setStock("TEST", 0);
 	builder.setSourceSupplier(DataSupplierFactory.createFileFetcher("data/test/TestStockData.txt"));
 	DataSource source = builder.build();
 	assertEquals(source.getData(), new TreeMap<LocalDate, Double>()
@@ -94,7 +98,7 @@ public class TestStockSourceBuilder
 		put(LocalDate.of(2015, 1, 14), new Double(44.7 - 44.1));
 	    }
 	});
-	assertEquals("Ostadighet", source.getName());
+	assertEquals("TEST , Ostadighet", source.getName());
 	assertEquals("$", source.getUnit());
     }
 }
