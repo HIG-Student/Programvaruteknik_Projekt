@@ -75,6 +75,24 @@ export class CorrView
 				data:
 				{
 					type: "scatter",
+					"scale-x":
+					{  
+						label:
+						{  
+							text: data.a_source_name
+						}
+					},
+					"scale-y":
+					{  
+						label:
+						{  
+							text: data.b_source_name
+						}
+					},
+					plotarea:
+					{
+						margin: "75px"
+					},
 					series: 
 					[{
 						values: Object.keys(data.data).map(k=>[data.data[k].a,data.data[k].b])
