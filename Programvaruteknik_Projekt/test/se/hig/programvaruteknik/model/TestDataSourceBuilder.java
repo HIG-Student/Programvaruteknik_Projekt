@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
-import java.util.stream.Collectors;
 
 import org.junit.Test;
 
@@ -25,15 +24,15 @@ public class TestDataSourceBuilder
     })
     private Map<LocalDate, List<Double>> inflatedMap(Map<LocalDate, Double> map)
     {
-	return map.entrySet().stream().collect(
-		Collectors.<Entry<LocalDate, Double>, LocalDate, List<Double>> toMap(
-			(key) -> key.getKey(),
-			(value) -> new ArrayList()
-			{
-			    {
-				add(value.getValue());
-			    }
-			}));
+	Map<LocalDate, List<Double>> newMap = new TreeMap<LocalDate, List<Double>>();
+	for (Entry<LocalDate, Double> entry : map.entrySet())
+	    newMap.put(entry.getKey(), new ArrayList()
+	    {
+		{
+		    add(entry.getValue());
+		}
+	    });
+	return newMap;
     }
 
     @Test(expected = DataSourceBuilderException.class)
