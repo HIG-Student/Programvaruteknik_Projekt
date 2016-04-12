@@ -3,6 +3,7 @@ package se.hig.programvaruteknik;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.function.Supplier;
 
 /**
  * Clever utilities
@@ -14,21 +15,47 @@ public class Utils
     /**
      * Returns the first non-null parameter
      * 
-     * @param options
-     *            Options
-     * @return The first non-null option
+     * @param defaultValues
+     *            Default values
+     * @return The first non-null default value
      */
     @SafeVarargs
-    public static <T> T or(T... options)
+    public static <T> T or(T... defaultValues)
     {
-	if (options == null) return null;
+	if (defaultValues == null) return null;
 
-	for (T option : options)
+	for (T option : defaultValues)
 	{
 	    if (option != null) return option;
 	}
 
 	return null;
+    }
+
+    /**
+     * Returns the value of the supplier if possible, else return the first
+     * non-null default value
+     * 
+     * @param supplier
+     *            Supplier of a value
+     * @param defaultValues
+     *            Default values
+     * @return The first non-null option
+     */
+    @SafeVarargs
+    public static <T> T or(Supplier<T> supplier, T... defaultValues)
+    {
+	try
+	{
+	    T value = supplier.get();
+	    if (value != null) return value;
+	}
+	catch (Exception e)
+	{
+
+	}
+
+	return or(defaultValues);
     }
 
     /**
