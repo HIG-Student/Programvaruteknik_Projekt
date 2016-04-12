@@ -77,10 +77,15 @@ export class DataView
 				data:
 				{
 					type: this.type,
+					plot:
+					{ 
+						aspect: "spline" 
+					}, 
 					series: 
 					[{
 						values: Object.keys(data.data).map(k=>[data.data[k].a,data.data[k].b])
-					}],
+					}
+					],
 				},
 				height: 400,
 				width: 600

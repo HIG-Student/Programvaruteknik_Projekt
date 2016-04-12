@@ -10,7 +10,7 @@ export class DataLoader
 	getDataSource(params)
 	{
 		return this.http
-		.post("SampleServlet?sourceA=Weather,GÄVLE_A&sourceB=Stock,MSFT,Value", JSON.stringify(null))
+		.post("SampleServlet?sourceA=Weather,GÄVLE_A&sourceB=Stock,MSFT,Value&resolution=YEAR", JSON.stringify(null))
 		.map(res => res.json().data);
 	}
 }
