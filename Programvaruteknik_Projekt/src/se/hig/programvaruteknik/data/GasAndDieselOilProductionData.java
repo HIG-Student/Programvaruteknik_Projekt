@@ -28,7 +28,7 @@ public class GasAndDieselOilProductionData extends JSONDataSourceBuilder
 			setNameExtractor(
 				(source) -> ((Map<String, Object>) source.get("dataset")).get("name").toString().split(",")[0]);
 
-			setUnit("Prisändring på aktien");
+			setUnit("Metric tons - thousand");
 
 			setSourceName("Quandl");
 			setSourceLink("www.quandl.com");

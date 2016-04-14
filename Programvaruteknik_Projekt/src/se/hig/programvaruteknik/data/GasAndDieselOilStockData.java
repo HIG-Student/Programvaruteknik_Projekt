@@ -20,7 +20,6 @@ public class GasAndDieselOilStockData extends JSONDataSourceBuilder
 			setListExtractor(
 				(source) -> listToMap(
 					(((List<List<Object>>) ((Map<String, Object>) source.get("dataset")).get("data"))))
-
 			);
 
 			setDataExtractor(
@@ -29,7 +28,7 @@ public class GasAndDieselOilStockData extends JSONDataSourceBuilder
 			setNameExtractor(
 				(source) -> ((Map<String, Object>) source.get("dataset")).get("name").toString().split(",")[0]);
 
-			setUnit("Metric tons - thousand");
+			setUnit("Prisändring på aktien");
 
 			setSourceName("Quandl");
 			setSourceLink("www.quandl.com");

@@ -29,7 +29,7 @@ public class DeathRatesOverLiverCirrhosisData extends JSONDataSourceBuilder
 			setNameExtractor(
 				(source) -> ((Map<String, Object>) source.get("dataset")).get("name").toString().split(",")[0]);
 
-			setUnit("Number of drinkers in USA");
+			setUnit("Rate of death from cirrhosis");
 
 			setSourceName("Quandl");
 			setSourceLink("www.quandl.com");
