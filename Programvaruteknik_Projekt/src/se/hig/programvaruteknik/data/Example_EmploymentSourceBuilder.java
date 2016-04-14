@@ -9,8 +9,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
-
-import javassist.compiler.ast.Pair;
 import se.hig.programvaruteknik.model.DataSource;
 
 /**
@@ -18,7 +16,7 @@ import se.hig.programvaruteknik.model.DataSource;
  */
 public class Example_EmploymentSourceBuilder extends JSONDataSourceBuilder
 {
-    @SuppressWarnings("javadoc") // Only an primitive example, thus no javadoc
+    @SuppressWarnings({ "javadoc", "unchecked" }) // Only an primitive example, thus no javadoc
     public Example_EmploymentSourceBuilder()
     {
 	setSourceSupplier(
@@ -42,7 +40,8 @@ public class Example_EmploymentSourceBuilder extends JSONDataSourceBuilder
 	setSourceLink("www.quandl.com");
     }
 
-    public List<Map<String, Object>> listToMap(List<List<Object>> list)
+    @SuppressWarnings("serial")
+	public List<Map<String, Object>> listToMap(List<List<Object>> list)
     {
 	return list.stream().map((entry) -> new TreeMap<String, Object>()
 	{
