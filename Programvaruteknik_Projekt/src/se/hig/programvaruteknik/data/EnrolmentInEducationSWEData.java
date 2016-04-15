@@ -9,11 +9,11 @@ import java.util.stream.Collectors;
 
 import se.hig.programvaruteknik.model.DataSource;
 
-public class DeathRatesOverLiverCirrhosisData extends JSONDataSourceBuilder {
+public class EnrolmentInEducationSWEData extends JSONDataSourceBuilder {
 	@SuppressWarnings("unchecked")
-	public DeathRatesOverLiverCirrhosisData() {
+	public EnrolmentInEducationSWEData() {
 		setSourceSupplier(
-				DataSupplierFactory.createURLFetcher("https://www.quandl.com/api/v3/datasets/NIAAA/CIRRHOSIS.json"));
+				DataSupplierFactory.createURLFetcher("https://www.quandl.com/api/v3/datasets/UGEN/ENRL_SWE.json"));
 
 		setListExtractor((source) -> listToMap(
 				(((List<List<Object>>) ((Map<String, Object>) source.get("dataset")).get("data"))))
@@ -26,7 +26,7 @@ public class DeathRatesOverLiverCirrhosisData extends JSONDataSourceBuilder {
 		setNameExtractor(
 				(source) -> ((Map<String, Object>) source.get("dataset")).get("name").toString().split(",")[0]);
 
-		setUnit("Rate of death from cirrhosis");
+		setUnit("Education enrolment");
 
 		setSourceName("Quandl");
 		setSourceLink("www.quandl.com");
@@ -43,7 +43,7 @@ public class DeathRatesOverLiverCirrhosisData extends JSONDataSourceBuilder {
 	}
 
 	public static void main(String[] args) {
-		DataSource source = new DeathRatesOverLiverCirrhosisData().build();
+		DataSource source = new EnrolmentInEducationSWEData().build();
 		for (Entry<LocalDate, Double> entry : source.getData().entrySet()) {
 			System.out.println(entry.getKey() + ": " + entry.getValue());
 		}

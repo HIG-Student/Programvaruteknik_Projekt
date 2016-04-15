@@ -9,9 +9,9 @@ import java.util.stream.Collectors;
 
 import se.hig.programvaruteknik.model.DataSource;
 
-public class DeathRatesOverLiverCirrhosisData extends JSONDataSourceBuilder {
+public class EmploymentRateSWEData extends JSONDataSourceBuilder {
 	@SuppressWarnings("unchecked")
-	public DeathRatesOverLiverCirrhosisData() {
+	public EmploymentRateSWEData() {
 		setSourceSupplier(
 				DataSupplierFactory.createURLFetcher("https://www.quandl.com/api/v3/datasets/NIAAA/CIRRHOSIS.json"));
 
@@ -26,7 +26,7 @@ public class DeathRatesOverLiverCirrhosisData extends JSONDataSourceBuilder {
 		setNameExtractor(
 				(source) -> ((Map<String, Object>) source.get("dataset")).get("name").toString().split(",")[0]);
 
-		setUnit("Rate of death from cirrhosis");
+		setUnit("Employment Rate");
 
 		setSourceName("Quandl");
 		setSourceLink("www.quandl.com");
