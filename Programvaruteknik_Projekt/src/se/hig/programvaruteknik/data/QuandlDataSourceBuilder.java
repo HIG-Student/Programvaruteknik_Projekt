@@ -35,8 +35,8 @@ public class QuandlDataSourceBuilder extends JSONDataSourceBuilder
 		ENROLMENT_EDU_SWE("Education enrolment", "Number", "Enrolment of women in education",
 				"https://www.quandl.com/api/v3/datasets/UGEN/ENRL_SWE.json"),
 		
-		EMPLOYMENT_RATE_FEMALE_SWE("Employment", "%", "Employment of women from the age of 15+",
-				"https://www.quandl.com/api/v3/datasets/UGEN/EMPL_SWE.json"),
+//		EMPLOYMENT_RATE_FEMALE_SWE("Employment", "%", "Employment of women from the age of 15+",
+//				"https://www.quandl.com/api/v3/datasets/UGEN/EMPL_SWE.json"),
 		
 		EMPLOYMENT_RATE_OVERALL_SWE("Employment", "Value", "Employment ",
 				"https://www.quandl.com/api/v3/datasets/ODA/SWE_LE.json");
@@ -108,6 +108,7 @@ public class QuandlDataSourceBuilder extends JSONDataSourceBuilder
 	public static void main(String[] args) {
 		QuandlDataSourceBuilder build = new QuandlDataSourceBuilder(SourceType.GAS_AND_DIESEL_STOCK_SWE);
 		DataSource source = build.build();
+		System.out.println(source.getData());
 		for (Entry<LocalDate, Double> entry : source.getData().entrySet()) {
 			System.out.println(entry.getKey() + ": " + entry.getValue());
 		}
