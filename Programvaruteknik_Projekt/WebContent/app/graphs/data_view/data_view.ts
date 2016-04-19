@@ -71,7 +71,9 @@ export class DataView
 		}
 		else
 		{
-			var values = Object.keys(data.data).map(k=>[k,Date.parse(k),data.data[k]).sort((a,b)=>a[1]>b[1]);
+			var values = Object.keys(data.data).map(k=>[k,Date.parse(k),data.data[k]);
+			
+			window.values1 = values;
 			
 			if(values.length == 0)
 			{
