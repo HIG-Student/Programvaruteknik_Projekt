@@ -35,9 +35,6 @@ public class QuandlDataSourceBuilder extends JSONDataSourceBuilder
 		ENROLMENT_EDU_SWE("Education enrolment", "Number", "Enrolment of women in education",
 				"https://www.quandl.com/api/v3/datasets/UGEN/ENRL_SWE.json"),
 		
-//		EMPLOYMENT_RATE_FEMALE_SWE("Employment", "%", "Employment of women from the age of 15+",
-//				"https://www.quandl.com/api/v3/datasets/UGEN/EMPL_SWE.json"),
-		
 		EMPLOYMENT_RATE_OVERALL_SWE("Employment", "Value", "Employment ",
 				"https://www.quandl.com/api/v3/datasets/ODA/SWE_LE.json");
 		
