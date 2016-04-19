@@ -1,0 +1,11 @@
+<select (change)="pickSelect($event.target.value)">
+	<option *ngFor="#builder of builders_keys">{{builder}}</option>
+</select>
+
+<label *ngFor="#input of inputs.inputs">{{input.name}}:
+	<select (change)="setValue(input.value,$event.target.value)">
+		<option *ngFor="#value of input.values">{{value.value}}</option>
+	</select>
+</label>
+
+<button (click)="showDataSource()">Load</button>

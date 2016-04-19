@@ -1,5 +1,4 @@
 import {Component, NgZone, AfterView, OnDestroy, Input} from "angular2/core";
-import {DataLoader} from "app/data_loader";
 
 class Chart
 { 
@@ -25,8 +24,7 @@ class Chart
 class ZingChart implements AfterView, OnDestroy
 {
 	chart: Chart;
-	constructor(private zone: NgZone)
-	{}
+	constructor(private zone: NgZone) { }
 
 	ngAfterViewInit()
 	{
@@ -58,37 +56,87 @@ class ZingChart implements AfterView, OnDestroy
 export class DataView 
 {
 	@Input("chart-id") id: string;
-	
-	@Input("value-type") key: string;
 
 	charts: Chart[];
 	
-	constructor(private dataLoader: DataLoader) { }
+	constructor() { }
+	
+	json:object = null;
+	
+	setData(data:object)
+	{
+		if(data == null)
+		{
+			this.clear();
+		}
+		else
+		{
+			var values = Object.keys(data.data).map(k=>[k,Date.parse(k),data.data[k]).sort((a,b)=>a[1]>b[1]);
+			
+			if(values.length == 0)
+			{
+				this.clear();
+			}
+			else
+			{
+				var first = values[0];
+
+				this.charts = 
+				[{
+					id: "chart-" + this.id,
+					data:
+					{
+						type: "line",
+						plot:
+						{ 
+							aspect: "spline" 
+						},
+						"scale-x":
+						{
+							"min-value": first[1],
+							"step":"day",
+							"transform":
+							{
+								"type":"date",
+								"all":"%Y-%mm-%dd"
+							}
+						},
+						series: 
+						[{
+							values: Object.keys(values).map(k=>[values[k][1],values[k][2]])
+						}],
+					},
+					height: 400,
+					width: 600
+				}];
+			}
+		}
+	}
+	
+	clear()
+	{
+		this.charts = 
+		[{
+			id: "chart-" + this.id,
+			data:
+			{
+				"labels":
+				[{
+					"text": "No values found",
+					"font-family": "Georgia",
+					"font-size": "50",
+					"font-color":"red",
+					"x": "20%",
+					"y": "40%"
+				}]
+			},
+			height: 400,
+			width: 600
+		}];
+	}
 	
 	ngOnInit()
 	{
-		this.name = 'Angular2'
-		
-		this.dataLoader.getDataSource().subscribe(data =>
-		{
-			this.charts = 
-			[{
-				id: "chart-" + this.id,
-				data:
-				{
-					type: "line",
-					plot:
-					{ 
-						aspect: "spline" 
-					}, 
-					series: 
-					[{
-						values: Object.keys(data.data).map(k=>data.data[k][this.key])
-					}],
-				},
-				height: 400,
-				width: 600
-			}]
-		});
+		this.clear();
 	}
 }
