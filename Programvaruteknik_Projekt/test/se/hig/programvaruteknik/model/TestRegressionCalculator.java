@@ -18,12 +18,14 @@ public class TestRegressionCalculator {
 	double expectedMinX = 0;
 
 	
-	int[] xValues = {0,1,3,4,5,7,9,10,15,18,19,20};
-	int[] yValues = {3,4,5,7,8,9,11,13,14,15,17,19};
+	//int[] xValues = {0,1,3,4,5,7,9,10,15,18,19,20};
+	//int[] yValues = {3,4,5,7,8,9,11,13,14,15,17,19};
+	double[][] xyValues = {{0,3},{1,4},{3,5},{4,7},{5,8},{7,9},{9,11},{10,13},{15,14},{18,15},{19,17},{20,19}};
+	
 	
 	@Before
 	public void setUp() throws Exception {
-		regCalc = new RegressionCalculator(xValues, yValues);
+		regCalc = new RegressionCalculator(xyValues);
 	}
 
 	@After
