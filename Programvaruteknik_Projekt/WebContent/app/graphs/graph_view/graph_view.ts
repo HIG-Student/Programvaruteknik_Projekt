@@ -3,12 +3,13 @@ import {DataView} from "app/graphs/data_view/data_view";
 import {CorrView} from "app/graphs/corr_view/corr_view";
 import {PickSourceView} from "app/graphs/pick_source_view/pick_source_view";
 import {DataLoader} from "app/data_loader";
+import {DatePickerView} from "app/graphs/date_picker_view/date_picker_view";
 
 @Component({
 	selector: "graph-view",
 	templateUrl: "app/graphs/graph_view/graph_view.html",
 	styleUrls: ["app/graphs/graph_view/graph_view.css"],
-	directives: [DataView,CorrView,PickSourceView]
+	directives: [DataView,CorrView,PickSourceView,DatePickerView]
 })
 export class GraphView 
 {
