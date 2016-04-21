@@ -103,7 +103,7 @@ public class TestStatisticsServlet extends TestCase
 
 	resolution = mock(Resolution.class);
 
-	servlet = spy(new StatisticsServlet(formatter, collectionBuilder, JSONConverter));
+	//servlet = spy(new StatisticsServlet(formatter, collectionBuilder, JSONConverter, null));
 
 	Method getValue = method(StatisticsServlet.class, "getValue", Map.class, String.class);
 

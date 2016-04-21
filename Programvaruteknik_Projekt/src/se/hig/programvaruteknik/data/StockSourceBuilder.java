@@ -8,6 +8,10 @@ import java.time.format.DateTimeFormatter;
 import java.util.function.Function;
 
 import se.hig.programvaruteknik.Utils;
+import se.hig.programvaruteknik.model.DataSource;
+import se.hig.programvaruteknik.model.DataSourceBuilder;
+import se.hig.programvaruteknik.model.Param;
+import se.hig.programvaruteknik.model.SourceGenerator;
 
 import static se.hig.programvaruteknik.Utils.*;
 
@@ -173,10 +177,14 @@ public class StockSourceBuilder extends CSVDataSourceBuilder
 	    return url;
 	}
 
-	@Override
-	public String toString()
+	/**
+	 * Get the name
+	 * 
+	 * @return The name
+	 */
+	public String getName()
 	{
-	    return name() + ": " + description;
+	    return description + " (" + name() + ")";
 	}
     }
 
@@ -374,5 +382,11 @@ public class StockSourceBuilder extends CSVDataSourceBuilder
 	{
 	    super(exception);
 	}
+    }
+
+    @SourceGenerator("Stock")
+    private static DataSourceBuilder generate(@Param(value = "stock-info", name = "Stock info", suggestEnum = StockInfo.class, onlyEnum = true) StockInfo info, @Param(value = "stock-name", name = "Stock name", suggestEnum = StockName.class) String name)
+    {
+	return new StockSourceBuilder(info).setStock(name, Integer.MAX_VALUE);
     }
 }
