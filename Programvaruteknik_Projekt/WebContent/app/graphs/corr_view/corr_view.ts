@@ -109,7 +109,8 @@ export class CorrView
 		
 		function getKValue()
 		{
-			return ((nbrOfElements*xySum)-(xSum*ySum))/((nbrOfElements*xSquaredSum)-(xSum*xSum));
+			return ((nbrOfElements*xySum)-(xSum*ySum))/
+			((nbrOfElements*xSquaredSum)-(xSum*xSum));
 		}
 		
 		function getMValue()
@@ -124,49 +125,10 @@ export class CorrView
 				(((nbrOfElements*xSquaredSum)-(xSum*xSum))*((nbrOfElements*ySquaredSum)-(ySum*ySum)));
 		}
 		
-		function getRegLineMinYValue() 
-		{
-			return straightLineEqFofX(getMinX());
-		}
-
-		function getRegLineMaxYValue() 
-		{
-			return straightLineEqFofX(getMaxXValue());
-		}
-		
-		function straightLineEq( x )
-		{
-			return (getKValue()*x)+getMValue();
-		}
-
-		function getMinX() 
-		{
-			var minX = null;
-			for (var i = 0; i < xValues.length; i++) 
-			{
-				if (minX == null || minX > xValues[i])
-					minX = xValues[i];
-			}
-			return minX;
-		}
-
-		function getMaxX()
-		{
-			var maxX = null;
-			for (var i = 0; i < xValues.length; i++) 
-			{
-				if (maxX == null || maxX < xValues[i])
-					maxX = xValues[i];
-			}
-			return maxX;
-		}
-		
 		return {
 			"m": getMValue(),
 			"k": getKValue(),
 			"R": getRValue(),
-			"Y1": straightLineEq(getMinX()),
-			"Y2": straightLineEq(getMaxX()),
 		}
 	}
 	
@@ -197,16 +159,6 @@ export class CorrView
 					{  
 						text: data.b_name + " (" + data.b_unit + ")"
 					},
-					"markers": 
-					[
-			            {
-			            
-			                "type": "line",
-			                "range": [info.Y1, info.Y2],
-			                "line-style": "dashed"
-			                
-			            }
-			        ]
 			        
 				},
 				
