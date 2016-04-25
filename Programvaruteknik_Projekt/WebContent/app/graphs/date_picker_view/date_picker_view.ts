@@ -8,4 +8,10 @@ import {Component} from "angular2/core";
 })
 export class DatePickerView 
 {
+	resolution:string; 
+	
+	setResolution(event)
+	{
+		resolution = event.explicitOriginalTarget.value;
+	}
 }

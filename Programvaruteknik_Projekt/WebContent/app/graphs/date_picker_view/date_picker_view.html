@@ -1,4 +1,14 @@
-<p>From: <input type="text" ng-model="name" placeholder="2016-04-20" maxlength="10" size="10">
-   To: <input type="text" ng-model="name" placeholder="2016-04-20" maxlength="10" size="10">
-   <button type="button">Submit</button>
+<p>From: <input type="text" ng-model="from" placeholder="2016-04-20" maxlength="10" size="10">
+   To: <input type="text" ng-model="to" placeholder="2016-04-20" maxlength="10" size="10">
+   Res:<select (change)="setResolution($event)">
+   		<option value="YEAR">År</option>
+   		<option value="QUARTER">Kvartal</option>
+		<option value="MONTH">Månad</option>
+   		<option value="WEEK">Vecka</option>
+   		<option value="DAY">Dag</option>
+   		
+   		
+   	</select>
+   
+   <button type="button" (click)="clicking()">Submit</button>
 </p>
