@@ -13,6 +13,21 @@
     <sourceDirectory>src</sourceDirectory>
     <testSourceDirectory>test</testSourceDirectory>
     <plugins>
+		<plugin>
+	      <groupId>com.github.klieber</groupId>
+	      <artifactId>phantomjs-maven-plugin</artifactId>
+	      <version>0.7</version>
+	      <executions>
+	        <execution>
+	          <goals>
+	            <goal>install</goal>
+	          </goals>
+	        </execution>
+	      </executions>
+	        <configuration>
+	          <version>2.1.1</version>
+	        </configuration>
+	    </plugin>
 	    <plugin>
 	      <groupId>com.github.searls</groupId>
 	      <artifactId>jasmine-maven-plugin</artifactId>
@@ -25,6 +40,13 @@
 	        </execution>
 	      </executions>
 	      <configuration>
+            <webDriverClassName>org.openqa.selenium.phantomjs.PhantomJSDriver</webDriverClassName>
+            <webDriverCapabilities>
+              <capability>
+                <name>phantomjs.binary.path</name>
+                <value>${phantomjs.binary}</value>
+              </capability>
+            </webDriverCapabilities>
 	      	<jsSrcDir>${project.basedir}${file.separator}WebContent${file.separator}app</jsSrcDir>
 	        <jsTestSrcDir>${project.basedir}${file.separator}WebContent${file.separator}WEB-INF${file.separator}test</jsTestSrcDir>
 	      </configuration>
@@ -69,6 +91,7 @@
   		<groupId>org.javassist</groupId>
   		<artifactId>javassist</artifactId>
   		<version>3.20.0-GA</version>
+  		<scope>test</scope>
   	</dependency>
   	<dependency>
   		<groupId>org.powermock</groupId>
@@ -80,6 +103,12 @@
   		<groupId>com.github.searls</groupId>
   		<artifactId>jasmine-maven-plugin</artifactId>
   		<version>2.1</version>
+  		<scope>test</scope>
+  	</dependency>
+  	<dependency>
+		<groupId>com.github.klieber</groupId>
+		<artifactId>phantomjs-maven-plugin</artifactId>
+		<version>0.7</version>
   		<scope>test</scope>
   	</dependency>
   </dependencies>
