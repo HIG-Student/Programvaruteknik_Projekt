@@ -1,12 +1,12 @@
 <p>From: <input type="text" ng-model="from" placeholder="2016-04-20" maxlength="10" size="10">
    To: <input type="text" ng-model="to" placeholder="2016-04-20" maxlength="10" size="10">
-   Res:<select (change)="setResolution($event)">
-   		<option value="YEAR">År</option>
-   		<option value="QUARTER">Kvartal</option>
-		<option value="MONTH">Månad</option>
-   		<option value="WEEK">Vecka</option>
-   		<option value="DAY">Dag</option>
-   	</select>
+   Res:
+   
+   
+	<select [(ngModel)]="res">
+		<option *ngFor="#option of resolutions" [value]="option.value">{{option.name}}</option>
+	</select>
+   
    
    <button type="button" (click)="clicking()">Submit</button>
 </p>

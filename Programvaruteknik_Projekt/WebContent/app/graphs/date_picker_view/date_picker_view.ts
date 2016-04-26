@@ -1,5 +1,5 @@
-import {Component} from "angular2/core";
-
+import {Component,Output,Input,EventEmitter} from "angular2/core";
+import {NgForm}    from 'angular2/common';
 
 @Component({
 	selector: "date-picker-view",
@@ -8,10 +8,35 @@ import {Component} from "angular2/core";
 })
 export class DatePickerView 
 {
-	resolution:string; 
+	public @Input() resolution: string = "YEAR";
 	
-	setResolution(event)
+	resolutions:object = 
+	[
+		{
+			"name": "År",
+			"value": "YEAR"
+		},
+		{
+			"name": "Kvartal",
+			"value": "QUARTER"
+		},
+		{
+			"name": "Månad",
+			"value": "MONTH"
+		},
+		{
+			"name": "Vecka",
+			"value": "WEEK"
+		},
+		{
+			"name": "Dag",
+			"value": "DAY"
+		}
+	];
+	
+	clicking()
 	{
-		resolution = event.explicitOriginalTarget.value;
+		console.log(this.res);
+		this.res = "YEAR";
 	}
 }

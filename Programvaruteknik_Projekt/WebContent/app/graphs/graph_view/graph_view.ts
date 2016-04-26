@@ -18,23 +18,27 @@ export class GraphView
 	sourceAJSON:object = null;
 	sourceBJSON:object = null;
 	
-	setSourceA(corr:object,graph:object,json:object)
+	resolution:object;
+	
+	setSourceA(corr:object,graph:object,json:object,date_picker:object)
 	{
 		this.sourceAJSON = json;
-		this.dataLoader.getSourceData({},json).subscribe(data=>graph.setData(data));
-		this.updateCorr(corr);
+		this.dataLoader.getSourceData({},json).subscribe(data=>graph.data = data);
+		this.updateCorr(corr,date_picker);
 	}
 	
-	setSourceB(corr:object,graph:object,json:object)
+	setSourceB(corr:object,graph:object,json:object,date_picker:object)
 	{
 		this.sourceBJSON = json;
-		this.dataLoader.getSourceData({},json).subscribe(data=>graph.setData(data));
-		this.updateCorr(corr);
+		this.dataLoader.getSourceData({},json).subscribe(data=>graph.data = data);
+		this.updateCorr(corr,date_picker);
 	}
 	
 	updateCorr(corr:object,date_picker:object)
 	{
 		corr.clear();
+		console.log("resolution");
+		console.log(date_picker.resolution);
 		if(this.sourceAJSON != null && this.sourceBJSON != null)
 		{
 			this.dataLoader.getCorrData(

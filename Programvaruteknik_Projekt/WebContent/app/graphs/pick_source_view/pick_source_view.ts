@@ -1,4 +1,4 @@
-import {Component,Output,EventEmitter} from "angular2/core";
+import {Component,Output,Input,EventEmitter} from "angular2/core";
 import {DataLoader} from "app/data_loader";
 
 @Component({
@@ -9,6 +9,8 @@ import {DataLoader} from "app/data_loader";
 export class PickSourceView 
 {
 	@Output("change-view") changeView: EventEmitter<any> = new EventEmitter();
+	
+	@Input() data: object;
 	
 	constructor(private dataLoader: DataLoader) { }
 	

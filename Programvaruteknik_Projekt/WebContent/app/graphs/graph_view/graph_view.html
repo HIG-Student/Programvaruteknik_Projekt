@@ -1,19 +1,19 @@
 <table>
 	<tr>
 		<td>
-			<data-view #view_a chart-id="source_a"></data-view>
-			<pick-source-view (change-view)="setSourceA(corr,view_a,$event)"></pick-source-view>
+			<data-view #view_a></data-view>
+			<pick-source-view (change-view)="setSourceA(corr,view_a,$event,date_picker)"></pick-source-view>
 		</td>
 		
 		<td rowspan="2">
 			<corr-view #corr chart-id="corr"></corr-view>
-			<date-picker-view #date_picker></date-picker-view>
+			<date-picker-view [(resolution)]="resolution" #date_picker></date-picker-view>
 		</td>
 	</tr>
 	<tr>
 		<td>
-			<data-view #view_b chart-id="source_b"></data-view>
-			<pick-source-view (change-view)="setSourceB(corr,view_b,$event)"></pick-source-view>
+			<data-view #view_b></data-view>
+			<pick-source-view (change-view)="setSourceB(corr,view_b,$event,date_picker)"></pick-source-view>
 		</td>
 	</tr>
 </table>
