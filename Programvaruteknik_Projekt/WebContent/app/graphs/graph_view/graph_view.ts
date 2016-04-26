@@ -15,37 +15,56 @@ export class GraphView
 {
 	constructor(private dataLoader: DataLoader) { }
 	
-	sourceAJSON:object = null;
-	sourceBJSON:object = null;
+	sourceA:object = null;
+	sourceA_JSON:object = null;
 	
-	resolution:object;
+	sourceB:object = null;
+	sourceB_JSON:object = null;
 	
-	setSourceA(corr:object,graph:object,json:object,date_picker:object)
+	sourceCorr:object = null;
+	
+	resolution:string = "YEAR";
+	
+	setSourceA(json:object)
 	{
-		this.sourceAJSON = json;
-		this.dataLoader.getSourceData({},json).subscribe(data=>graph.data = data);
-		this.updateCorr(corr,date_picker);
+		this.sourceA_JSON = json;
+		this.dataLoader.getSourceData({},json).subscribe(data=>
+		{
+			this.sourceA = data;
+			this.updateCorr();
+		});
 	}
 	
-	setSourceB(corr:object,graph:object,json:object,date_picker:object)
+	setSourceB(json:object)
 	{
-		this.sourceBJSON = json;
-		this.dataLoader.getSourceData({},json).subscribe(data=>graph.data = data);
-		this.updateCorr(corr,date_picker);
+		this.sourceB_JSON = json;
+		this.dataLoader.getSourceData({},json).subscribe(data=>
+		{
+			this.sourceB = data;
+			this.updateCorr();
+		});
 	}
 	
-	updateCorr(corr:object,date_picker:object)
+	setResolution(resolution:string)
 	{
-		corr.clear();
-		console.log("resolution");
-		console.log(date_picker.resolution);
-		if(this.sourceAJSON != null && this.sourceBJSON != null)
+		this.resolution = resolution;
+		this.updateCorr();
+	}
+	
+	updateCorr()
+	{
+		this.sourceCorr = null;
+		
+		if(this.sourceA != null && this.sourceB != null)
 		{
 			this.dataLoader.getCorrData(
 			{ 
-				"resolution": date_picker.resolution
+				"resolution": this.resolution
 			},
-			this.sourceAJSON,this.sourceBJSON).subscribe(data=>corr.update(data));
+			this.sourceA_JSON,this.sourceB_JSON).subscribe(data=>
+			{
+				this.sourceCorr = data;
+			});
 		}
 	}
 }

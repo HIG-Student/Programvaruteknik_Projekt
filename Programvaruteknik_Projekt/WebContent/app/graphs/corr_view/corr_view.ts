@@ -39,14 +39,16 @@ class ZingChart implements AfterView, OnDestroy
 				height: this.chart['height']
 				events:
 				{
-     			   load:function()
-     			   {
-            		$("#chart-corr").drawTrendline();
+					load:function()
+					{
+						if(this.chart)
+            				$(this.chart['id']).drawTrendline();
         			}
     			}
 			});
 		});
 	}
+	
 	ngOnDestroy()
 	{
 		zingchart.exec(this.chart['id'], 'destroy');
@@ -63,8 +65,6 @@ class ZingChart implements AfterView, OnDestroy
 })
 export class CorrView 
 {
-	@Input("chart-id") id: string;
-	
 	charts: Chart[];
 	
 	constructor() { }
@@ -170,73 +170,89 @@ export class CorrView
 		}
 	}
 	
-	update(data:object)
+	private _data:object;
+	
+	@Input()
+	set data(data:object)
 	{
-		var info = this.calculate(Object.keys(data.data).map(k=>[data.data[k].a,data.data[k].b]));
+		this._data = data;
+		this.clear();
 		
-		window.info = info;
-		
-		this.charts = 
-		[{
-		
-			id: "chart-" + this.id,
-			data:
-			{	
+		if(data != null)
+		{
+			var info = this.calculate(Object.keys(data.data).map(k=>[data.data[k].a,data.data[k].b]));
 			
-				type: "scatter",
-				"scale-x":
-				{  
-					label:
-					{  
-						text: data.a_name + " (" + data.a_unit + ")"
-					}
-				},
-				"scale-y":
-				{  
-					label:
-					{  
-						text: data.b_name + " (" + data.b_unit + ")"
-					},
-					"markers": 
-					[
-			            {
-			            
-			                "type": "line",
-			                "range": [info.Y1, info.Y2],
-			                "line-style": "dashed"
-			                
-			            }
-			        ]
-			        
-				},
+			window.info = info;
+			
+			this.charts = 
+			[{
+			
+				id: this.id,
+				data:
+				{	
 				
-				plotarea:
-				{
-					margin: "75px"
+					type: "scatter",
+					"scale-x":
+					{  
+						label:
+						{  
+							text: data.a_name + " (" + data.a_unit + ")"
+						}
+					},
+					"scale-y":
+					{  
+						label:
+						{  
+							text: data.b_name + " (" + data.b_unit + ")"
+						},
+						"markers": 
+						[
+				            {
+				            
+				                "type": "line",
+				                "range": [info.Y1, info.Y2],
+				                "line-style": "dashed"
+				                
+				            }
+				        ]
+				        
+					},
+					
+					plotarea:
+					{
+						margin: "75px"
+					},
+					"tooltip":
+					{
+						"html-mode": true,
+						"border-width":2,
+						"border-radius":5,
+						"border-color":"#000",
+						"text": "<table><tr><td>Datum:</td><td>%data-dates</td></tr><tr><td>%data-name-a:</td><td>%v %data-unit-a</td></tr><tr><td>%data-name-b:</td><td>%k %data-unit-b</td></tr></table>" 
+					},
+					series: 
+					[{
+						values: Object.keys(data.data).map(k=>[data.data[k].a,data.data[k].b]),
+						"data-dates": Object.keys(data.data),
+						"data-name-a": data.a_name,
+						"data-name-b": data.b_name,
+						"data-unit-a": data.a_unit,
+						"data-unit-b": data.b_unit
+					}],
 				},
-				"tooltip":
-				{
-					"html-mode": true,
-					"border-width":2,
-					"border-radius":5,
-					"border-color":"#000",
-					"text": "<table><tr><td>Datum:</td><td>%data-dates</td></tr><tr><td>%data-name-a:</td><td>%v %data-unit-a</td></tr><tr><td>%data-name-b:</td><td>%k %data-unit-b</td></tr></table>" 
-				},
-				series: 
-				[{
-					values: Object.keys(data.data).map(k=>[data.data[k].a,data.data[k].b]),
-					"data-dates": Object.keys(data.data),
-					"data-name-a": data.a_name,
-					"data-name-b": data.b_name,
-					"data-unit-a": data.a_unit,
-					"data-unit-b": data.b_unit
-				}],
-			},
-			height: 400,
-			width: 600
-		}];
-		
+				height: 400,
+				width: 600
+			}];
+		}
 	}
+	
+	get data()
+	{
+		return this._data;
+	}
+	
+	static elements:int = 0;
+	id:int = "chart-corr-" + CorrView.elements++;
 	
 	ngOnInit()
 	{
@@ -248,7 +264,7 @@ export class CorrView
 		this.charts = 
 		[{
 			
-			id: "chart-" + this.id,
+			id: this.id,
 			data:
 			{
 				"labels":

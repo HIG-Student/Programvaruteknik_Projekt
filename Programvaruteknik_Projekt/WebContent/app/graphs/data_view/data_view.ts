@@ -120,11 +120,6 @@ export class DataView
 	
 	constructor() { }
 	
-	setData(o:object)
-	{
-	
-	}
-	
 	clear()
 	{
 		this.charts = 
@@ -148,7 +143,7 @@ export class DataView
 	}
 	
 	static elements:int = 0;
-	id:int = "chart-" + DataView.elements++;
+	id:int = "chart-source-" + DataView.elements++;
 	
 	ngOnInit()
 	{

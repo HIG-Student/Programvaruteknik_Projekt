@@ -8,7 +8,8 @@ import {NgForm}    from 'angular2/common';
 })
 export class DatePickerView 
 {
-	public @Input() resolution: string = "YEAR";
+	public @Output() onPick: EventEmitter<any> = new EventEmitter();
+	public @Input() resolution:string;
 	
 	resolutions:object = 
 	[
@@ -36,7 +37,6 @@ export class DatePickerView
 	
 	clicking()
 	{
-		console.log(this.res);
-		this.res = "YEAR";
+		this.onPick.emit(this.resolution);
 	}
 }
