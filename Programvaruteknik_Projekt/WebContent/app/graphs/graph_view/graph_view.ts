@@ -25,6 +25,8 @@ export class GraphView
 	
 	resolution:string = "YEAR";
 	
+	title:string = "";
+	
 	setSourceA(json:object)
 	{
 		this.sourceA_JSON = json;
