@@ -38,32 +38,11 @@ export class PickSourceView
 	
 	ngOnInit()
 	{
-		var dummy = 
+		this.dataLoader.getSources().subscribe(data =>
 		{
-			"Stock":
-			{
-				"inputs":
-				[
-					{
-						"name":"Stock info",
-						"value": "stock-info",
-						"values": [{"name":"Pris","value":"PRICE"},{"name":"Ändring","value":"CHANGE"}]
-					},
-					{
-						"name":"Stock name",
-						"value": "stock-name",
-						"values": [{"name":"IBM (ibm watheva)","value":"IBM"},{"name":"MSFT (microsoft)","value":"MSFT"}]
-					}
-				]
-			},
-			"Constant": 
-			{
-				"inputs": []
-			}
-		}];
-		
-		this.builders = dummy;
-		this.builders_keys = Object.keys(this.builders);
-		this.pickSelect(this.builders_keys[0]);
+			this.builders = data;
+			this.builders_keys = Object.keys(this.builders);
+			this.pickSelect(this.builders_keys[0]);
+		});
 	}
 }

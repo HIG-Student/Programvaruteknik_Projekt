@@ -2,8 +2,13 @@ package se.hig.programvaruteknik.servlet;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
+import java.time.LocalDate;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.Map.Entry;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -16,6 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.owlike.genson.Genson;
 
 import se.hig.programvaruteknik.data.ConstantSourceBuilder;
+import se.hig.programvaruteknik.data.QuandlDataSourceBuilder;
 import se.hig.programvaruteknik.data.SMHILocation;
 import se.hig.programvaruteknik.data.SMHISourceBuilder;
 import se.hig.programvaruteknik.data.SMHISourceBuilder.DataType;
@@ -26,7 +32,9 @@ import se.hig.programvaruteknik.data.StockSourceBuilder.StockName;
 import se.hig.programvaruteknik.model.DataCollectionBuilder;
 import se.hig.programvaruteknik.model.DataSourceBuilder;
 import se.hig.programvaruteknik.model.MergeType;
+import se.hig.programvaruteknik.model.Param;
 import se.hig.programvaruteknik.model.Resolution;
+import se.hig.programvaruteknik.model.SourceGenerator;
 import se.hig.programvaruteknik.JSONFormatter;
 import se.hig.programvaruteknik.JSONOutputter;
 import se.hig.programvaruteknik.Utils;
@@ -42,15 +50,23 @@ public class StatisticsServlet extends HttpServlet
     private static final long serialVersionUID = 1L;
 
     protected DataCollectionBuilder builder;
-    protected JSONFormatter JSONFormatter;
+    protected JSONFormatter JSON_Formatter;
     protected Function<InputStream, Map<String, Object>> JSONConverter;
+    protected DataSourceGenerator dataSourceGenerator;
 
     /**
      * Server entry-point
      */
     public StatisticsServlet()
     {
-	this(new JSONFormatter(), new DataCollectionBuilder(), (stream) -> new Genson().deserialize(stream, Map.class));
+	this(
+		new JSONFormatter(),
+		new DataCollectionBuilder(),
+		(stream) -> new Genson().deserialize(stream, Map.class),
+		new DataSourceGenerator(
+			ConstantSourceBuilder.class,
+			StockSourceBuilder.class,
+			QuandlDataSourceBuilder.class));
     }
 
     /**
@@ -64,115 +80,18 @@ public class StatisticsServlet extends HttpServlet
      *            A function that can convert a JSON InputStream to a Map
      *            <String,Object>
      */
-    public StatisticsServlet(JSONFormatter JSONFormatter, DataCollectionBuilder builder, Function<InputStream, Map<String, Object>> JSONConverter)
+    public StatisticsServlet(JSONFormatter JSONFormatter, DataCollectionBuilder builder, Function<InputStream, Map<String, Object>> JSONConverter, DataSourceGenerator dataSourceGenerator)
     {
-	this.JSONFormatter = JSONFormatter;
+	this.JSON_Formatter = JSONFormatter;
 	this.builder = builder;
 	this.JSONConverter = JSONConverter;
+	this.dataSourceGenerator = dataSourceGenerator;
     }
 
-    @SuppressWarnings("serial")
     @Override
     protected void doOptions(HttpServletRequest arg0, HttpServletResponse arg1) throws ServletException, IOException
     {
-	Map<String, Object> info = new TreeMap<>();
 
-	info.put("StockInformation", new TreeMap<String, Object>()
-	{
-	    {
-		put("types", new TreeMap<String, Object>()
-		{
-		    {
-			put("type", "fixed");
-			put("values", new TreeMap<String, Object>()
-			{
-			    {
-				for (StockInfo info : StockInfo.values())
-				{
-				    put(info.name(), new TreeMap<String, String>()
-				    {
-					{
-					    put("name", info.getName());
-					    put("description", info.getDescription());
-					}
-				    });
-				}
-			    }
-			});
-		    }
-		});
-		put("names", new TreeMap<String, Object>()
-		{
-		    {
-			put("type", "custom");
-			put("values", new TreeMap<String, Object>()
-			{
-			    {
-				for (StockName name : StockName.values())
-				{
-				    put(name.name(), new TreeMap<String, String>()
-				    {
-					{
-					    put("name", name.getDescription());
-					}
-				    });
-				}
-			    }
-			});
-		    }
-		});
-	    }
-	});
-
-	info.put("WeatherData", new TreeMap<String, Object>()
-	{
-	    {
-		put("types", new TreeMap<String, Object>()
-		{
-		    {
-			put("type", "fixed");
-			put("values", new TreeMap<String, Object>()
-			{
-			    {
-				for (DataType dataType : DataType.values())
-				{
-				    put(dataType.name(), new TreeMap<String, String>()
-				    {
-					{
-					    put("name", dataType.name());
-					}
-				    });
-				}
-			    }
-			});
-		    }
-		});
-
-		put("places", new TreeMap<String, Object>()
-		{
-		    {
-			put("type", "fixed");
-			put("values", new TreeMap<String, Object>()
-			{
-			    {
-				for (SMHILocation location : SMHILocation.values())
-				{
-				    put(location.name(), new TreeMap<String, String>()
-				    {
-					{
-					    put("name", location.name());
-					}
-				    });
-				}
-			    }
-			});
-		    }
-		});
-	    }
-	});
-
-	arg1.setCharacterEncoding("UTF-8");
-	arg1.getWriter().append(new Genson().serialize(info));
     }
 
     @SuppressWarnings(
@@ -265,6 +184,7 @@ public class StatisticsServlet extends HttpServlet
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
     {
 	response.setCharacterEncoding("UTF-8");
+	response.setContentType("application/json;charset=UTF-8");
 
 	try
 	{
@@ -272,66 +192,74 @@ public class StatisticsServlet extends HttpServlet
 
 	    if (body == null) throw new RequestException("Need data!");
 
-	    String sourceType = getValue(body, "type");
-	    Map<String, Object> data = getValue(body, "data");
-
 	    Boolean pretty = getValue(body, "pretty", (String str) -> "true".equalsIgnoreCase(str), false);
 
-	    Resolution resolution = getValue(
-		    body,
-		    "resolution",
-		    (String str) -> Resolution.valueOf(str),
-		    Resolution.DAY);
+	    String sourceType = getValue(body, "type");
 
 	    JSONOutputter outputter;
 
-	    if ("data-source".equalsIgnoreCase(sourceType))
+	    if ("sources".equalsIgnoreCase(sourceType))
 	    {
-		/*
-		 * MergeType mergeType = getValue(
-		 * body,
-		 * "merge-type",
-		 * (String str) -> MergeType.fromString(str),
-		 * MergeType.AVERAGE);
-		 */
+		outputter = new JSONOutputter()
+		{
+		    @Override
+		    public String asJSON(JSONFormatter formatter)
+		    {
+			Map<String, Object> result = new TreeMap<>();
+			result.put("data", dataSourceGenerator.getSources());
 
-		DataSourceBuilder source = getDataSource(getValue(data, "source"));
-		outputter = source.build();
+			return formatter.format(new Genson().serialize(result));
+		    }
+		};
 	    }
 	    else
-		if ("data-correlation".equalsIgnoreCase(sourceType))
+	    {
+		Map<String, Object> data = getValue(body, "data");
+
+		Resolution resolution = getValue(
+			body,
+			"resolution",
+			(String str) -> Resolution.valueOf(str),
+			Resolution.DAY);
+
+		if ("data-source".equalsIgnoreCase(sourceType))
 		{
-		    MergeType mergeTypeX = getValue(
-			    body,
-			    "merge-type-x",
-			    (String str) -> MergeType.fromString(str),
-			    MergeType.AVERAGE);
-
-		    MergeType mergeTypeY = getValue(
-			    body,
-			    "merge-type-y",
-			    (String str) -> MergeType.fromString(str),
-			    MergeType.AVERAGE);
-
-		    DataSourceBuilder sourceA = getDataSource(getValue(data, "sourceA"));
-		    DataSourceBuilder sourceB = getDataSource(getValue(data, "sourceB"));
-
-		    builder.setXDatasource(sourceA.build());
-		    builder.setYDatasource(sourceB.build());
-
-		    builder.setXMergeType(mergeTypeX);
-		    builder.setYMergeType(mergeTypeY);
-		    builder.setResolution(resolution);
-
-		    outputter = builder.getResult();
+		    DataSourceBuilder builder = dataSourceGenerator.getBuilder(getValue(data, "source"));
+		    outputter = builder.build();
 		}
 		else
-		{
-		    throw new RequestException("Unknown type!");
-		}
+		    if ("data-correlation".equalsIgnoreCase(sourceType))
+		    {
+			MergeType mergeTypeX = getValue(
+				body,
+				"merge-type-x",
+				(String str) -> MergeType.fromString(str),
+				MergeType.AVERAGE);
 
-	    response.setContentType("application/json;charset=UTF-8");
-	    response.getWriter().append(outputter.asJSON(pretty ? JSONFormatter : null));
+			MergeType mergeTypeY = getValue(
+				body,
+				"merge-type-y",
+				(String str) -> MergeType.fromString(str),
+				MergeType.AVERAGE);
+
+			DataSourceBuilder sourceA = dataSourceGenerator.getBuilder(getValue(data, "sourceA"));
+			DataSourceBuilder sourceB = dataSourceGenerator.getBuilder(getValue(data, "sourceB"));
+
+			builder.setXDatasource(sourceA.build());
+			builder.setYDatasource(sourceB.build());
+
+			builder.setXMergeType(mergeTypeX);
+			builder.setYMergeType(mergeTypeY);
+			builder.setResolution(resolution);
+
+			outputter = builder.getResult();
+		    }
+		    else
+		    {
+			throw new RequestException("Unknown type!");
+		    }
+	    }
+	    response.getWriter().append(outputter.asJSON(pretty ? JSON_Formatter : JSONFormatter.NONE));
 	}
 	catch (RequestException e)
 	{

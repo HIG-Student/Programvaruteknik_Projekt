@@ -6,7 +6,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import se.hig.programvaruteknik.data.StockSourceBuilder.StockInfo;
+import se.hig.programvaruteknik.data.StockSourceBuilder.StockName;
+import se.hig.programvaruteknik.model.DataSource;
 import se.hig.programvaruteknik.model.DataSourceBuilder;
+import se.hig.programvaruteknik.model.SourceGenerator;
 
 /**
  * Generates constant data, ignores any suppliers and extractors except
@@ -43,5 +47,11 @@ public class ConstantSourceBuilder extends DataSourceBuilder
 	}
 
 	return map;
+    }
+
+    @SourceGenerator("Constant")
+    private static DataSourceBuilder generate()
+    {
+	return new ConstantSourceBuilder();
     }
 }

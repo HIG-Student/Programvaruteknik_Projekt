@@ -32,12 +32,16 @@ export class GraphView
 		this.updateCorr(corr);
 	}
 	
-	updateCorr(corr:object)
+	updateCorr(corr:object,date_picker:object)
 	{
 		corr.clear();
 		if(this.sourceAJSON != null && this.sourceBJSON != null)
 		{
-			this.dataLoader.getCorrData({},this.sourceAJSON,this.sourceBJSON).subscribe(data=>corr.update(data));
+			this.dataLoader.getCorrData(
+			{ 
+				"resolution": date_picker.resolution
+			},
+			this.sourceAJSON,this.sourceBJSON).subscribe(data=>corr.update(data));
 		}
 	}
 }

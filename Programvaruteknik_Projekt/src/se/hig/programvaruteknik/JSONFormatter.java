@@ -145,4 +145,16 @@ public class JSONFormatter
 	for (int i = 0; i < amount; i++)
 	    builder.append(tab);
     }
+
+    /**
+     * No formatting
+     */
+    public static JSONFormatter NONE = new JSONFormatter()
+    {
+	@Override
+	public String format(String JSON)
+	{
+	    return JSON;
+	}
+    };
 }
