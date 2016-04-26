@@ -1,4 +1,4 @@
-import {Component,Output,EventEmitter} from "angular2/core";
+import {Component,Output,Input,EventEmitter} from "angular2/core";
 import {DataLoader} from "app/data_loader";
 
 @Component({
@@ -8,32 +8,31 @@ import {DataLoader} from "app/data_loader";
 })
 export class PickSourceView 
 {
-	@Output("change-view") changeView: EventEmitter<any> = new EventEmitter();
+	@Output() onPick: EventEmitter<any> = new EventEmitter();
+	
+	@Input() data: object;
 	
 	constructor(private dataLoader: DataLoader) { }
 	
-	showDataSource()
+	pick()
 	{
-		this.dataLoader.getSourceData({},this.json).subscribe(data =>
-		{
-			this.changeView.emit(this.json,data);
-		});
+		this.onPick.emit(this.data);
 	}
 	
 	pickSelect(value)
 	{
 		this.inputs = this.builders[value];
 		
-		this.json = { };
-		this.json["source-type"] = value;
+		this.data = { };
+		this.data["source-type"] = value;
 		
 		for(input of this.inputs.inputs)
 			this.setValue(input.value,input.values[0].value);
 	}
 	
-	setValue(type,value)
+	setValue(type:string,value:string)
 	{
-		this.json[type] = value;
+		this.data[type] = value;
 	}
 	
 	ngOnInit()

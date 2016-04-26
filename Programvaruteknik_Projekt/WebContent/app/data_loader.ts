@@ -9,19 +9,36 @@ export class DataLoader
 	
 	getCorrData(data,sourceA,sourceB)
 	{
-		return this.http
-		.post("SampleServlet", JSON.stringify(
+		console.log("D1",data);
+	
+		if(!data)
+			data = { };
+			
+		console.log("D2",data);
+		
+		data["type"] = "data-correlation";
+			
+		if(!data["resolution"])
+			data["resolution"] = "YEAR";
+			
+		console.log("D3",data);
+		
+		if(!data["merge-type-x"])
+			data["merge-type-x"] = "AVERAGE";
+			
+		if(!data["merge-type-y"])
+			data["merge-type-y"] = "AVERAGE";
+		
+		data["data"] = 			
 		{
-			"type": "data-correlation",
-			"resolution": "YEAR",
-			"merge-type-x": "AVERAGE",
-			"merge-type-y": "AVERAGE",
-			"data":
-			{
-				"sourceA": sourceA,
-				"sourceB": sourceB
-			}
-		}))
+			"sourceA": sourceA,
+			"sourceB": sourceB
+		};
+		
+		console.log("D4",data);
+		
+		return this.http
+		.post("SampleServlet", JSON.stringify(data))
 		.map(res => res.json().data);
 	}
 	

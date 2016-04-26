@@ -55,16 +55,12 @@ class ZingChart implements AfterView, OnDestroy
 })
 export class DataView 
 {
-	@Input("chart-id") id: string;
-
-	charts: Chart[];
+	private _data:object;
 	
-	constructor() { }
-	
-	json:object = null;
-	
-	setData(data:object)
+	@Input()
+	set data(data:object)
 	{
+		this._data = data;
 		if(data == null)
 		{
 			this.clear();
@@ -85,7 +81,7 @@ export class DataView
 
 				this.charts = 
 				[{
-					id: "chart-" + this.id,
+					id: this.id,
 					data:
 					{
 						type: "line",
@@ -115,11 +111,20 @@ export class DataView
 		}
 	}
 	
+	get data()
+	{
+		return this._data;
+	}
+
+	charts: Chart[];
+	
+	constructor() { }
+	
 	clear()
 	{
 		this.charts = 
 		[{
-			id: "chart-" + this.id,
+			id: this.id,
 			data:
 			{
 				"labels":
@@ -136,6 +141,9 @@ export class DataView
 			width: 600
 		}];
 	}
+	
+	static elements:int = 0;
+	id:int = "chart-source-" + DataView.elements++;
 	
 	ngOnInit()
 	{
