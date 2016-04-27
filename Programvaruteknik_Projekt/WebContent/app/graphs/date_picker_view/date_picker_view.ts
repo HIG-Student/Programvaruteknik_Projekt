@@ -11,6 +11,9 @@ export class DatePickerView
 	public @Output() onPick: EventEmitter<any> = new EventEmitter();
 	public @Input() resolution:string;
 	
+	from:string = "";
+	to:string = "";
+	
 	resolutions:object = 
 	[
 		{
