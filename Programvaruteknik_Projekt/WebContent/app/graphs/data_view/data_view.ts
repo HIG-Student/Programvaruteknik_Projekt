@@ -51,11 +51,14 @@ class ZingChart implements AfterView, OnDestroy
 {
 	selector: "data-view",
 	directives: [ZingChart],
-	templateUrl: "app/graphs/data_view/data_view.html"
+	templateUrl: "app/graphs/data_view/data_view.html",
+	styleUrls: ["app/graphs/data_view/data_view.css"]
 })
 export class DataView 
 {
 	private _data:object;
+	
+	missing_data:int = 0;
 	
 	@Input()
 	set data(data:object)
@@ -68,8 +71,29 @@ export class DataView
 		else
 		{
 			var values = Object.keys(data.data).map(k=>[k,Date.parse(k),data.data[k]);
+
+			var first = values[0][1];
+			var last = values[values.length-1][1];
+			var step = 1000 * 60 * 60 * 24;
+			var steps = (last - first) / step;
 			
-			window.values1 = values;
+			this.missing_data = steps - values.length;
+			
+			var new_data = {};
+			
+			for(i = first;i < last;i += step)
+				new_data[i.toString()] = null;
+			
+			for(value of values)
+				new_data[value[1].toString()] = value;
+				
+			values = Object.keys(new_data).map(k=>
+			{
+				if(new_data[k] == null)
+					return null;
+				else
+					return [new_data[k][1],new_data[k][2]];
+			});
 			
 			if(values.length == 0)
 			{
@@ -77,8 +101,6 @@ export class DataView
 			}
 			else
 			{
-				var first = values[0];
-
 				this.charts = 
 				[{
 					id: this.id,
@@ -91,7 +113,7 @@ export class DataView
 						},
 						"scale-x":
 						{
-							"min-value": first[1],
+							"min-value": first,
 							"step":"day",
 							"transform":
 							{
@@ -101,7 +123,7 @@ export class DataView
 						},
 						series: 
 						[{
-							values: Object.keys(values).map(k=>[values[k][1],values[k][2]])
+							values: values
 						}],
 					},
 					height: 400,
@@ -122,6 +144,8 @@ export class DataView
 	
 	clear()
 	{
+		this.missing_data = 0;
+		
 		this.charts = 
 		[{
 			id: this.id,

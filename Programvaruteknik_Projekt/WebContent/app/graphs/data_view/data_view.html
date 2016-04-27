@@ -1,1 +1,2 @@
 <zingchart *ngFor="#chartObj of charts" [chart]='chartObj'></zingchart>
+<p class="missing_data" *ngIf="missing_data > 0">Dates with missing data: {{missing_data}}</p>

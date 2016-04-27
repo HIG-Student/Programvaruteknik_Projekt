@@ -61,7 +61,8 @@ class ZingChart implements AfterView, OnDestroy
 {
 	selector: "corr-view",
 	directives: [ZingChart],
-	templateUrl: "app/graphs/corr_view/corr_view.html"
+	templateUrl: "app/graphs/corr_view/corr_view.html",
+	styleUrls: ["app/graphs/corr_view/corr_view.css"]
 })
 export class CorrView 
 {
