@@ -60,6 +60,6 @@ function calculate(xyValues)
 		return {
 			"m": getMValue(),
 			"k": getKValue(),
-			"R": getRValue(),
+			"r": getRValue(),
 		}
 	}
