@@ -27,6 +27,9 @@ export class GraphView
 	
 	title:string = "";
 	
+	from:string = "";
+	to:string = "";
+	
 	setSourceA(json:object)
 	{
 		this.sourceA_JSON = json;
@@ -37,7 +40,7 @@ export class GraphView
 		});
 	}
 	
-	setSourceB(json:object)
+	setSourceB(json:object,from:string,to:string)
 	{
 		this.sourceB_JSON = json;
 		this.dataLoader.getSourceData({},json).subscribe(data=>
@@ -47,9 +50,11 @@ export class GraphView
 		});
 	}
 	
-	setResolution(resolution:string)
+	setResolution(data:object)
 	{
-		this.resolution = resolution;
+		this.resolution = data.resolution;
+		this.from = data.from;
+		this.to = data.to;
 		this.updateCorr();
 	}
 	
