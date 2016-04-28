@@ -5,13 +5,13 @@ import {HTTP_PROVIDERS} from 'angular2/http';
 
 @Component(
 {
-  selector: "hello-world",
-  templateUrl: "app/hello_world.html",
-  styleUrls: ["app/hello_world.css"],
+  selector: "statistics",
+  templateUrl: "app/statistics.html",
+  styleUrls: ["app/statistics.css"],
   directives: [GraphView],
   providers: [HTTP_PROVIDERS, DataLoader]
 })
-export class HelloWorld 
+export class Statistics 
 {
 	yourName: string = '';
 }
