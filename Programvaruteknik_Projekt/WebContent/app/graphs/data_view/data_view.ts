@@ -82,10 +82,12 @@ export class DataView
 			var new_data = {};
 			
 			for(i = first;i < last;i += step)
-				new_data[i.toString()] = null;
+				new_data["D:"+i.toString()] = null;
 			
-			for(value of values)
-				new_data[value[1].toString()] = value;
+			values.forEach(value=>
+			{
+				new_data["D:"+value[1].toString()] = value;
+			});
 				
 			values = Object.keys(new_data).map(k=>
 			{
