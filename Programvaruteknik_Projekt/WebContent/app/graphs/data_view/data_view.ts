@@ -71,7 +71,7 @@ export class DataView
 		}
 		else
 		{
-			var values = Object.keys(data.data).map(k=>[k,Date.parse(k),data.data[k]);
+			var values = Object.keys(data.data).map(k=>[k,Date.parse(k),data.data[k]]);
 			
 			window.values1 = values;
 			

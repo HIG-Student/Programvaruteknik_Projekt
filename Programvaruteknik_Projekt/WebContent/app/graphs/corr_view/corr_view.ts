@@ -36,7 +36,7 @@ class ZingChart implements AfterView, OnDestroy
 				id: this.chart['id'],
 				data: this.chart['data'],
 				width: this.chart['width'],
-				height: this.chart['height']
+				height: this.chart['height'],
 				events:
 				{
      			   load:function()
