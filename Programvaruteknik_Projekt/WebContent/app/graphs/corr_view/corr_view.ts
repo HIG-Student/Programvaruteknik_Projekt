@@ -173,6 +173,9 @@ export class CorrView
 	
 	private _data:object;
 	
+	@Input() from:string;
+	@Input() to:string;
+	
 	@Input()
 	set data(data:object)
 	{
@@ -181,7 +184,24 @@ export class CorrView
 		
 		if(data != null)
 		{
-			var info = this.calculate(Object.keys(data.data).map(k=>[data.data[k].a,data.data[k].b]));
+			var from_date = Date.parse(this.from);
+			var to_date = Date.parse(this.to);
+				
+			var values = [];
+			var dates = [];
+			for(var key in data.data)
+			{
+				var key_date = Date.parse(key);
+				if(from_date != NaN && from_date > key_date)
+					continue;
+				if(to_date != NaN && to_date < key_date)
+					continue;
+					
+				values.push([data.data[key].a,data.data[key].b]);
+				dates.push(key);
+			}
+			
+			var info = this.calculate(values);
 			
 			window.info = info;
 			
@@ -233,8 +253,8 @@ export class CorrView
 					},
 					series: 
 					[{
-						values: Object.keys(data.data).map(k=>[data.data[k].a,data.data[k].b]),
-						"data-dates": Object.keys(data.data),
+						values: values,
+						"data-dates": dates,
 						"data-name-a": data.a_name,
 						"data-name-b": data.b_name,
 						"data-unit-a": data.a_unit,

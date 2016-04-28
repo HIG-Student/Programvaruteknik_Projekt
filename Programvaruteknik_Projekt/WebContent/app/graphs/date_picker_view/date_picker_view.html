@@ -1,12 +1,20 @@
-<p>From: <input type="text" ng-model="from" placeholder="2016-04-20" maxlength="10" size="10">
-   To: <input type="text" ng-model="to" placeholder="2016-04-20" maxlength="10" size="10">
-   Res:
-   
-   
-	<select [(ngModel)]="resolution">
-		<option *ngFor="#option of resolutions" [value]="option.value">{{option.name}}</option>
-	</select>
-   
+<p>
+	<label>
+		From:
+		<input type="text" [(ngModel)]="from" (blur)="verifyDate($event.target)" placeholder="yyyy-mm-dd" maxlength="10" size="10">
+	</label>
+	
+	<label>
+		To:
+		<input type="text" [(ngModel)]="to" (blur)="verifyDate($event.target)" placeholder="yyyy-mm-dd" maxlength="10" size="10">
+	</label>
+	
+	<label>
+		Res:
+		<select [(ngModel)]="resolution">
+			<option *ngFor="#option of resolutions" [value]="option.value">{{option.name}}</option>
+		</select>
+   </label>
    
    <button type="button" (click)="clicking()">Submit</button>
 </p>

@@ -1,5 +1,4 @@
 import {Component,Output,Input,EventEmitter} from "angular2/core";
-import {NgForm}    from 'angular2/common';
 
 @Component({
 	selector: "date-picker-view",
@@ -10,6 +9,9 @@ export class DatePickerView
 {
 	public @Output() onPick: EventEmitter<any> = new EventEmitter();
 	public @Input() resolution:string;
+	
+	public @Input() from:string = "";
+	public @Input() to:string = "";
 	
 	resolutions:object = 
 	[
@@ -35,8 +37,19 @@ export class DatePickerView
 		}
 	];
 	
+	verifyDate(element)
+	{
+		if(isNaN(Date.parse(element.value))
+			element.value = "";
+	}
+	
 	clicking()
 	{
-		this.onPick.emit(this.resolution);
+		this.onPick.emit(
+		{
+			"resolution": this.resolution,
+			"from": this.from,
+			"to": this.to
+		});
 	}
 }
