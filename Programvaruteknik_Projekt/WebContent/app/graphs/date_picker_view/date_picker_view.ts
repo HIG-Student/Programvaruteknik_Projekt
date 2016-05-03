@@ -3,7 +3,7 @@ import {Component,Output,Input,EventEmitter} from "angular2/core";
 @Component({
 	selector: "date-picker-view",
 	templateUrl: "app/graphs/date_picker_view/date_picker_view.html",
-	styleUrls: ["app/graphs/date_picker_view/date_picker_view.css"]
+	styleUrls: ["app/graphs/date_picker_view/date_picker_view.css"],
 })
 export class DatePickerView 
 {
@@ -51,5 +51,5 @@ export class DatePickerView
 			"from": this.from,
 			"to": this.to
 		});
-	}
+	}	
 }

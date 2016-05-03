@@ -1,7 +1,7 @@
 <p>
 	<label>
 		From:
-		<input type="text" [(ngModel)]="from" (blur)="verifyDate($event.target)" placeholder="yyyy-mm-dd" maxlength="10" size="10">
+		<input type="text" [ngModel]="dataBridgeService.saveData.timeFilter.from" (blur)="verifyDate($event.target)" placeholder="yyyy-mm-dd" maxlength="10" size="10">
 	</label>
 	
 	<label>
@@ -17,4 +17,5 @@
    </label>
    
    <button type="button" (click)="clicking()">Submit</button>
+
 </p>
