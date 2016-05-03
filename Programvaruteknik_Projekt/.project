@@ -41,7 +41,7 @@
 	</natures>
 	<filteredResources>
 		<filter>
-			<id>1462192439967</id>
+			<id>1462266127832</id>
 			<name></name>
 			<type>26</type>
 			<matcher>
@@ -51,16 +51,48 @@
 						<id>org.eclipse.ui.ide.multiFilter</id>
 						<arguments>1.0-name-matches-false-false-node</arguments>
 					</matcher>
-					<matcher>
-						<id>org.eclipse.ui.ide.multiFilter</id>
-						<arguments>1.0-name-matches-false-false-node_modules</arguments>
-					</matcher>
 				</arguments>
 			</matcher>
 		</filter>
 		<filter>
-			<id>1462195673745</id>
+			<id>1462277168609</id>
 			<name>WebContent</name>
+			<type>30</type>
+			<matcher>
+				<id>org.eclipse.ui.ide.multiFilter</id>
+				<arguments>1.0-projectRelativePath-matches-false-false-WebContent/node_modules</arguments>
+			</matcher>
+		</filter>
+		<filter>
+			<id>1462277168640</id>
+			<name>WebContent</name>
+			<type>30</type>
+			<matcher>
+				<id>org.eclipse.ui.ide.multiFilter</id>
+				<arguments>1.0-projectRelativePath-matches-false-false-WebContent/typings</arguments>
+			</matcher>
+		</filter>
+		<filter>
+			<id>1462277168771</id>
+			<name>WebContent</name>
+			<type>30</type>
+			<matcher>
+				<id>org.eclipse.ui.ide.multiFilter</id>
+				<arguments>1.0-projectRelativePath-matches-false-false-WebContent/node_modules</arguments>
+			</matcher>
+		</filter>
+		<filter>
+			<id>1462277168825</id>
+			<name>WebContent</name>
+			<type>30</type>
+			<matcher>
+				<id>org.eclipse.ui.ide.multiFilter</id>
+				<arguments>1.0-projectRelativePath-matches-false-false-WebContent/typings</arguments>
+			</matcher>
+		</filter>
+		<filter>
+			<id>1462277233468</id>
+			<name>WebContent/app</name>
 			<type>22</type>
 			<matcher>
 				<id>org.eclipse.ui.ide.orFilterMatcher</id>
@@ -77,12 +109,44 @@
 			</matcher>
 		</filter>
 		<filter>
-			<id>1462195673803</id>
-			<name>WebContent</name>
-			<type>10</type>
+			<id>1462277258949</id>
+			<name>WebContent/my_typings</name>
+			<type>6</type>
 			<matcher>
-				<id>org.eclipse.ui.ide.multiFilter</id>
-				<arguments>1.0-projectRelativePath-matches-false-false-WebContent/typings</arguments>
+				<id>org.eclipse.ui.ide.orFilterMatcher</id>
+				<arguments>
+					<matcher>
+						<id>org.eclipse.ui.ide.multiFilter</id>
+						<arguments>1.0-name-matches-false-false-*.js</arguments>
+					</matcher>
+					<matcher>
+						<id>org.eclipse.ui.ide.multiFilter</id>
+						<arguments>1.0-name-matches-false-false-*.js.map</arguments>
+					</matcher>
+				</arguments>
+			</matcher>
+		</filter>
+		<filter>
+			<id>1462277319006</id>
+			<name>WebContent/WEB-INF/karma</name>
+			<type>6</type>
+			<matcher>
+				<id>org.eclipse.ui.ide.andFilterMatcher</id>
+				<arguments>
+					<matcher>
+						<id>org.eclipse.ui.ide.orFilterMatcher</id>
+						<arguments>
+							<matcher>
+								<id>org.eclipse.ui.ide.multiFilter</id>
+								<arguments>1.0-name-matches-false-false-*.js</arguments>
+							</matcher>
+							<matcher>
+								<id>org.eclipse.ui.ide.multiFilter</id>
+								<arguments>1.0-name-matches-false-false-*.js.map</arguments>
+							</matcher>
+						</arguments>
+					</matcher>
+				</arguments>
 			</matcher>
 		</filter>
 	</filteredResources>
