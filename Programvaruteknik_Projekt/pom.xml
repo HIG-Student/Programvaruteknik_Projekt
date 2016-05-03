@@ -47,7 +47,7 @@
 						<goal>karma</goal>
 					</goals>
 					<configuration>
-						<karmaConfPath>WebContent/WEB-INF/karma/config/karma.conf.ci.js</karmaConfPath>
+						<karmaConfPath>WEB-INF/karma/config/karma.conf.ci.js</karmaConfPath>
 					</configuration>
 				</execution>
 				

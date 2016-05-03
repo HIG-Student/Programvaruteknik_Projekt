@@ -1,14 +1,17 @@
 module.exports = function(config) {
     config.set({
-        basePath: '../../..',
+        basePath: '../../../../',
         frameworks: 
 		[
 			"jasmine"
 		],
         files: 
 		[
-            "WebContent/app/*.js",
-            "WebContent/WEB-INF/karma/*.js"
+			"WebContent/node_modules/jasmine-core/lib/jasmine-core/jasmine.js",
+			"WebContent/node_modules/karma-jasmine/lib/boot.js",
+			"WebContent/node_modules/karma-jasmine/lib/adapter.js",
+			
+			"WebContent/WEB-INF/karma/*.js"
         ],
         exclude: 
 		[
