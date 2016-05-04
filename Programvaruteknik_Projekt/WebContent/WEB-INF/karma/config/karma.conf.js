@@ -3,14 +3,18 @@ module.exports = function(config) {
         basePath: '../../../../',
         frameworks: 
 		[
+			"systemjs",
 			"jasmine"
 		],
         files: 
 		[
+			"WebContent/node_modules/systemjs/dist/system-polyfills.js",
+			
 			"WebContent/node_modules/jasmine-core/lib/jasmine-core/jasmine.js",
 			"WebContent/node_modules/karma-jasmine/lib/boot.js",
 			"WebContent/node_modules/karma-jasmine/lib/adapter.js",
 			
+			"WebContent/app/**.js",
 			"WebContent/WEB-INF/karma/*.js"
         ],
         exclude: 
@@ -22,7 +26,7 @@ module.exports = function(config) {
 			"progress"
 		],
         port: 9876,
-        logLevel: config.LOG_INFO,
+        logLevel: config.LOG_DEBUG,
         browsers: 
 		[
 			"PhantomJS"
@@ -31,8 +35,24 @@ module.exports = function(config) {
         autoWatch: true,
         plugins: 
 		[
+		 	"karma-systemjs",
             "karma-jasmine",
             "karma-phantomjs-launcher"
-        ]
+        ],
+        
+        systemjs: 
+        {
+        	// Path to your SystemJS configuration file 
+        	configFile: 'WebContent/WEB-INF/karma/config/system.conf.js',
+        	config: 
+        	{
+        		paths: 
+                {
+        			'WebContent': 'WebContent',
+        			'app': 'WebContent/app'
+                }
+        	}
+        }
+    
     });
 };

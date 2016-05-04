@@ -1,5 +1,5 @@
 import {Component, NgZone, Input} from "angular2/core";
-import {CalculateService} from "app/graphs/services/calculate.service";
+import {CalculateService} from "../services/calculate";
 
 var zingchart: Zingchart;
 

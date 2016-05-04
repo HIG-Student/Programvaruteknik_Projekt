@@ -1,0 +1,4 @@
+System.config(
+{
+	transpiler: "none"
+});

@@ -1,3 +1,7 @@
+import {CalculateService} from "../../app/graphs/services/calculate";
+
+var calculate_service = new CalculateService();
+
 /*
  * This tests the regression calculator with different scenarios.
  */
@@ -84,21 +88,21 @@ describe("testMValueOrientation", function()
     var xyValues = [[0, 2], [1, 4], [2, 6], [3, 8]];
     var m = 2;
     testM(xyValues, m);
-    
+
     var xyValues = [[0, 5], [1, 5]];
     var m = 5;
     var xyValues = [[0, 0.00004], [1, 0.00004]];
     var m = 0.00004;
     testM(xyValues, m);
-    
+
     var xyValues = [[0, -7], [1, -7]];
     var m = -7;
     testM(xyValues, m);
-    
+
     var xyValues = [[3, 25], [7, 25]];
     var m = 25;
     testM(xyValues, m);
-    
+
     var xyValues = [[0, 7.5], [1, 7.5]];
     var m = 7.5;
 })
@@ -107,7 +111,7 @@ function testM(xyValues, m)
 {
     it("Tests that the calculated m value is the expected m: " + m, function() 
     {
-        expect(calculate(xyValues).m).toBe(m);
+        expect(calculate_service.calculate(xyValues).m).toBe(m);
     });
 }
 
@@ -115,7 +119,7 @@ function testK(xyValues, k)
 {
     it("Tests that the calculated k value is the expected k: " + k, function() 
     {
-        expect(calculate(xyValues).k).toBe(k);
+        expect(calculate_service.calculate(xyValues).k).toBe(k);
     });
 }
 
@@ -123,7 +127,7 @@ function testR(xyValues, r)
 {
     it("Tests that the calculated r value is the expected r: " + r, function() 
     {
-        expect(calculate(xyValues).r).toBe(r);
+        expect(calculate_service.calculate(xyValues).R).toBe(r);
     });
 }
 
