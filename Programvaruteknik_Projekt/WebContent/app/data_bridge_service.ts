@@ -7,6 +7,12 @@ export class DataBridgeService
 	public saveData: object = 
 	{
 		"title":""
+		"timeFilter":{
+		
+		"from": "",
+		"to": ""
+		
+		}
 	};
 	
 	public setTimeFilter(timeFilter: object)
@@ -33,17 +39,21 @@ export class DataBridgeService
 	
 	private verifyValues():String
 	{
-		// Felmedelande och check
+		
+		console.log("Still going strong");
+		return "error";
 	}
 	
 	public save():String
 	{
-		var error:String = verifyValues();
-		if(error)
+	  console.log("vi kom in");
+		var error:String = this.verifyValues();
+		if(error =="error")
+			console.log("it works");
 			return error;
 		
 		// Skicka json till "example.com"
-		
+		console.log("fuck somthing did nopt work");
 		return null;
 	}
 	

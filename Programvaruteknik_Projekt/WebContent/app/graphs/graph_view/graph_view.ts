@@ -89,5 +89,6 @@ export class GraphView
 	clickSave()
 	{
 		window.bridge = this.dataBridgeService;
+		this.dataBridgeService.save();
 	}
 }
