@@ -1,17 +1,21 @@
 import {Injectable} from 'angular2/core';
 import {Http} from 'angular2/http';
+import {DataLoader} from "app/data_loader";	
 
-@Injectable()
+@Injectable({
+	providers:[DataLoader]
+})
 export class DataBridgeService
 {
+	constructor(private dataLoader: DataLoader) { }
+	
 	public saveData: object = 
 	{
 		"title":""
-		"timeFilter":{
-		
-		"from": "",
-		"to": ""
-		
+		"timeFilter":
+		{
+			"from": "",
+			"to": ""
 		}
 	};
 	
@@ -24,6 +28,7 @@ export class DataBridgeService
 	{
 		this.saveData["sourceA"]= sourceA;
 		this.saveData["sourceAParam"]= json;
+		
 	}
 	
 	public setSourceB(sourceB:object,json:object)
@@ -39,30 +44,57 @@ export class DataBridgeService
 	
 	private verifyValues():String
 	{
+		if(this.saveData["sourceA"] == null)
+		{
+			return "Missing sourceA";
+		}
 		
-		console.log("Still going strong");
-		return "error";
+		if(this.saveData["sourceB"] == null)
+		{
+			return "Missing sourceB";
+		}
+		
+		if(this.saveData["sourceCorr"] == null)
+		{
+			return "Missing sourceCorr";
+		}
+		
+		if(this.saveData["title"] == "")
+		{
+			return "Missing title";
+		}
+		
+		return null;
 	}
 	
 	public save():String
 	{
-	  console.log("vi kom in");
 		var error:String = this.verifyValues();
-		if(error =="error")
-			console.log("it works");
+		if(error)
+		{
+			console.log("Error:",error);	
 			return error;
+		}
 		
-		// Skicka json till "example.com"
-		console.log("fuck somthing did nopt work");
+		
+		this.dataLoader.sendSaveData(this.saveData).subscribe(data=>
+		{
+			console.log("Sent data",data);	
+		},err=>
+		{
+			console.log("Error on send",err);
+		});
+		
 		return null;
 	}
 	
 	public load():String
 	{
-		// this.saveData = ...;
 		
-		// load example.json
-		
+		this.dataLoader.getSavedData().subscribe(data =>
+		{
+			this.saveData = data;
+		});
 		return null;
 	}
 }

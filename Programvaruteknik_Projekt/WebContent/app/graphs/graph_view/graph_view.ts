@@ -31,6 +31,8 @@ export class GraphView
 	
 	from:string = "";
 	to:string = "";
+	LoadData:object={};
+	
 	
 	setSourceA(json:object)
 	{
@@ -90,5 +92,10 @@ export class GraphView
 	{
 		window.bridge = this.dataBridgeService;
 		this.dataBridgeService.save();
+	}
+	clickLoad()
+	{
+	
+      this.LoadData["Data"] = this.dataBridgeService.load();
 	}
 }

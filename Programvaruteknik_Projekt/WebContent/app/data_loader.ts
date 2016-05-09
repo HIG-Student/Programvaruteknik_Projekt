@@ -9,20 +9,15 @@ export class DataLoader
 	
 	getCorrData(data,sourceA,sourceB)
 	{
-		console.log("D1",data);
-	
+
 		if(!data)
 			data = { };
 			
-		console.log("D2",data);
-		
 		data["type"] = "data-correlation";
 			
 		if(!data["resolution"])
 			data["resolution"] = "YEAR";
 			
-		console.log("D3",data);
-		
 		if(!data["merge-type-x"])
 			data["merge-type-x"] = "AVERAGE";
 			
@@ -35,8 +30,6 @@ export class DataLoader
 			"sourceB": sourceB
 		};
 		
-		console.log("D4",data);
-		
 		return this.http
 		.post("SampleServlet", JSON.stringify(data))
 		.map(res => res.json().data);
@@ -44,7 +37,6 @@ export class DataLoader
 	
 	getSourceData(data,source)
 	{
-		console.log("get",data,source);
 		data["type"] = "data-source";
 		
 		if(!data["data"])
@@ -68,6 +60,27 @@ export class DataLoader
 		.post("SampleServlet", JSON.stringify(
 		{
 			"type": "sources"
+		}))
+		.map(res => res.json().data);
+	}
+	
+	sendSaveData(data:object){
+		return this.http
+		.post("SampleServlet", JSON.stringify(
+		{
+			"type": "save",
+			"data": data
+		}))
+		.map(res => res.json().data);
+	}
+	
+	getSavedData()
+	{	
+		return this.http
+		.post("SampleServlet", JSON.stringify(
+		{
+			"type": "load",
+			"data": data
 		}))
 		.map(res => res.json().data);
 	}
