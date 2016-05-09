@@ -14,7 +14,13 @@ module.exports = function(config) {
 			"WebContent/node_modules/karma-jasmine/lib/boot.js",
 			"WebContent/node_modules/karma-jasmine/lib/adapter.js",
 			
-			"WebContent/app/**.js",
+			"WebContent/node_modules/angular2/bundles/angular2.js",
+			"WebContent/node_modules/angular2/bundles/http.js",
+			"WebContent/node_modules/rxjs/bundles/Rx.js",
+			
+			"WebContent/app/data_loader.js",
+			"WebContent/app/hello_world.js",
+			"WebContent/app/graphs/**.js",
 			"WebContent/WEB-INF/karma/*.js"
         ],
         exclude: 
@@ -39,6 +45,11 @@ module.exports = function(config) {
             "karma-jasmine",
             "karma-phantomjs-launcher"
         ],
+        
+        proxies: 
+        {
+            "/app/": "/base/WebContent/app/"
+        },
         
         systemjs: 
         {

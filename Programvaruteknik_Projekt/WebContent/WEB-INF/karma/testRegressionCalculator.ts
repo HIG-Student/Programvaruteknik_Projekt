@@ -1,4 +1,4 @@
-import {CalculateService} from "../../app/graphs/services/calculate";
+import {CalculateService} from "app/graphs/services/calculate";
 
 var calculate_service = new CalculateService();
 
