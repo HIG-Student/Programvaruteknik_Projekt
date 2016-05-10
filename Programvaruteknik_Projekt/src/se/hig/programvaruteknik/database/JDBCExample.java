@@ -1,55 +1,72 @@
 package se.hig.programvaruteknik.database;
 
-//STEP 1. Import required packages
-import java.sql.*;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
 
+
+//http://www.mkyong.com/jdbc/how-do-connect-to-postgresql-with-jdbc-driver-java/
 public class JDBCExample {
- // JDBC driver name and database URL
- static final String JDBC_DRIVER = "se.hig.programvaruteknik.database.JDBCDriver";  
- static final String DB_URL = "jdbc:mysql://localhost/";
 
- //  Database credentials
- static final String USER = "username";
- static final String PASS = "password";
- 
- public static void main(String[] args) {
- Connection conn = null;
- Statement stmt = null;
- try{
-    //STEP 2: Register JDBC driver
-    Class.forName(JDBC_DRIVER);
+	public static void main(String[] argv) {
 
-    //STEP 3: Open a connection
-    System.out.println("Connecting to database...");
-    conn = DriverManager.getConnection(DB_URL, USER, PASS);
+		System.out.println("-------- PostgreSQL " + "JDBC Connection Testing ------------");
 
-    //STEP 4: Execute a query
-    System.out.println("Creating database...");
-    stmt = conn.createStatement();
-    
-    String sql = "CREATE DATABASE STUDENTS";
-    stmt.executeUpdate(sql);
-    System.out.println("Database created successfully...");
- }catch(SQLException se){
-    //Handle errors for JDBC
-    se.printStackTrace();
- }catch(Exception e){
-    //Handle errors for Class.forName
-    e.printStackTrace();
- }finally{
-    //finally block used to close resources
-    try{
-       if(stmt!=null)
-          stmt.close();
-    }catch(SQLException se2){
-    }// nothing we can do
-    try{
-       if(conn!=null)
-          conn.close();
-    }catch(SQLException se){
-       se.printStackTrace();
-    }//end finally try
- }//end try
- System.out.println("Goodbye!");
-}//end main
-}//end JDBCExample
+		try {
+
+			Class.forName("org.postgresql.Driver");
+
+		} catch (ClassNotFoundException e) {
+
+			System.out.println("Where is your PostgreSQL JDBC Driver? " + "Include in your library path!");
+			e.printStackTrace();
+			return;
+
+		}
+
+		System.out.println("PostgreSQL JDBC Driver Registered!");
+
+		Connection connection = null;
+		
+		try {
+
+			connection = DriverManager.getConnection("jdbc:postgresql://127.0.0.1:5432/statistics", "kaka", "kaka");
+			
+			String sql = "INSERT INTO data(user_id, data, title) VALUES (44, 'hejhej', 'greeting')";
+			
+			Statement statement = connection.createStatement();
+			
+			statement.executeUpdate(sql);
+			
+		} catch (SQLException e) {
+
+			System.out.println("Connection Failed! Check output console");
+			e.printStackTrace();
+			return;
+
+		}
+		
+		try {
+
+			connection = DriverManager.getConnection("jdbc:postgresql://127.0.0.1:5432/statistics", "kaka", "kaka");
+			
+			connection.prepareCall("").executeQuery();
+
+		} catch (SQLException e) {
+
+			System.out.println("Connection Failed! Check output console");
+			e.printStackTrace();
+			return;
+
+		}
+
+		if (connection != null) {
+			System.out.println("You made it, take control of your database now!");
+		} else {
+			System.out.println("Failed to make connection!");
+		}
+	}
+
+}
