@@ -4,19 +4,20 @@
 <table>
 	<tr>
 		<td>
-			<data-view [data]="sourceA"></data-view>
-			<pick-source-view (onPick)="setSourceA($event)"></pick-source-view>
+			<data-view [data]="dataBridgeService.saveData.sourceA"></data-view>
+			<p>{{dataBridgeService.saveData.sourceAParam['source-type']}}</p>
+			<pick-source-view [data]="dataBridgeService.saveData.sourceAParam" (onPick)="setSourceA($event)"></pick-source-view>
 		</td>
 		
 		<td rowspan="2">
-			<corr-view [data]="sourceCorr" [from]="from" [to]="to"></corr-view>
-			<date-picker-view [resolution]="resolution" (onPick)="setResolution($event)"></date-picker-view>
+			<corr-view [data]="dataBridgeService.saveData.sourceCorr" [from]="dataBridgeService.saveData.timeFilter.from" [to]="dataBridgeService.saveData.timeFilter.to"></corr-view>
+			<date-picker-view [resolution]="dataBridgeService.saveData.timeFilter.resolution" (onPick)="setTimeFilter($event)"></date-picker-view>
 		</td>
 	</tr>
 	<tr>
 		<td>
-			<data-view [data]="sourceB"></data-view>
-			<pick-source-view (onPick)="setSourceB($event)"></pick-source-view>
+			<data-view [data]="dataBridgeService.saveData.sourceB"></data-view>
+			<pick-source-view [data]="dataBridgeService.saveData.sourceBParam"  (onPick)="setSourceB($event)"></pick-source-view>
 		</td>
 	</tr>
 </table>

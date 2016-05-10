@@ -1,4 +1,4 @@
-import {Injectable} from 'angular2/core';
+import {Injectable,Output,EventEmitter} from 'angular2/core';
 import {Http} from 'angular2/http';
 import {DataLoader} from "app/data_loader";	
 
@@ -9,13 +9,22 @@ export class DataBridgeService
 {
 	constructor(private dataLoader: DataLoader) { }
 	
+	@Output() dataLoaded: EventEmitter<any> = new EventEmitter();
+	
+	
 	public saveData: object = 
 	{
-		"title":""
+		"title":"",
+		"sourceA": null,
+		"sourceAParam": { "source-type": "Constant" },
+		"sourceB": null,
+		"sourceBParam": { "source-type": "Constant" },
+		"sourceCorr": null,
 		"timeFilter":
 		{
 			"from": "",
-			"to": ""
+			"to": "",
+			"resolution": "YEAR"
 		}
 	};
 	
@@ -28,7 +37,6 @@ export class DataBridgeService
 	{
 		this.saveData["sourceA"]= sourceA;
 		this.saveData["sourceAParam"]= json;
-		
 	}
 	
 	public setSourceB(sourceB:object,json:object)
@@ -70,12 +78,12 @@ export class DataBridgeService
 	public save():String
 	{
 		var error:String = this.verifyValues();
+		
 		if(error)
 		{
 			console.log("Error:",error);	
 			return error;
 		}
-		
 		
 		this.dataLoader.sendSaveData(this.saveData).subscribe(data=>
 		{
@@ -90,10 +98,10 @@ export class DataBridgeService
 	
 	public load():String
 	{
-		
 		this.dataLoader.getSavedData().subscribe(data =>
 		{
 			this.saveData = data;
+			this.dataLoaded.emit(data);
 		});
 		return null;
 	}

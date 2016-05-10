@@ -76,12 +76,20 @@ export class DataLoader
 	
 	getSavedData()
 	{	
+		console.log("REMEMBER TO REMOVE ME!!!!!!!");
+		// REMOVE ME
+		return this.http
+		.get("example.json")
+		.map(res => res.json().data);
+
+		/* THIS IS THE CORRECT CODE!!!!!!
 		return this.http
 		.post("SampleServlet", JSON.stringify(
 		{
 			"type": "load",
-			"data": data
+			"data": 1
 		}))
 		.map(res => res.json().data);
+		*/
 	}
 }

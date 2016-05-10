@@ -15,7 +15,10 @@ import {DataBridgeService} from "app/data_bridge_service";
 })
 export class GraphView 
 {
-	constructor(private dataLoader: DataLoader, private dataBridgeService: DataBridgeService) { }
+	constructor(private dataLoader: DataLoader, private dataBridgeService: DataBridgeService) 
+	{
+	
+	}
 	
 	sourceA:object = null;
 	sourceA_JSON:object = null;
@@ -25,14 +28,13 @@ export class GraphView
 	
 	sourceCorr:object = null;
 	
-	resolution:string = "YEAR";
-	
 	public @Output() onPick: EventEmitter<any> = new EventEmitter();
 	
-	from:string = "";
-	to:string = "";
-	LoadData:object={};
-	
+	setTimeFilter(json:object)
+	{
+		this.dataBridgeService.saveData.timeFilter = json;
+		this.updateCorr();
+	}
 	
 	setSourceA(json:object)
 	{
@@ -43,7 +45,6 @@ export class GraphView
 			this.dataBridgeService.setSourceA(data,json);
 			this.updateCorr();
 		});
-	
 	}
 	
 	setSourceB(json:object,from:string,to:string)
@@ -55,19 +56,6 @@ export class GraphView
 			this.dataBridgeService.setSourceB(data,json);
 			this.updateCorr();
 		});
-		
-	
-	}
-	
-	setResolution(data:object)
-	{
-		this.dataBridgeService.setTimeFilter(data);
-	
-		this.resolution = data.resolution;
-		this.from = data.from;
-		this.to = data.to;
-		
-		this.updateCorr();
 	}
 	
 	updateCorr()
@@ -78,7 +66,7 @@ export class GraphView
 		{
 			this.dataLoader.getCorrData(
 			{
-				"resolution": this.resolution
+				"resolution": this.dataBridgeService.saveData.timeFilter.resolution
 			},
 			this.sourceA_JSON,this.sourceB_JSON).subscribe(data=>
 			{
@@ -90,12 +78,14 @@ export class GraphView
 
 	clickSave()
 	{
-		window.bridge = this.dataBridgeService;
 		this.dataBridgeService.save();
 	}
+	
 	clickLoad()
 	{
-	
-      this.LoadData["Data"] = this.dataBridgeService.load();
+		
+      	this.dataBridgeService.load();
+      	// sourceAParam
+      	// sourceBParam
 	}
 }
