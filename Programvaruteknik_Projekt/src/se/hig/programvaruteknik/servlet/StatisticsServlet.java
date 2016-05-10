@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.LinkedList;
 import java.util.Map;
@@ -12,11 +15,14 @@ import java.util.Map.Entry;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import javax.naming.Context;
+import javax.naming.InitialContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
 
 import com.owlike.genson.Genson;
 
@@ -54,6 +60,45 @@ public class StatisticsServlet extends HttpServlet
     protected Function<InputStream, Map<String, Object>> JSONConverter;
     protected DataSourceGenerator dataSourceGenerator;
 
+    public void testing()
+    {
+		System.out.println("-------- PostgreSQL " + "JDBC Connection Testing ------------");
+
+		try {
+
+			Context initCtx = new InitialContext();
+			Context envCtx = (Context) initCtx.lookup("java:comp/env");
+			DataSource ds = (DataSource) envCtx.lookup("jdbc/webapp");
+
+			Connection connection = ds.getConnection();
+
+			try {
+				String sql = "INSERT INTO data(data, title) VALUES (?, ?)";
+
+				PreparedStatement statement = connection.prepareStatement(sql);
+				statement.setString(1, "Dennis har inga Gnuer");
+				statement.setString(2, "42");
+				statement.execute();
+
+			} catch (SQLException e) {
+
+				System.out.println("Connection Failed! Check output console");
+				e.printStackTrace();
+				return;
+
+			}
+
+		} catch (Exception e) {
+
+			System.out.println("Where is your PostgreSQL JDBC Driver? " + "Include in your library path!");
+			e.printStackTrace();
+			return;
+
+		}
+
+		System.out.println("PostgreSQL JDBC Driver Registered!");
+    }
+    
     /**
      * Server entry-point
      */
@@ -67,6 +112,9 @@ public class StatisticsServlet extends HttpServlet
 			ConstantSourceBuilder.class,
 			StockSourceBuilder.class,
 			QuandlDataSourceBuilder.class));
+	
+	testing();
+	System.out.println("GO!");
     }
 
     /**
