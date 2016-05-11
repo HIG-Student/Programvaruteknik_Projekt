@@ -2,36 +2,57 @@ package se.hig.programvaruteknik.database;
 
 import static org.junit.Assert.*;
 
+import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Matchers;
 import org.mockito.stubbing.Answer;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import com.sun.corba.se.pept.transport.Connection;
-
 import se.hig.programvaruteknik.data.StockSourceBuilder;
+import se.hig.programvaruteknik.database.DatabaseHandler.DatabaseHandlerException;
+
 import static org.powermock.api.mockito.PowerMockito.*;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ DatabaseHandler.class })
 public class TestDatabaseHandler {
 
+	private static final String DB_URL = "jdbc:postgresql://127.0.0.1:5432/statistics";
+	private static final String USERNAME = "kaka";
+	private static final String PASSWORD = "kaka";
+
 	DatabaseHandler dbHandler;
 
 	@Before
-	public void setUp() {
-		dbHandler = spy(new DatabaseHandler());
+	public void setUp() throws Exception {
+		dbHandler = spy(new DatabaseHandler(DB_URL, USERNAME, PASSWORD));
 
 		Connection connection = mock(Connection.class);
 
 		when(dbHandler, method(DatabaseHandler.class, "createConnection", String.class, String.class, String.class))
-				.withArguments("jdbc:postgresql://127.0.0.1:5432/statistics", "kaka", "kaka").thenReturn(connection);
+				.withArguments(DB_URL, USERNAME, PASSWORD).thenReturn(connection);
 
-		dbHandler = new DatabaseHandler(driverManager);
+		PreparedStatement statement = mock(PreparedStatement.class);
+		when(connection.prepareStatement("INSERT INTO data(data, title) VALUES (?, ?)")).thenReturn(statement);
+
+		doNothing().when(statement).setString(1, "[value1]");
+		doNothing().when(statement).setString(2, "[value2]");
+		doReturn(true).when(statement).execute();
+
+		doThrow(dbHandler.new DatabaseHandlerException()).when(dbHandler).save((String) Matchers.isNull(),
+				Matchers.any());
+		doThrow(dbHandler.new DatabaseHandlerException()).when(dbHandler).save(Matchers.any(),
+				(String) Matchers.isNull());
+
+		doThrow(dbHandler.new DatabaseHandlerException()).when(dbHandler).load(null);
+		doThrow(dbHandler.new DatabaseHandlerException()).when(dbHandler).load(-1);
+
 	}
 
 	@Test
