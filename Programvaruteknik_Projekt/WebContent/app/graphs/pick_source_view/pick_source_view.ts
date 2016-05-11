@@ -1,6 +1,5 @@
 import {Component,Output,Input,EventEmitter} from "angular2/core";
 import {DataLoader} from "app/data_loader";
-import {DataBridgeService} from "app/data_bridge_service";
 
 @Component({
 	selector: "pick-source-view",
@@ -11,10 +10,9 @@ export class PickSourceView
 {
 	@Output() onPick: EventEmitter<any> = new EventEmitter();
 	
-	private 
-	@Input() data:object;
+	private data:object;
 	
-	constructor(private dataLoader: DataLoader,private dataBridgeService: DataBridgeService) { }
+	constructor(private dataLoader: DataLoader) { }
 
 	pick()
 	{
@@ -22,10 +20,7 @@ export class PickSourceView
 	}
 	
 	selectedValueChange(value)
-	{
-			
-		console.log("PICKEED",value);
-		// dataLoaded
+	{	
 		this.inputs = this.builders[value];
 		
 		this.data = { };
@@ -42,13 +37,11 @@ export class PickSourceView
 	
 	ngOnInit()
 	{
-	
 		this.dataLoader.getSources().subscribe(data =>
 		{
 			this.builders = data;
 			this.builders_keys = Object.keys(this.builders);
 			this.selectedValueChange(this.builders_keys[0]);		
 		});
-		
 	}
 }

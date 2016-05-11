@@ -11,7 +11,6 @@ export class DataBridgeService
 	
 	@Output() dataLoaded: EventEmitter<any> = new EventEmitter();
 	
-	
 	public saveData: object = 
 	{
 		"title":"",
@@ -75,7 +74,7 @@ export class DataBridgeService
 		return null;
 	}
 	
-	public save():String
+	public save(callback):String
 	{
 		var error:String = this.verifyValues();
 		
@@ -87,7 +86,10 @@ export class DataBridgeService
 		
 		this.dataLoader.sendSaveData(this.saveData).subscribe(data=>
 		{
-			console.log("Sent data",data);	
+			console.log("Sent data",data);
+			
+			if(callback)
+				callback(data);
 		},err=>
 		{
 			console.log("Error on send",err);
@@ -96,9 +98,9 @@ export class DataBridgeService
 		return null;
 	}
 	
-	public load():String
+	public load(id:number):String
 	{
-		this.dataLoader.getSavedData().subscribe(data =>
+		this.dataLoader.getSavedData(id).subscribe(data =>
 		{
 			this.saveData = data;
 			this.dataLoaded.emit(data);

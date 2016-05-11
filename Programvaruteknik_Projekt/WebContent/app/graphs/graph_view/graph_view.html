@@ -1,12 +1,19 @@
 <center><input [(ngModel)]="dataBridgeService.saveData.title" class="title" placeholder="[Click to edit title]"></center>
+
 <button type="button" (click)="clickSave()">Save</button>
-<button type="button" (click)="clickLoad()">Load SaveData</button>
+<div>
+	<select [(ngModel)]="pickedSave">
+		<option *ngFor="let save of savesList" [value]="save.id">{{save.title}}</option>
+	</select>
+	<button type="button" [disabled]="!(savesList && savesList.length > 0)" (click)="clickLoad()">Load SaveData</button>
+</div>
+
 <table>
 	<tr>
 		<td>
 			<data-view [data]="dataBridgeService.saveData.sourceA"></data-view>
-			<p>{{dataBridgeService.saveData.sourceAParam['source-type']}}</p>
-			<pick-source-view [data]="dataBridgeService.saveData.sourceAParam" (onPick)="setSourceA($event)"></pick-source-view>
+			<p *ngIf="sourceA_JSON">{{sourceA_JSON | json}}</p>
+			<pick-source-view (onPick)="setSourceA($event)"></pick-source-view>
 		</td>
 		
 		<td rowspan="2">
@@ -17,7 +24,8 @@
 	<tr>
 		<td>
 			<data-view [data]="dataBridgeService.saveData.sourceB"></data-view>
-			<pick-source-view [data]="dataBridgeService.saveData.sourceBParam"  (onPick)="setSourceB($event)"></pick-source-view>
+			<p *ngIf="sourceA_JSON">{{sourceB_JSON | json}}</p>
+			<pick-source-view (onPick)="setSourceB($event)"></pick-source-view>
 		</td>
 	</tr>
 </table>

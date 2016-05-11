@@ -17,8 +17,25 @@ export class GraphView
 {
 	constructor(private dataLoader: DataLoader, private dataBridgeService: DataBridgeService) 
 	{
-	
+		this.updateSaveList();
+		
+		dataBridgeService.dataLoaded.subscribe(data =>
+		{
+			this.sourceA_JSON = JSON.parse(JSON.stringify(data.sourceAParam));
+			this.sourceB_JSON = JSON.parse(JSON.stringify(data.sourceBParam));
+		});
 	}
+	
+	updateSaveList()
+	{
+		this.dataLoader.getSaveList().subscribe(data =>
+		{
+			this.savesList = data;
+		});
+	}
+	
+	pickedSave:number;
+	savesList:object;
 	
 	sourceA:object = null;
 	sourceA_JSON:object = null;
@@ -38,7 +55,7 @@ export class GraphView
 	
 	setSourceA(json:object)
 	{
-		this.sourceA_JSON = json;
+		this.sourceA_JSON = JSON.parse(JSON.stringify(json));
 		this.dataLoader.getSourceData({},json).subscribe(data=>
 		{	
 			this.sourceA = data;
@@ -49,7 +66,7 @@ export class GraphView
 	
 	setSourceB(json:object,from:string,to:string)
 	{
-		this.sourceB_JSON = json;
+		this.sourceB_JSON = JSON.parse(JSON.stringify(json));
 		this.dataLoader.getSourceData({},json).subscribe(data=>
 		{
 			this.sourceB = data;
@@ -78,14 +95,11 @@ export class GraphView
 
 	clickSave()
 	{
-		this.dataBridgeService.save();
+		this.dataBridgeService.save(this.updateSaveList);
 	}
 	
 	clickLoad()
 	{
-		
-      	this.dataBridgeService.load();
-      	// sourceAParam
-      	// sourceBParam
+      	this.dataBridgeService.load(this.pickedSave);
 	}
 }

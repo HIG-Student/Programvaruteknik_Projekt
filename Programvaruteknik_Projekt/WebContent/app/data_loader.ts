@@ -74,7 +74,7 @@ export class DataLoader
 		.map(res => res.json().data);
 	}
 	
-	getSavedData()
+	getSavedData(id:number)
 	{	
 		console.log("REMEMBER TO REMOVE ME!!!!!!!");
 		// REMOVE ME
@@ -87,7 +87,25 @@ export class DataLoader
 		.post("SampleServlet", JSON.stringify(
 		{
 			"type": "load",
-			"data": 1
+			"data": id
+		}))
+		.map(res => res.json().data);
+		*/
+	}
+	
+	getSaveList()
+	{	
+		console.log("REMEMBER TO REMOVE ME TOO!!!!!!!");
+		// REMOVE ME
+		return this.http
+		.get("example_list.json")
+		.map(res => res.json().data);
+
+		/* THIS MIGHT BE THE CORRECT CODE!!!!!!
+		return this.http
+		.post("SampleServlet", JSON.stringify(
+		{
+			"type": "list"
 		}))
 		.map(res => res.json().data);
 		*/
