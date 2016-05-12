@@ -72,6 +72,9 @@ public class TestEverysportData
 	FootballSourceBuilder footballSource = new FootballSourceBuilder();
 	footballSource
 		.setSourceSupplier(DataSupplierFactory.createFileFetcher("data/test/TestEverysportData_Full.json"));
+	footballSource.setFetchFromWebsite("apikey=1769e0fdbeabd60f479b1dcaff03bf5c", "");
+	footballSource.setFetchFromWebsite("apikey=1769e0fdbeabd60f479b1dcaff03bf5c", null);
+	footballSource.setFetchFromWebsite("apikey=1769e0fdbeabd60f479b1dcaff03bf5c", "league=63925&limit=240");
 	footballSource.setName("Football data");
 	footballSource.setUnit("Goals");
 	footballSource.setDataExtractor(FootballSourceBuilder.TOTAL_GOALS_EXTRACTOR);
@@ -87,5 +90,19 @@ public class TestEverysportData
 	Map<LocalDate, Double> data = dataSource.getData();
 
 	assertEquals(new Double(240), new Double(data.size()));
+    }
+    
+    @Test
+    public void testFetchFromURL() 
+    {
+    	FootballSourceBuilder footballSource = new FootballSourceBuilder();
+    	footballSource
+    		.setSourceSupplier(DataSupplierFactory.createFileFetcher("data/test/TestEverysportData_Full.json"));
+    	footballSource.setFetchFromWebsite
+    	("http://api.everysport.com/v1/events?apikey=1769e0fdbeabd60f479b1dcaff03bf5c&league=63925&limit=240");
+    	footballSource.setName("Football data");
+    	footballSource.setUnit("Goals");
+    	footballSource.setFetchFromWebsite();
+    	footballSource.setDataExtractor(FootballSourceBuilder.DATE_EXTRACTOR, FootballSourceBuilder.SPECTATORS_EXTRACTOR);
     }
 }
