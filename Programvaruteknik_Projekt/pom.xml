@@ -13,39 +13,6 @@
     <sourceDirectory>src</sourceDirectory>
     <testSourceDirectory>test</testSourceDirectory>
     <plugins>
-		<plugin>
-	      <groupId>com.github.klieber</groupId>
-	      <artifactId>phantomjs-maven-plugin</artifactId>
-	      <version>0.7</version>
-	      <executions>
-	      </executions>
-	        <configuration>
-	          <version>2.1.1</version>
-	        </configuration>
-	    </plugin>
-	    <plugin>
-	      <groupId>com.github.searls</groupId>
-	      <artifactId>jasmine-maven-plugin</artifactId>
-	      <version>2.1</version>
-	      <executions>
-	        <execution>
-	          <goals>
-	            <goal>test</goal>
-	          </goals>
-	        </execution>
-	      </executions>
-	      <configuration>
-            <webDriverClassName>org.openqa.selenium.phantomjs.PhantomJSDriver</webDriverClassName>
-            <webDriverCapabilities>
-              <capability>
-                <name>phantomjs.binary.path</name>
-                <value>${phantomjs.binary}</value>
-              </capability>
-            </webDriverCapabilities>
-	      	<jsSrcDir>${project.basedir}${file.separator}WebContent${file.separator}app</jsSrcDir>
-	        <jsTestSrcDir>${project.basedir}${file.separator}WebContent${file.separator}WEB-INF${file.separator}test</jsTestSrcDir>
-	      </configuration>
-	    </plugin>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.3</version>
@@ -101,10 +68,9 @@
   		<scope>test</scope>
   	</dependency>
   	<dependency>
-		<groupId>com.github.klieber</groupId>
-		<artifactId>phantomjs-maven-plugin</artifactId>
-		<version>0.7</version>
-  		<scope>test</scope>
+  		<groupId>org.postgresql</groupId>
+  		<artifactId>postgresql</artifactId>
+  		<version>9.4.1208.jre7</version>
   	</dependency>
   </dependencies>
 </project>

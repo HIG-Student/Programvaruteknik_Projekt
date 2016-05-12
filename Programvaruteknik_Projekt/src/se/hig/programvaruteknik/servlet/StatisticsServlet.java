@@ -24,6 +24,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
+import org.postgresql.util.PGobject;
+
 import com.owlike.genson.Genson;
 
 import se.hig.programvaruteknik.data.ConstantSourceBuilder;
@@ -35,6 +37,8 @@ import se.hig.programvaruteknik.data.SMHISourceBuilder.Period;
 import se.hig.programvaruteknik.data.StockSourceBuilder;
 import se.hig.programvaruteknik.data.StockSourceBuilder.StockInfo;
 import se.hig.programvaruteknik.data.StockSourceBuilder.StockName;
+import se.hig.programvaruteknik.database.DataHandler;
+import se.hig.programvaruteknik.database.DatabaseDataHandler;
 import se.hig.programvaruteknik.model.DataCollectionBuilder;
 import se.hig.programvaruteknik.model.DataSourceBuilder;
 import se.hig.programvaruteknik.model.MergeType;
@@ -59,46 +63,8 @@ public class StatisticsServlet extends HttpServlet
     protected JSONFormatter JSON_Formatter;
     protected Function<InputStream, Map<String, Object>> JSONConverter;
     protected DataSourceGenerator dataSourceGenerator;
+    protected DataHandler dataHandler;
 
-    public void testing()
-    {
-		System.out.println("-------- PostgreSQL " + "JDBC Connection Testing ------------");
-
-		try {
-
-			Context initCtx = new InitialContext();
-			Context envCtx = (Context) initCtx.lookup("java:comp/env");
-			DataSource ds = (DataSource) envCtx.lookup("jdbc/webapp");
-
-			Connection connection = ds.getConnection();
-
-			try {
-				String sql = "INSERT INTO data(data, title) VALUES (?, ?)";
-
-				PreparedStatement statement = connection.prepareStatement(sql);
-				statement.setString(1, "Dennis har inga Gnuer");
-				statement.setString(2, "42");
-				statement.execute();
-
-			} catch (SQLException e) {
-
-				System.out.println("Connection Failed! Check output console");
-				e.printStackTrace();
-				return;
-
-			}
-
-		} catch (Exception e) {
-
-			System.out.println("Where is your PostgreSQL JDBC Driver? " + "Include in your library path!");
-			e.printStackTrace();
-			return;
-
-		}
-
-		System.out.println("PostgreSQL JDBC Driver Registered!");
-    }
-    
     /**
      * Server entry-point
      */
@@ -111,10 +77,8 @@ public class StatisticsServlet extends HttpServlet
 		new DataSourceGenerator(
 			ConstantSourceBuilder.class,
 			StockSourceBuilder.class,
-			QuandlDataSourceBuilder.class));
-	
-	testing();
-	System.out.println("GO!");
+			QuandlDataSourceBuilder.class),
+		new DatabaseDataHandler());
     }
 
     /**
@@ -127,13 +91,17 @@ public class StatisticsServlet extends HttpServlet
      * @param JSONConverter
      *            A function that can convert a JSON InputStream to a Map
      *            <String,Object>
+     * @param dataSaver
+     *            A datasaver that saves data
+     * 
      */
-    public StatisticsServlet(JSONFormatter JSONFormatter, DataCollectionBuilder builder, Function<InputStream, Map<String, Object>> JSONConverter, DataSourceGenerator dataSourceGenerator)
+    public StatisticsServlet(JSONFormatter JSONFormatter, DataCollectionBuilder builder, Function<InputStream, Map<String, Object>> JSONConverter, DataSourceGenerator dataSourceGenerator, DataHandler dataSaver)
     {
 	this.JSON_Formatter = JSONFormatter;
 	this.builder = builder;
 	this.JSONConverter = JSONConverter;
 	this.dataSourceGenerator = dataSourceGenerator;
+	this.dataHandler = dataSaver;
     }
 
     @Override
@@ -242,11 +210,46 @@ public class StatisticsServlet extends HttpServlet
 
 	    Boolean pretty = getValue(body, "pretty", (String str) -> "true".equalsIgnoreCase(str), false);
 
-	    String sourceType = getValue(body, "type");
+	    String actionType = getValue(body, "type");
 
 	    JSONOutputter outputter;
 
-	    if ("sources".equalsIgnoreCase(sourceType))
+	    if ("save".equalsIgnoreCase(actionType))
+	    {
+		Map<String, Object> raw_json = getValue(body, "data");
+		String json = new Genson().serialize(raw_json);
+
+		Long savedAt_Index = dataHandler.save(getValue(raw_json, "title"), json);
+
+		outputter = new JSONOutputter()
+		{
+		    @Override
+		    public String asJSON(JSONFormatter formatter)
+		    {
+			Map<String, Object> result = new TreeMap<>();
+			result.put("data", savedAt_Index);
+			return formatter.format(new Genson().serialize(result));
+		    }
+		};
+	    }
+	    else if ("load".equalsIgnoreCase(actionType))
+	    {
+		Long index = getValue(body, "data");
+
+		Object loaded_data = new Genson().deserialize(dataHandler.load(index), Map.class);
+
+		outputter = new JSONOutputter()
+		{
+		    @Override
+		    public String asJSON(JSONFormatter formatter)
+		    {
+			Map<String, Object> result = new TreeMap<>();
+			result.put("data", loaded_data);
+			return formatter.format(new Genson().serialize(result));
+		    }
+		};
+	    }
+	    else if ("sources".equalsIgnoreCase(actionType))
 	    {
 		outputter = new JSONOutputter()
 		{
@@ -270,42 +273,41 @@ public class StatisticsServlet extends HttpServlet
 			(String str) -> Resolution.valueOf(str),
 			Resolution.DAY);
 
-		if ("data-source".equalsIgnoreCase(sourceType))
+		if ("data-source".equalsIgnoreCase(actionType))
 		{
 		    DataSourceBuilder builder = dataSourceGenerator.getBuilder(getValue(data, "source"));
 		    outputter = builder.build();
 		}
+		else if ("data-correlation".equalsIgnoreCase(actionType))
+		{
+		    MergeType mergeTypeX = getValue(
+			    body,
+			    "merge-type-x",
+			    (String str) -> MergeType.fromString(str),
+			    MergeType.AVERAGE);
+
+		    MergeType mergeTypeY = getValue(
+			    body,
+			    "merge-type-y",
+			    (String str) -> MergeType.fromString(str),
+			    MergeType.AVERAGE);
+
+		    DataSourceBuilder sourceA = dataSourceGenerator.getBuilder(getValue(data, "sourceA"));
+		    DataSourceBuilder sourceB = dataSourceGenerator.getBuilder(getValue(data, "sourceB"));
+
+		    builder.setXDatasource(sourceA.build());
+		    builder.setYDatasource(sourceB.build());
+
+		    builder.setXMergeType(mergeTypeX);
+		    builder.setYMergeType(mergeTypeY);
+		    builder.setResolution(resolution);
+
+		    outputter = builder.getResult();
+		}
 		else
-		    if ("data-correlation".equalsIgnoreCase(sourceType))
-		    {
-			MergeType mergeTypeX = getValue(
-				body,
-				"merge-type-x",
-				(String str) -> MergeType.fromString(str),
-				MergeType.AVERAGE);
-
-			MergeType mergeTypeY = getValue(
-				body,
-				"merge-type-y",
-				(String str) -> MergeType.fromString(str),
-				MergeType.AVERAGE);
-
-			DataSourceBuilder sourceA = dataSourceGenerator.getBuilder(getValue(data, "sourceA"));
-			DataSourceBuilder sourceB = dataSourceGenerator.getBuilder(getValue(data, "sourceB"));
-
-			builder.setXDatasource(sourceA.build());
-			builder.setYDatasource(sourceB.build());
-
-			builder.setXMergeType(mergeTypeX);
-			builder.setYMergeType(mergeTypeY);
-			builder.setResolution(resolution);
-
-			outputter = builder.getResult();
-		    }
-		    else
-		    {
-			throw new RequestException("Unknown type!");
-		    }
+		{
+		    throw new RequestException("Unknown type!");
+		}
 	    }
 	    response.getWriter().append(outputter.asJSON(pretty ? JSON_Formatter : JSONFormatter.NONE));
 	}

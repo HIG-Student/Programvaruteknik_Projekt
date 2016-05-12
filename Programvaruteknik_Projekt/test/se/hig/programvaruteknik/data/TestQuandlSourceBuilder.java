@@ -28,7 +28,7 @@ public class TestQuandlSourceBuilder
     {
 	QuandlDataSourceBuilder builder = new QuandlDataSourceBuilder(SourceType.UNEMPLOYMENT_RATE_USA);
 	DataSource source = builder.build();
-	assertEquals(819, source.getData().size());
+	assertEquals(820, source.getData().size());
 
 	assertEquals(source.getData().get(LocalDate.of(2016, 3, 1)), new Double(8116));
 	assertEquals(source.getData().get(LocalDate.of(1948, 1, 1)), new Double(2351));
