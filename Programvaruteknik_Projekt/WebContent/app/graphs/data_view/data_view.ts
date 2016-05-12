@@ -72,7 +72,16 @@ export class DataView
 		}
 		else
 		{
-			var values = Object.keys(data.data).map(k=>[k,Date.parse(k),data.data[k]);
+			var keys =  Object.keys(data.data);
+			
+			/*
+			keys.sort( (a, b) =>
+			{
+				return a - b;
+			});
+			*/
+			
+			var values = keys.map(k=>[k,Date.parse(k),data.data[k]);
 
 			var first = values[0][1];
 			var last = values[values.length-1][1];

@@ -64,6 +64,7 @@ public class DatabaseDataHandler implements DataHandler
 	    PreparedStatement statement = connection
 		    .prepareStatement("INSERT INTO data(title, data) VALUES (?, ?) RETURNING id;");
 	    statement.setString(1, title);
+	    System.out.println("DATA:  " + data);
 	    statement.setString(2, data);
 	    ResultSet result = statement.executeQuery();
 	    if (!result.next()) throw new DatabaseDataSaverException("Cannot save data");

@@ -73,7 +73,7 @@ public class StatisticsServlet extends HttpServlet
 	this(
 		new JSONFormatter(),
 		new DataCollectionBuilder(),
-		(stream) -> new Genson().deserialize(stream, Map.class),
+		(stream) -> new Genson().deserialize(stream, TreeMap.class),
 		new DataSourceGenerator(
 			ConstantSourceBuilder.class,
 			StockSourceBuilder.class,
@@ -219,6 +219,8 @@ public class StatisticsServlet extends HttpServlet
 		Map<String, Object> raw_json = getValue(body, "data");
 		String json = new Genson().serialize(raw_json);
 
+		System.out.println("Json:" + json);
+
 		Long savedAt_Index = dataHandler.save(getValue(raw_json, "title"), json);
 
 		outputter = new JSONOutputter()
@@ -234,9 +236,14 @@ public class StatisticsServlet extends HttpServlet
 	    }
 	    else if ("load".equalsIgnoreCase(actionType))
 	    {
-		Long index = getValue(body, "data");
+		Long index;
+		Object longing = getValue(body, "data");
+		if (longing instanceof String)
+		    index = Long.parseLong((String) longing);
+		else
+		    index = (Long) longing;
 
-		Object loaded_data = new Genson().deserialize(dataHandler.load(index), Map.class);
+		Object loaded_data = new Genson().deserialize(dataHandler.load(index), TreeMap.class);
 
 		outputter = new JSONOutputter()
 		{
