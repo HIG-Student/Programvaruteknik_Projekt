@@ -1,0 +1,10 @@
+{
+	"type": "list",
+	"data":
+	[
+		{"id":0,"title":"GNU"},
+		{"id":1,"title":"GNU2"},
+		{"id":2,"title":"GNU3"},
+		{"id":3,"title":"GNU4"}
+	]
+}

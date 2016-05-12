@@ -1,11 +1,11 @@
-<select (change)="pickSelect($event.target.value)">
-	<option *ngFor="#builder of builders_keys">{{builder}}</option>
+<select (change)="selectedValueChange($event.target.value)">
+	<option *ngFor="let builder of builders_keys">{{builder}}</option>
 </select>
 
 <div *ngIf="inputs">
-	<label *ngFor="#input of inputs.inputs">{{input.name}}:
+	<label *ngFor="let input of inputs.inputs">{{input.name}}:
 		<select (change)="setValue(input.value,$event.target.value)">
-			<option *ngFor="#value of input.values">{{value.value}}</option>
+			<option *ngFor="let value of input.values">{{value.value}}</option>
 		</select>
 	</label>
 	

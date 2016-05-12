@@ -9,20 +9,15 @@ export class DataLoader
 	
 	getCorrData(data,sourceA,sourceB)
 	{
-		console.log("D1",data);
-	
+
 		if(!data)
 			data = { };
 			
-		console.log("D2",data);
-		
 		data["type"] = "data-correlation";
 			
 		if(!data["resolution"])
 			data["resolution"] = "YEAR";
 			
-		console.log("D3",data);
-		
 		if(!data["merge-type-x"])
 			data["merge-type-x"] = "AVERAGE";
 			
@@ -35,8 +30,6 @@ export class DataLoader
 			"sourceB": sourceB
 		};
 		
-		console.log("D4",data);
-		
 		return this.http
 		.post("SampleServlet", JSON.stringify(data))
 		.map(res => res.json().data);
@@ -44,7 +37,6 @@ export class DataLoader
 	
 	getSourceData(data,source)
 	{
-		console.log("get",data,source);
 		data["type"] = "data-source";
 		
 		if(!data["data"])
@@ -70,5 +62,52 @@ export class DataLoader
 			"type": "sources"
 		}))
 		.map(res => res.json().data);
+	}
+	
+	sendSaveData(data:object){
+		return this.http
+		.post("SampleServlet", JSON.stringify(
+		{
+			"type": "save",
+			"data": data
+		}))
+		.map(res => res.json().data);
+	}
+	
+	getSavedData(id:number)
+	{	
+		console.log("REMEMBER TO REMOVE ME!!!!!!!");
+		// REMOVE ME
+		return this.http
+		.get("example.json")
+		.map(res => res.json().data);
+
+		/* THIS IS THE CORRECT CODE!!!!!!
+		return this.http
+		.post("SampleServlet", JSON.stringify(
+		{
+			"type": "load",
+			"data": id
+		}))
+		.map(res => res.json().data);
+		*/
+	}
+	
+	getSaveList()
+	{	
+		console.log("REMEMBER TO REMOVE ME TOO!!!!!!!");
+		// REMOVE ME
+		return this.http
+		.get("example_list.json")
+		.map(res => res.json().data);
+
+		/* THIS MIGHT BE THE CORRECT CODE!!!!!!
+		return this.http
+		.post("SampleServlet", JSON.stringify(
+		{
+			"type": "list"
+		}))
+		.map(res => res.json().data);
+		*/
 	}
 }
