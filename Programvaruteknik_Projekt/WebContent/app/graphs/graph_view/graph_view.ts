@@ -31,10 +31,11 @@ export class GraphView
 		this.dataLoader.getSaveList().subscribe(data =>
 		{
 			this.savesList = data;
+			this.pickedSave = -1;
 		});
 	}
 	
-	pickedSave:number;
+	pickedSave:number = -1;
 	savesList:object;
 	
 	sourceA:object = null;
@@ -95,7 +96,7 @@ export class GraphView
 
 	clickSave()
 	{
-		this.dataBridgeService.save(this.updateSaveList);
+		this.dataBridgeService.save(savedEntry=>this.updateSaveList());
 	}
 	
 	clickLoad()

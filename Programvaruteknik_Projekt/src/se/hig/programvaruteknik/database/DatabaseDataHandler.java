@@ -5,12 +5,17 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.Map.Entry;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
 
-public class DatabaseDataHandler implements DataHandler
+public class DatabaseDataHandler extends DataHandler
 {
     private Connection connection;
 
@@ -30,7 +35,7 @@ public class DatabaseDataHandler implements DataHandler
 	{
 	    return DriverManager.getConnection(url, user, password);
 	}
-	catch (SQLException e)
+	catch (Exception e)
 	{
 	    throw new DatabaseDataSaverException(e);
 	}
@@ -44,7 +49,6 @@ public class DatabaseDataHandler implements DataHandler
 	    Context envCtx = (Context) initCtx.lookup("java:comp/env");
 	    DataSource ds = (DataSource) envCtx.lookup("jdbc/webapp");
 	    return ds.getConnection();
-
 	}
 	catch (Exception e)
 	{
@@ -53,12 +57,8 @@ public class DatabaseDataHandler implements DataHandler
     }
 
     @Override
-    public Long save(String title, String data)
+    protected Long saveData(String title, String data)
     {
-	if (title == null) throw new DatabaseDataSaverException("Missing title");
-
-	if (data == null) throw new DatabaseDataSaverException("Missing data");
-
 	try
 	{
 	    PreparedStatement statement = connection
@@ -77,12 +77,8 @@ public class DatabaseDataHandler implements DataHandler
     }
 
     @Override
-    public String load(Long i)
+    protected String loadData(Long i)
     {
-	if (i == null) throw new DatabaseDataSaverException("Null is invalid index");
-
-	if (i < 0) throw new DatabaseDataSaverException("Negative index is not valid");
-
 	try
 	{
 	    PreparedStatement statement = connection.prepareStatement("SELECT * FROM data WHERE id = ?");
@@ -95,6 +91,30 @@ public class DatabaseDataHandler implements DataHandler
 	{
 	    throw new DatabaseDataSaverException(e);
 	}
+    }
+
+    @Override
+    public List<Map<String, Object>> getList()
+    {
+	List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+
+	try
+	{
+	    ResultSet result = connection.createStatement().executeQuery("SELECT (id,title) FROM data");
+	    while (result.next())
+	    {
+		Map<String, Object> entry = new TreeMap<>();
+		entry.put("id", result.getLong("id"));
+		entry.put("title", result.getString("title"));
+		list.add(entry);
+	    }
+	}
+	catch (SQLException e)
+	{
+	    throw new DatabaseDataSaverException(e);
+	}
+
+	return list;
     }
 
     @SuppressWarnings("serial")

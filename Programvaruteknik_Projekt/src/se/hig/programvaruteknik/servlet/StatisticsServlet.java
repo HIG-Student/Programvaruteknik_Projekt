@@ -2,29 +2,16 @@ package se.hig.programvaruteknik.servlet;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.time.LocalDate;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.Map.Entry;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import javax.naming.Context;
-import javax.naming.InitialContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.sql.DataSource;
-
-import org.postgresql.util.PGobject;
 
 import com.owlike.genson.Genson;
 
@@ -36,18 +23,15 @@ import se.hig.programvaruteknik.data.SMHISourceBuilder.DataType;
 import se.hig.programvaruteknik.data.SMHISourceBuilder.Period;
 import se.hig.programvaruteknik.data.StockSourceBuilder;
 import se.hig.programvaruteknik.data.StockSourceBuilder.StockInfo;
-import se.hig.programvaruteknik.data.StockSourceBuilder.StockName;
 import se.hig.programvaruteknik.database.DataHandler;
 import se.hig.programvaruteknik.database.DatabaseDataHandler;
+import se.hig.programvaruteknik.database.MemoryDataHandler;
 import se.hig.programvaruteknik.model.DataCollectionBuilder;
 import se.hig.programvaruteknik.model.DataSourceBuilder;
 import se.hig.programvaruteknik.model.MergeType;
-import se.hig.programvaruteknik.model.Param;
 import se.hig.programvaruteknik.model.Resolution;
-import se.hig.programvaruteknik.model.SourceGenerator;
 import se.hig.programvaruteknik.JSONFormatter;
 import se.hig.programvaruteknik.JSONOutputter;
-import se.hig.programvaruteknik.Utils;
 
 /**
  * Servlet implementation class SampleServlet
@@ -218,10 +202,9 @@ public class StatisticsServlet extends HttpServlet
 	    {
 		Map<String, Object> raw_json = getValue(body, "data");
 		String json = new Genson().serialize(raw_json);
+		String title = getValue(raw_json, "title");
 
-		System.out.println("Json:" + json);
-
-		Long savedAt_Index = dataHandler.save(getValue(raw_json, "title"), json);
+		Long savedAt_Index = dataHandler.save(title, json);
 
 		outputter = new JSONOutputter()
 		{
@@ -229,7 +212,10 @@ public class StatisticsServlet extends HttpServlet
 		    public String asJSON(JSONFormatter formatter)
 		    {
 			Map<String, Object> result = new TreeMap<>();
-			result.put("data", savedAt_Index);
+			Map<String, Object> data = new TreeMap<>();
+			data.put("id", savedAt_Index);
+			data.put("title", title);
+			result.put("data", data);
 			return formatter.format(new Genson().serialize(result));
 		    }
 		};
@@ -252,6 +238,19 @@ public class StatisticsServlet extends HttpServlet
 		    {
 			Map<String, Object> result = new TreeMap<>();
 			result.put("data", loaded_data);
+			return formatter.format(new Genson().serialize(result));
+		    }
+		};
+	    }
+	    else if ("list".equalsIgnoreCase(actionType))
+	    {
+		outputter = new JSONOutputter()
+		{
+		    @Override
+		    public String asJSON(JSONFormatter formatter)
+		    {
+			Map<String, Object> result = new TreeMap<>();
+			result.put("data", dataHandler.getList());
 			return formatter.format(new Genson().serialize(result));
 		    }
 		};

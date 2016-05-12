@@ -3,9 +3,10 @@
 <button type="button" (click)="clickSave()">Save</button>
 <div>
 	<select [(ngModel)]="pickedSave">
+		<option value="-1">NONE</option>
 		<option *ngFor="let save of savesList" [value]="save.id">{{save.title}}</option>
 	</select>
-	<button type="button" [disabled]="!(savesList && savesList.length > 0)" (click)="clickLoad()">Load SaveData</button>
+	<button type="button" [disabled]="!(savesList && savesList.length > 0) || pickedSave == -1" (click)="clickLoad()">Load SaveData</button>
 </div>
 
 <table>
@@ -24,7 +25,7 @@
 	<tr>
 		<td>
 			<data-view [data]="dataBridgeService.saveData.sourceB"></data-view>
-			<p *ngIf="sourceA_JSON">{{sourceB_JSON | json}}</p>
+			<p *ngIf="sourceB_JSON">{{sourceB_JSON | json}}</p>
 			<pick-source-view (onPick)="setSourceB($event)"></pick-source-view>
 		</td>
 	</tr>
