@@ -4,11 +4,13 @@ import static org.junit.Assert.*;
 
 import java.time.LocalDate;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import se.hig.programvaruteknik.data.QuandlDataSourceBuilder.SourceType;
 import se.hig.programvaruteknik.model.DataSource;
 
+@Ignore("Need to run from file instead!")
 public class TestQuandlSourceBuilder
 {
 
