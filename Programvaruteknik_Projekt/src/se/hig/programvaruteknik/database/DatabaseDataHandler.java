@@ -98,7 +98,7 @@ public class DatabaseDataHandler extends DataHandler
 
 	try
 	{
-	    ResultSet result = connection.createStatement().executeQuery("SELECT (id,title) FROM data");
+	    ResultSet result = connection.createStatement().executeQuery("SELECT id,title FROM data");
 	    while (result.next())
 	    {
 		Map<String, Object> entry = new TreeMap<>();
