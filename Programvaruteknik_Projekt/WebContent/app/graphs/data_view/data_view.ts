@@ -74,12 +74,10 @@ export class DataView
 		{
 			var keys =  Object.keys(data.data);
 			
-			/*
 			keys.sort( (a, b) =>
 			{
-				return a - b;
+			    return (a<b?-1:(a>b?1:0));
 			});
-			*/
 			
 			var values = keys.map(k=>[k,Date.parse(k),data.data[k]);
 
