@@ -10,8 +10,8 @@ public abstract class DataHandler
 {
     public final Long save(String title, String data)
     {
-	if (title == null) throw new DataSaverException("Save: Missing title");
-	if (data == null) throw new DataSaverException("Save: Missing data");
+	if (title == null) throw new DataHandlerException("Save: Missing title");
+	if (data == null) throw new DataHandlerException("Save: Missing data");
 
 	return saveData(title, data);
     }
@@ -20,9 +20,9 @@ public abstract class DataHandler
 
     public final String load(Long index)
     {
-	if (index == null) throw new DataSaverException("Load: Null is not a valid index");
-	if (index < 0) throw new DataSaverException("Load: Negative index is not valid");
-	if (index == 0) throw new DataSaverException("Load: Index begins at 1, not 0");
+	if (index == null) throw new DataHandlerException("Load: Null is not a valid index");
+	if (index < 0) throw new DataHandlerException("Load: Negative index is not valid");
+	if (index == 0) throw new DataHandlerException("Load: Index begins at 1, not 0");
 
 	return loadData(index);
     }
@@ -32,19 +32,19 @@ public abstract class DataHandler
     public abstract List<Map<String, Object>> getList();
 
     @SuppressWarnings("serial")
-    public class DataSaverException extends RuntimeException
+    public class DataHandlerException extends RuntimeException
     {
-	public DataSaverException()
+	public DataHandlerException()
 	{
 
 	}
 
-	public DataSaverException(String message)
+	public DataHandlerException(String message)
 	{
 	    super(message);
 	}
 
-	public DataSaverException(Throwable throwable)
+	public DataHandlerException(Throwable throwable)
 	{
 	    super(throwable);
 	}

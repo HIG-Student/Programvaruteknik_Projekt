@@ -1,5 +1,7 @@
 package se.hig.programvaruteknik.database;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -40,27 +42,39 @@ public class TestDataHandler
 	};
     }
 
-    @Test(expected = DataHandler.DataSaverException.class)
+    @Test(expected = DataHandler.DataHandlerException.class)
     public void testSaveWithNullTitle()
     {
 	dataHandler.save(null, "[json]");
     }
 
-    @Test(expected = DataHandler.DataSaverException.class)
+    @Test(expected = DataHandler.DataHandlerException.class)
     public void testSaveWithNullData()
     {
 	dataHandler.save("[title]", null);
     }
 
-    @Test(expected = DataHandler.DataSaverException.class)
+    @Test(expected = DataHandler.DataHandlerException.class)
     public void testLoadWhenNegativeInParameter()
     {
 	dataHandler.load(-1L);
     }
 
-    @Test(expected = DataHandler.DataSaverException.class)
+    @Test(expected = DataHandler.DataHandlerException.class)
     public void testLoadWhenNullInParameter()
     {
 	dataHandler.load(null);
+    }
+
+    @Test
+    public void testLoad()
+    {
+	assertEquals("[data]", dataHandler.load(42L));
+    }
+
+    @Test
+    public void testSave()
+    {
+	assertEquals(new Long(42L), dataHandler.save("[title]", "[data]"));
     }
 }

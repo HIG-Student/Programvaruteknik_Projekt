@@ -36,7 +36,7 @@ public class DatabaseDataHandler extends DataHandler
 	}
 	catch (Exception e)
 	{
-	    throw new DatabaseDataSaverException(e);
+	    throw new DatabaseDataHandlerException(e);
 	}
     }
 
@@ -51,7 +51,7 @@ public class DatabaseDataHandler extends DataHandler
 	}
 	catch (Exception e)
 	{
-	    throw new DatabaseDataSaverException(e);
+	    throw new DatabaseDataHandlerException(e);
 	}
     }
 
@@ -63,15 +63,14 @@ public class DatabaseDataHandler extends DataHandler
 	    PreparedStatement statement = connection
 		    .prepareStatement("INSERT INTO data(title, data) VALUES (?, ?) RETURNING id;");
 	    statement.setString(1, title);
-	    System.out.println("DATA:  " + data);
 	    statement.setString(2, data);
 	    ResultSet result = statement.executeQuery();
-	    if (!result.next()) throw new DatabaseDataSaverException("Cannot save data");
+	    if (!result.next()) throw new DatabaseDataHandlerException("Cannot save data");
 	    return result.getLong("id");
 	}
 	catch (SQLException e)
 	{
-	    throw new DatabaseDataSaverException(e);
+	    throw new DatabaseDataHandlerException(e);
 	}
     }
 
@@ -83,12 +82,12 @@ public class DatabaseDataHandler extends DataHandler
 	    PreparedStatement statement = connection.prepareStatement("SELECT * FROM data WHERE id = ?");
 	    statement.setLong(1, i);
 	    ResultSet result = statement.executeQuery();
-	    if (!result.next()) throw new DatabaseDataSaverException("No data found for index " + i);
+	    if (!result.next()) throw new DatabaseDataHandlerException("No data found for index " + i);
 	    return result.getString("data");
 	}
 	catch (SQLException e)
 	{
-	    throw new DatabaseDataSaverException(e);
+	    throw new DatabaseDataHandlerException(e);
 	}
     }
 
@@ -110,27 +109,30 @@ public class DatabaseDataHandler extends DataHandler
 	}
 	catch (SQLException e)
 	{
-	    throw new DatabaseDataSaverException(e);
+	    throw new DatabaseDataHandlerException(e);
 	}
 
 	return list;
     }
 
-    public class DatabaseDataSaverException extends RuntimeException
+    public class DatabaseDataHandlerException extends DataHandlerException
     {
-	private static final long serialVersionUID = -7471606575598147356L;
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
-	public DatabaseDataSaverException()
+	public DatabaseDataHandlerException()
 	{
 
 	}
 
-	public DatabaseDataSaverException(String message)
+	public DatabaseDataHandlerException(String message)
 	{
 	    super(message);
 	}
 
-	public DatabaseDataSaverException(Throwable throwable)
+	public DatabaseDataHandlerException(Throwable throwable)
 	{
 	    super(throwable);
 	}

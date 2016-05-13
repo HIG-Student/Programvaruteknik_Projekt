@@ -7,6 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import se.hig.programvaruteknik.database.DataHandler.DataHandlerException;
+
 import java.util.TreeMap;
 
 public class MemoryDataHandler extends DataHandler
@@ -29,13 +32,15 @@ public class MemoryDataHandler extends DataHandler
     @Override
     protected String loadData(Long index)
     {
+	if (!database.containsKey(index)) throw new MemoryDataHandlerException("No value at index [" + index + "]");
+
 	try
 	{
 	    return database.get(index)[1];
 	}
 	catch (Throwable t)
 	{
-	    throw new DataSaverException(t);
+	    throw new MemoryDataHandlerException(t);
 	}
     }
 
@@ -51,5 +56,28 @@ public class MemoryDataHandler extends DataHandler
 	    result.add(entry);
 	}
 	return result;
+    }
+
+    public class MemoryDataHandlerException extends DataHandlerException
+    {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public MemoryDataHandlerException()
+	{
+
+	}
+
+	public MemoryDataHandlerException(String message)
+	{
+	    super(message);
+	}
+
+	public MemoryDataHandlerException(Throwable throwable)
+	{
+	    super(throwable);
+	}
     }
 }
