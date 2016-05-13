@@ -116,9 +116,10 @@ public class DatabaseDataHandler extends DataHandler
 	return list;
     }
 
-    @SuppressWarnings("serial")
     public class DatabaseDataSaverException extends RuntimeException
     {
+	private static final long serialVersionUID = -7471606575598147356L;
+
 	public DatabaseDataSaverException()
 	{
 
