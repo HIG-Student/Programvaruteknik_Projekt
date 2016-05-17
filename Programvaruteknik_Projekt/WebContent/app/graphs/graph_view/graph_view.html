@@ -33,3 +33,9 @@
 </table>
 
 <textarea [(ngModel)]="dataBridgeService.saveData.comment" placeholder="Comment"></textarea>
+
+<div>
+	Last save: 
+	<span *ngIf="!dataBridgeService.saveData.lastSaveDate">never</span>
+    <date-view *ngIf="dataBridgeService.saveData.lastSaveDate" [date]="dataBridgeService.saveData.lastSaveDate"></date-view>
+</div>

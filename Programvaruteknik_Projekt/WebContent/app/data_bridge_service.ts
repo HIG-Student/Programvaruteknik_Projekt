@@ -24,9 +24,8 @@ export class DataBridgeService
 			"from": "",
 			"to": "",
 			"resolution": "YEAR"
-		}
-		"LastSaveDate":"";
-		
+		},
+		"lastSaveDate": null
 	};
 	
 	public setTimeFilter(timeFilter: object)
@@ -86,8 +85,7 @@ export class DataBridgeService
 			return error;
 		}
 		
-		this.saveData["LastSaveDate"] = (new Date()).toString().split(' ').splice(1,3).join(' '));
-		console.log("t2 ",this.saveData["LastSaveDate"]);
+		this.saveData["lastSaveDate"] = Date.now();
 		
 		this.dataLoader.sendSaveData(this.saveData).subscribe(data=>
 		{
