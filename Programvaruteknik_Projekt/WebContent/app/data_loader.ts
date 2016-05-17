@@ -86,6 +86,17 @@ export class DataLoader
 		.map(res => res.json().data);
 	}
 	
+	deleteData(id:number)
+	{	
+		return this.http
+		.post("SampleServlet", JSON.stringify(
+		{
+			"type": "delete",
+			"data": id
+		}))
+		.map(res => res.json().data);
+	}
+	
 	getSaveList()
 	{	
 		return this.http

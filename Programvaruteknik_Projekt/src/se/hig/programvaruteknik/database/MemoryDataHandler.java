@@ -45,6 +45,22 @@ public class MemoryDataHandler extends DataHandler
     }
 
     @Override
+    protected Long deleteData(Long index)
+    {
+	if (!database.containsKey(index)) throw new MemoryDataHandlerException("No value at index [" + index + "]");
+
+	try
+	{
+	    database.remove(index);
+	    return index;
+	}
+	catch (Throwable t)
+	{
+	    throw new MemoryDataHandlerException(t);
+	}
+    }
+
+    @Override
     public List<Map<String, Object>> getList()
     {
 	List<Map<String, Object>> result = new ArrayList<Map<String, Object>>();

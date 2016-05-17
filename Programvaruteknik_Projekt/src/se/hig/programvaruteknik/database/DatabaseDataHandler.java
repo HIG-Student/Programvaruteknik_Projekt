@@ -92,13 +92,29 @@ public class DatabaseDataHandler extends DataHandler
     }
 
     @Override
+    protected Long deleteData(Long index)
+    {
+	try
+	{
+	    PreparedStatement statement = connection.prepareStatement("DELETE FROM data WHERE id = ?");
+	    statement.setLong(1, index);
+	    if (statement
+		    .executeUpdate() != 1) throw new DatabaseDataHandlerException("No data found for index " + index);
+	    return index;
+	}
+	catch (SQLException e)
+	{
+	    throw new DatabaseDataHandlerException(e);
+	}
+    }
+
+    @Override
     public List<Map<String, Object>> getList()
     {
 	List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
-
 	try
 	{
-	    ResultSet result = connection.createStatement().executeQuery("SELECT id,title FROM data");
+	    ResultSet result = connection.prepareStatement("SELECT id,title FROM data").executeQuery();
 	    while (result.next())
 	    {
 		Map<String, Object> entry = new TreeMap<>();

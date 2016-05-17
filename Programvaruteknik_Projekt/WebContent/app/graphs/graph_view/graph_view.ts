@@ -103,4 +103,9 @@ export class GraphView
 	{
       	this.dataBridgeService.load(this.pickedSave);
 	}
+	
+	clickDelete()
+	{
+      	this.dataBridgeService.delete(this.pickedSave,savedEntry=>this.updateSaveList());
+	}
 }

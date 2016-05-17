@@ -62,7 +62,7 @@ public class StatisticsServlet extends HttpServlet
 			ConstantSourceBuilder.class,
 			StockSourceBuilder.class,
 			QuandlDataSourceBuilder.class),
-		new MemoryDataHandler());
+		new DatabaseDataHandler());
     }
 
     /**
@@ -216,6 +216,26 @@ public class StatisticsServlet extends HttpServlet
 			data.put("id", savedAt_Index);
 			data.put("title", title);
 			result.put("data", data);
+			return formatter.format(new Genson().serialize(result));
+		    }
+		};
+	    }
+	    else if ("delete".equalsIgnoreCase(actionType))
+	    {
+		Long index;
+		Object longing = getValue(body, "data");
+		if (longing instanceof String)
+		    index = Long.parseLong((String) longing);
+		else
+		    index = (Long) longing;
+
+		outputter = new JSONOutputter()
+		{
+		    @Override
+		    public String asJSON(JSONFormatter formatter)
+		    {
+			Map<String, Object> result = new TreeMap<>();
+			result.put("data", dataHandler.delete(index));
 			return formatter.format(new Genson().serialize(result));
 		    }
 		};

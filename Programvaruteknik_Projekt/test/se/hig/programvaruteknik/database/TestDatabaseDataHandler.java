@@ -37,6 +37,48 @@ public class TestDatabaseDataHandler
     private Map<Long, String[]> database;
     private DatabaseDataHandler databaseHandler;
 
+    private PreparedStatement makeDeleteStatement() throws SQLException
+    {
+	PreparedStatement statement = mock(PreparedStatement.class);
+
+	Store<Long> index = new Store<Long>(null);
+
+	doAnswer(invocation ->
+	{
+	    index.value = invocation.getArgumentAt(1, Long.class);
+	    return null;
+	}).when(statement).setLong(Matchers.eq(1), Matchers.anyInt());
+
+	doAnswer(a ->
+	{
+	    if (index.value == null) throw new SQLException();
+
+	    if (!database.containsKey(index.value)) throw new SQLException();
+	    database.remove(index.value);
+
+	    Long i = index.value;
+	    ResultSet resultSet = mock(ResultSet.class);
+	    Store<Boolean> first = new Store<Boolean>(true);
+
+	    doAnswer(b ->
+	    {
+		if (!first.value) throw new SQLException();
+		first.value = false;
+		return true;
+	    }).when(resultSet).next();
+
+	    doAnswer(b ->
+	    {
+		if (first.value) throw new SQLException();
+		return i;
+	    }).when(resultSet).getLong("id");
+
+	    return 1L;
+	}).when(statement).executeUpdate();
+
+	return statement;
+    }
+
     private PreparedStatement makeLoadStatement() throws SQLException
     {
 	PreparedStatement statement = mock(PreparedStatement.class);
@@ -136,7 +178,7 @@ public class TestDatabaseDataHandler
 
     private Statement makeListStatement() throws SQLException
     {
-	Statement statement = mock(PreparedStatement.class);
+	PreparedStatement statement = mock(PreparedStatement.class);
 
 	doAnswer(a ->
 	{
@@ -163,7 +205,7 @@ public class TestDatabaseDataHandler
 	    }).when(resultSet).getString("title");
 
 	    return resultSet;
-	}).when(statement).executeQuery("SELECT (id,title) FROM data");
+	}).when(statement).executeQuery();
 
 	return statement;
     }
@@ -183,7 +225,8 @@ public class TestDatabaseDataHandler
 		connection,
 		"prepareStatement",
 		"INSERT INTO data(title, data) VALUES (?, ?) RETURNING id;");
-	doReturn(makeListStatement()).when(connection).createStatement();
+	doReturn(makeDeleteStatement()).when(connection, "prepareStatement", "DELETE FROM data WHERE id = ?");
+	doReturn(makeListStatement()).when(connection, "prepareStatement", "SELECT id,title FROM data");
 
 	Field f = DatabaseDataHandler.class.getDeclaredField("connection");
 	f.setAccessible(true);
@@ -254,6 +297,49 @@ public class TestDatabaseDataHandler
 	});
 
 	assertEquals("aa", databaseHandler.loadData(2L));
+    }
+
+    @Test
+    public void testDelete() throws Exception
+    {
+	database.put(1L, new String[]
+	{
+		"a",
+		"aa"
+	});
+	database.put(2L, new String[]
+	{
+		"b",
+		"bb"
+	});
+	database.put(3L, new String[]
+	{
+		"c",
+		"cc"
+	});
+
+	assertEquals(new Long(1L), databaseHandler.deleteData(1L));
+	assertEquals(new Long(3L), databaseHandler.deleteData(3L));
+	assertEquals(new Long(2L), databaseHandler.deleteData(2L));
+	assertEquals(0, database.size());
+    }
+
+    @Test(expected = DatabaseDataHandler.DatabaseDataHandlerException.class)
+    public void testDeleteWhenNone() throws Exception
+    {
+	databaseHandler.delete(1L);
+    }
+
+    @Test(expected = DatabaseDataHandler.DatabaseDataHandlerException.class)
+    public void testDeleteOutOfIndex() throws Exception
+    {
+	database.put(1L, new String[]
+	{
+		"a",
+		"aa"
+	});
+
+	databaseHandler.loadData(2L);
     }
 
     @Test
