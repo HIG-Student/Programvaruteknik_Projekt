@@ -1,35 +1,36 @@
 <center><input [(ngModel)]="dataBridgeService.saveData.title" class="title" placeholder="[Click to edit title]"></center>
 
-<button type="button" (click)="clickSave()">Save</button>
 <div>
 	<select [(ngModel)]="pickedSave">
 		<option value="-1">NONE</option>
 		<option *ngFor="let save of savesList" [value]="save.id">{{save.title}}</option>
 	</select>
+	<button type="button" (click)="clickSave()">Save</button>
 	<button type="button" [disabled]="!(savesList && savesList.length > 0) || pickedSave == -1" (click)="clickLoad()">Load SaveData</button>
 	<button type="button" [disabled]="!(savesList && savesList.length > 0) || pickedSave == -1" (click)="clickDelete()">Delete SaveData</button>
 </div>
 
-<table>
+<center><table>
 	<tr>
 		<td>
 			<data-view [data]="dataBridgeService.saveData.sourceA"></data-view>
 			<p *ngIf="sourceA_JSON">{{sourceA_JSON | json}}</p>
 			<pick-source-view (onPick)="setSourceA($event)"></pick-source-view>
 		</td>
-		
-		<td rowspan="2">
-			<corr-view [data]="dataBridgeService.saveData.sourceCorr" [from]="dataBridgeService.saveData.timeFilter.from" [to]="dataBridgeService.saveData.timeFilter.to"></corr-view>
-			<date-picker-view [resolution]="dataBridgeService.saveData.timeFilter.resolution" (onPick)="setTimeFilter($event)"></date-picker-view>
-		</td>
-	</tr>
-	<tr>
 		<td>
 			<data-view [data]="dataBridgeService.saveData.sourceB"></data-view>
 			<p *ngIf="sourceB_JSON">{{sourceB_JSON | json}}</p>
 			<pick-source-view (onPick)="setSourceB($event)"></pick-source-view>
 		</td>
 	</tr>
+	
+	<tr>
+		<td rowspan="2">
+			<corr-view [data]="dataBridgeService.saveData.sourceCorr" [from]="dataBridgeService.saveData.timeFilter.from" [to]="dataBridgeService.saveData.timeFilter.to"></corr-view>
+			<date-picker-view [resolution]="dataBridgeService.saveData.timeFilter.resolution" (onPick)="setTimeFilter($event)"></date-picker-view>
+		</td>
+		<td>
+			<textarea [(ngModel)]="dataBridgeService.saveData.comment" placeholder="Comment"></textarea>
+		</td>
+	</tr>
 </table>
-
-<textarea [(ngModel)]="dataBridgeService.saveData.comment" placeholder="Comment"></textarea>
