@@ -29,6 +29,17 @@ public abstract class DataHandler
 
     protected abstract String loadData(Long index);
 
+    public final Long delete(Long index)
+    {
+	if (index == null) throw new DataHandlerException("Delete: Null is not a valid index");
+	if (index < 0) throw new DataHandlerException("Delete: Negative index is not valid");
+	if (index == 0) throw new DataHandlerException("Delete: Index begins at 1, not 0");
+
+	return deleteData(index);
+    }
+
+    protected abstract Long deleteData(Long index);
+
     public abstract List<Map<String, Object>> getList();
 
     @SuppressWarnings("serial")

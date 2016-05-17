@@ -107,4 +107,14 @@ export class DataBridgeService
 		});
 		return null;
 	}
+	
+	public delete(id:number,callback):String
+	{
+		this.dataLoader.deleteData(id).subscribe(data =>
+		{
+			if(callback)
+				callback(data);
+		});
+		return null;
+	}
 }

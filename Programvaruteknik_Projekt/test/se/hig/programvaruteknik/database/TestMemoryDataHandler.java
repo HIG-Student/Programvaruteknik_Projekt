@@ -80,7 +80,7 @@ public class TestMemoryDataHandler
     @Test(expected = MemoryDataHandler.MemoryDataHandlerException.class)
     public void testLoadWhenNone() throws Exception
     {
-	assertEquals("aa", memoryDataHandler.loadData(1L));
+	memoryDataHandler.loadData(1L);
     }
 
     @Test(expected = MemoryDataHandler.MemoryDataHandlerException.class)
@@ -93,6 +93,49 @@ public class TestMemoryDataHandler
 	});
 
 	assertEquals("aa", memoryDataHandler.loadData(2L));
+    }
+
+    @Test
+    public void testDelete() throws Exception
+    {
+	database.put(1L, new String[]
+	{
+		"a",
+		"aa"
+	});
+	database.put(2L, new String[]
+	{
+		"b",
+		"bb"
+	});
+	database.put(3L, new String[]
+	{
+		"c",
+		"cc"
+	});
+
+	assertEquals(new Long(1L), memoryDataHandler.deleteData(1L));
+	assertEquals(new Long(3L), memoryDataHandler.deleteData(3L));
+	assertEquals(new Long(2L), memoryDataHandler.deleteData(2L));
+	assertEquals(0, database.size());
+    }
+
+    @Test(expected = MemoryDataHandler.MemoryDataHandlerException.class)
+    public void testDeleteWhenNone() throws Exception
+    {
+	memoryDataHandler.delete(1L);
+    }
+
+    @Test(expected = MemoryDataHandler.MemoryDataHandlerException.class)
+    public void testDeleteOutOfIndex() throws Exception
+    {
+	database.put(1L, new String[]
+	{
+		"a",
+		"aa"
+	});
+
+	memoryDataHandler.loadData(2L);
     }
 
     @Test

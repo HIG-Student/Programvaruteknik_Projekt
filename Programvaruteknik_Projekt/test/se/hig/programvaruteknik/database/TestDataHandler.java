@@ -35,6 +35,12 @@ public class TestDataHandler
 	    }
 
 	    @Override
+	    protected Long deleteData(Long index)
+	    {
+		return index;
+	    }
+
+	    @Override
 	    public List<Map<String, Object>> getList()
 	    {
 		return list;
@@ -70,6 +76,24 @@ public class TestDataHandler
     public void testLoad()
     {
 	assertEquals("[data]", dataHandler.load(42L));
+    }
+
+    @Test
+    public void testDelete()
+    {
+	assertEquals(new Long(1L), dataHandler.delete(1L));
+    }
+
+    @Test(expected = DataHandler.DataHandlerException.class)
+    public void testDeleteWhenNegativeInParameter()
+    {
+	dataHandler.delete(-1L);
+    }
+
+    @Test(expected = DataHandler.DataHandlerException.class)
+    public void testDeleteWhenNullInParameter()
+    {
+	dataHandler.delete(null);
     }
 
     @Test

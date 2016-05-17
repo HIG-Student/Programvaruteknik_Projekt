@@ -7,6 +7,7 @@
 		<option *ngFor="let save of savesList" [value]="save.id">{{save.title}}</option>
 	</select>
 	<button type="button" [disabled]="!(savesList && savesList.length > 0) || pickedSave == -1" (click)="clickLoad()">Load SaveData</button>
+	<button type="button" [disabled]="!(savesList && savesList.length > 0) || pickedSave == -1" (click)="clickDelete()">Delete SaveData</button>
 </div>
 
 <table>
