@@ -65,6 +65,8 @@ public class QuandlDataSourceBuilder extends JSONDataSourceBuilder
 	}
 
     }
+    
+    public SourceType source;
 
     public QuandlDataSourceBuilder()
     {
@@ -75,13 +77,23 @@ public class QuandlDataSourceBuilder extends JSONDataSourceBuilder
     public QuandlDataSourceBuilder(SourceType source)
     {
 	this();
-	setSourceSupplier(DataSupplierFactory.createURLFetcher(source.getUrl() + "?api_key=aS5eE67bVGDB2snkV9Wc"));
+	this.source = source;
+	setFetchFromWebsite("");  //required, but should be removed
 	setListExtractor(
 		(data) -> listToMap((((List<List<Object>>) ((Map<String, Object>) data.get("dataset")).get("data")))));
 	setDataExtractor(
 		(entry, adder) -> adder.accept(LocalDate.parse((String) entry.get("0")), (Double) entry.get("1")));
 	setNameExtractor((data) -> ((Map<String, Object>) data.get("dataset")).get("name").toString().split(",")[0]);
 	setUnit(source.getUnit());
+    }
+    
+    public void setFetchFromWebsite(String apiKey)
+    {
+	if (apiKey == null || apiKey == "") apiKey = "?api_key=aS5eE67bVGDB2snkV9Wc";
+
+	setSourceSupplier(
+			(DataSupplierFactory.createURLFetcher
+					(source.getUrl() + apiKey)));
     }
 
     @SuppressWarnings("serial")
