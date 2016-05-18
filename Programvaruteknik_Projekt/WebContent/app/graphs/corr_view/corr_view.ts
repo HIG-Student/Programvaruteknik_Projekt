@@ -290,7 +290,7 @@ export class CorrView
 			{
 				"labels":
 				[{
-					"text": "Brought to you by \n Zingchart",
+					"text": "Awaiting data",
 					"font-family": "Georgia",
 					"font-size": "50",
 					"font-color":"green",
