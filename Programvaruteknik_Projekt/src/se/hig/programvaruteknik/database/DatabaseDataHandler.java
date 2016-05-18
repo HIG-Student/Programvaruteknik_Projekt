@@ -46,7 +46,7 @@ public class DatabaseDataHandler extends DataHandler
 	{
 	    Context initCtx = new InitialContext();
 	    Context envCtx = (Context) initCtx.lookup("java:comp/env");
-	    DataSource ds = (DataSource) envCtx.lookup("jdbc/webapp");
+	    DataSource ds = (DataSource) envCtx.lookup("jdbc/Kaka");
 	    return ds.getConnection();
 	}
 	catch (Exception e)

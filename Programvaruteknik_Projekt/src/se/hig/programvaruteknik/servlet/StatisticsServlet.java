@@ -62,7 +62,7 @@ public class StatisticsServlet extends HttpServlet
 			ConstantSourceBuilder.class,
 			StockSourceBuilder.class,
 			QuandlDataSourceBuilder.class),
-		new MemoryDataHandler());
+		new DatabaseDataHandler());
     }
 
     /**
