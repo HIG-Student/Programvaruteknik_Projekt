@@ -1,15 +1,16 @@
 import {Injectable} from 'angular2/core';
 import {Http} from 'angular2/http';
+import {ProgressService} from "app/progress_service";
 import 'rxjs/add/operator/map';
+import {Observable} from 'rxjs/Rx';
 
 @Injectable()
 export class DataLoader
 {
-	constructor(private http: Http) { }
+	constructor(private http: Http, private progressor: ProgressService) { }
 	
 	getCorrData(data,sourceA,sourceB)
 	{
-
 		if(!data)
 			data = { };
 			
@@ -30,9 +31,7 @@ export class DataLoader
 			"sourceB": sourceB
 		};
 		
-		return this.http
-		.post("SampleServlet", JSON.stringify(data))
-		.map(res => res.json().data);
+		return this.post(data);
 	}
 	
 	getSourceData(data,source)
@@ -49,61 +48,78 @@ export class DataLoader
 		if(source)
 			data.data.source = source;
 		
-		return this.http
-		.post("SampleServlet", JSON.stringify(data))
-		.map(res => res.json().data);
+		return this.post(data);
 	}
 	
 	getSources()
 	{
-		return this.http
-		.post("SampleServlet", JSON.stringify(
+		return this.post(
 		{
 			"type": "sources"
-		}))
-		.map(res => res.json().data);
+		});
 	}
 	
 	sendSaveData(data:object)
 	{
-		return this.http
-		.post("SampleServlet", JSON.stringify(
+		return this.post(
 		{
 			"type": "save",
 			"data": data
-		}))
-		.map(res => res.json().data);
+		});
 	}
 	
 	getSavedData(id:number)
 	{	
-		return this.http
-		.post("SampleServlet", JSON.stringify(
+		return this.post(
 		{
 			"type": "load",
 			"data": id
-		}))
-		.map(res => res.json().data);
+		});
 	}
 	
 	deleteData(id:number)
 	{	
-		return this.http
-		.post("SampleServlet", JSON.stringify(
+		return this.post(
 		{
 			"type": "delete",
 			"data": id
-		}))
-		.map(res => res.json().data);
+		});
 	}
 	
 	getSaveList()
-	{	
-		return this.http
-		.post("SampleServlet", JSON.stringify(
+	{
+		return this.post(
 		{
 			"type": "list"
-		}))
-		.map(res => res.json().data);
+		});
+	}
+	
+	private post(data:object)
+	{		
+		return Observable.create(observer =>
+		{
+			this.progressor.addLoading();
+			
+			window.obs = observer;
+			
+			var thing = this.http
+				.post("SampleServlet", JSON.stringify(data))
+				.map(res => res.json().data)
+				.do(data =>
+					{
+						observer.next(data);
+					},
+					data =>
+					{
+						observer.error(error);
+						this.progressor.removeLoading();
+					},
+					data =>
+					{
+						observer.complete();
+						this.progressor.removeLoading();
+					})
+				.subscribe();
+		});
 	}
 }
