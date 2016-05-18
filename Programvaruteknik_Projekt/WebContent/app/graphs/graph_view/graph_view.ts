@@ -5,12 +5,13 @@ import {PickSourceView} from "app/graphs/pick_source_view/pick_source_view";
 import {DataLoader} from "app/data_loader";
 import {DatePickerView} from "app/graphs/date_picker_view/date_picker_view";
 import {DataBridgeService} from "app/data_bridge_service";
+import {DateView} from "app/date_view/date_view";
 
 @Component({
 	selector: "graph-view",
 	templateUrl: "app/graphs/graph_view/graph_view.html",
 	styleUrls: ["app/graphs/graph_view/graph_view.css"],
-	directives: [DataView,CorrView,PickSourceView,DatePickerView],
+	directives: [DataView,CorrView,PickSourceView,DatePickerView,DateView],
 	providers:[DataBridgeService]	
 })
 export class GraphView 

@@ -24,7 +24,8 @@ export class DataBridgeService
 			"from": "",
 			"to": "",
 			"resolution": "YEAR"
-		}
+		},
+		"lastSaveDate": null
 	};
 	
 	public setTimeFilter(timeFilter: object)
@@ -84,6 +85,8 @@ export class DataBridgeService
 			return error;
 		}
 		
+		this.saveData["lastSaveDate"] = Date.now();
+		
 		this.dataLoader.sendSaveData(this.saveData).subscribe(data=>
 		{
 			console.log("Sent data",data);
@@ -105,9 +108,11 @@ export class DataBridgeService
 			this.saveData = data;
 			this.dataLoaded.emit(data);
 		});
+		
+	
 		return null;
 	}
-	
+
 	public delete(id:number,callback):String
 	{
 		this.dataLoader.deleteData(id).subscribe(data =>
@@ -117,4 +122,5 @@ export class DataBridgeService
 		});
 		return null;
 	}
+
 }
