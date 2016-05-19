@@ -1,21 +1,36 @@
-import {Component} from "angular2/core";
+import {Component,OnInit,View} from "angular2/core";
+import {RouteConfig,Route, Router, ROUTER_DIRECTIVES} from 'angular2/router';
 import {GraphView} from "app/graphs/graph_view/graph_view";
+import {LoginView} from "app/login_view/login_view";
 import {DataLoader} from "app/data_loader";
 import {ProgressService} from "app/progress_service";
 import {HTTP_PROVIDERS} from 'angular2/http';
 
-@Component(
+console.log("R",Route);
+
+@View((
 {
-  selector: "statistics",
-  templateUrl: "app/statistics.html",
-  styleUrls: ["app/statistics.css"],
-  directives: [GraphView],
-  providers: [HTTP_PROVIDERS, DataLoader, ProgressService]
+	templateUrl: "app/statistics.html",
+	styleUrls: ["app/statistics.css"],
+	directives: [GraphView,LoginView,ROUTER_DIRECTIVES],
+	providers: [ProgressService,DataLoader,HTTP_PROVIDERS]
 })
-export class Statistics 
-{
-	constructor(private progressor: ProgressService) 
+@RouteConfig(
+[
 	{
-	
+		path: '/login',  
+		component: LoginView,
+		useAsDefault: true
+	},
+	{
+		path: '/statistics',  
+		component: GraphView
+	}
+])
+export class Statistics implements OnInit
+{
+	constructor(private router: Router, private progressor: ProgressService) 
+	{
+		
 	}
 }

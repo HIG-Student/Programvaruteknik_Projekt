@@ -1,4 +1,8 @@
-<graph-view></graph-view>
 <div class="progressor" *ngIf="progressor.loading">
 	<img src="images/loader.gif">
 </div>
+
+      <a [routerLink]="['/login']">Crisis Center</a>
+      <a [routerLink]="['/statistics']">Bugs</a>
+
+<router-outlet></router-outlet>
