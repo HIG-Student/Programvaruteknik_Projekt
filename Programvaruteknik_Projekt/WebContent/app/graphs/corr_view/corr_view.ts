@@ -290,10 +290,10 @@ export class CorrView
 			{
 				"labels":
 				[{
-					"text": "No values found",
+					"text": "Awaiting data",
 					"font-family": "Georgia",
 					"font-size": "50",
-					"font-color":"red",
+					"font-color":"green",
 					"x": "20%",
 					"y": "40%"
 				}]

@@ -164,10 +164,10 @@ export class DataView
 			{
 				"labels":
 				[{
-					"text": "No values found",
+					"text": "Please insert value",
 					"font-family": "Georgia",
 					"font-size": "50",
-					"font-color":"red",
+					"font-color":"green",
 					"x": "20%",
 					"y": "40%"
 				}]
