@@ -34,11 +34,11 @@ import se.hig.programvaruteknik.JSONFormatter;
 import se.hig.programvaruteknik.JSONOutputter;
 
 /**
- * Servlet implementation class SampleServlet
+ * Servlet implementation class StatisticsServlet
  * 
  * @author Viktor Hanstorp (ndi14vhp@student.hig.se)
  */
-@WebServlet("/SampleServlet")
+@WebServlet("/StatisticsServlet")
 public class StatisticsServlet extends HttpServlet
 {
     private static final long serialVersionUID = 1L;

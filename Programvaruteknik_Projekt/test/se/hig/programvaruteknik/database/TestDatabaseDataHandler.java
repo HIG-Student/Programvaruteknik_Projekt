@@ -26,6 +26,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
+import javax.sql.DataSource;
+
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(
 {
@@ -215,10 +217,12 @@ public class TestDatabaseDataHandler
     {
 	database = new TreeMap<Long, String[]>();
 
-	suppress(method(DatabaseDataHandler.class, "createConnection"));
+	suppress(method(DatabaseDataHandler.class, "createDataSource"));
 	databaseHandler = spy(new DatabaseDataHandler());
 
 	Connection connection = mock(Connection.class);
+
+	DataSource dataSource = mock(DataSource.class);
 
 	doReturn(makeLoadStatement()).when(connection, "prepareStatement", "SELECT * FROM data WHERE id = ?");
 	doReturn(makeSaveStatement()).when(
@@ -228,9 +232,11 @@ public class TestDatabaseDataHandler
 	doReturn(makeDeleteStatement()).when(connection, "prepareStatement", "DELETE FROM data WHERE id = ?");
 	doReturn(makeListStatement()).when(connection, "prepareStatement", "SELECT id,title FROM data");
 
-	Field f = DatabaseDataHandler.class.getDeclaredField("connection");
+	when(dataSource.getConnection()).thenReturn(connection);
+
+	Field f = DatabaseDataHandler.class.getDeclaredField("dataSource");
 	f.setAccessible(true);
-	f.set(databaseHandler, connection);
+	f.set(databaseHandler, dataSource);
     }
 
     @Test

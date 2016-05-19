@@ -103,7 +103,7 @@ export class DataLoader
 			window.obs = observer;
 			
 			var thing = this.http
-				.post("SampleServlet", JSON.stringify(data))
+				.post("StatisticsServlet", JSON.stringify(data))
 				.map(res => res.json().data)
 				.do(data =>
 					{

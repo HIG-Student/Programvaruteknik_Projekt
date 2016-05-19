@@ -30,7 +30,7 @@
 					console.log("Click!");
 					console.log("Text",$("#json").val());
 					console.log("JSON",$.parseJSON($("#json").val()));
-					$.post( "SampleServlet", $("#json").val() )
+					$.post( "StatisticsServlet", $("#json").val() )
 						.done(function(data)
 						{
 							console.log("yo",data);

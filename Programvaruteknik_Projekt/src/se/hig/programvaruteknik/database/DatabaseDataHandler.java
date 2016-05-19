@@ -1,7 +1,6 @@
 package se.hig.programvaruteknik.database;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -16,38 +15,20 @@ import javax.sql.DataSource;
 
 public class DatabaseDataHandler extends DataHandler
 {
-    private Connection connection;
+    private DataSource dataSource;
 
     public DatabaseDataHandler()
     {
-	connection = createConnection();
+	dataSource = createDataSource();
     }
 
-    public DatabaseDataHandler(String url, String user, String password)
-    {
-	connection = createConnection(url, user, password);
-    }
-
-    private Connection createConnection(String url, String user, String password)
-    {
-	try
-	{
-	    return DriverManager.getConnection(url, user, password);
-	}
-	catch (Exception e)
-	{
-	    throw new DatabaseDataHandlerException(e);
-	}
-    }
-
-    private Connection createConnection()
+    private DataSource createDataSource()
     {
 	try
 	{
 	    Context initCtx = new InitialContext();
 	    Context envCtx = (Context) initCtx.lookup("java:comp/env");
-	    DataSource ds = (DataSource) envCtx.lookup("jdbc/Kaka");
-	    return ds.getConnection();
+	    return (DataSource) envCtx.lookup("jdbc/Kaka");
 	}
 	catch (Exception e)
 	{
@@ -58,7 +39,7 @@ public class DatabaseDataHandler extends DataHandler
     @Override
     protected Long saveData(String title, String data)
     {
-	try
+	try (Connection connection = dataSource.getConnection())
 	{
 	    PreparedStatement statement = connection
 		    .prepareStatement("INSERT INTO data(title, data) VALUES (?, ?) RETURNING id;");
@@ -77,7 +58,7 @@ public class DatabaseDataHandler extends DataHandler
     @Override
     protected String loadData(Long i)
     {
-	try
+	try (Connection connection = dataSource.getConnection())
 	{
 	    PreparedStatement statement = connection.prepareStatement("SELECT * FROM data WHERE id = ?");
 	    statement.setLong(1, i);
@@ -94,7 +75,7 @@ public class DatabaseDataHandler extends DataHandler
     @Override
     protected Long deleteData(Long index)
     {
-	try
+	try (Connection connection = dataSource.getConnection())
 	{
 	    PreparedStatement statement = connection.prepareStatement("DELETE FROM data WHERE id = ?");
 	    statement.setLong(1, index);
@@ -112,7 +93,7 @@ public class DatabaseDataHandler extends DataHandler
     public List<Map<String, Object>> getList()
     {
 	List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
-	try
+	try (Connection connection = dataSource.getConnection())
 	{
 	    ResultSet result = connection.prepareStatement("SELECT id,title FROM data").executeQuery();
 	    while (result.next())
