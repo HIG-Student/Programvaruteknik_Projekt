@@ -26,3 +26,11 @@ corr-view
 	width: 100%;
 	border: none;
 }
+
+.comment
+{
+	resize: none;
+	width: 84%;
+	height: 250px;
+	overflow: auto;
+}
