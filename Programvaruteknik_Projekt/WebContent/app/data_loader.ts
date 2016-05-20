@@ -109,7 +109,7 @@ export class DataLoader
 					{
 						observer.next(data);
 					},
-					data =>
+					error =>
 					{
 						observer.error(error);
 						this.progressor.removeLoading();
