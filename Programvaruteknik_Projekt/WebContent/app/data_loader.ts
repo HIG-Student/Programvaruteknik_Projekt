@@ -40,11 +40,7 @@ export class DataLoader
 		
 		if(!data["data"])
 			data["data"] = { };
-		
-		//data["resolution"] = "YEAR";
-		//data["merge-type-x"] = "AVERAGE";
-		//data["merge-type-y"] = "AVERAGE";
-		
+
 		if(source)
 			data.data.source = source;
 		
@@ -94,13 +90,24 @@ export class DataLoader
 		});
 	}
 	
+	login(username:String,password:String):Observable
+	{
+		return this.post(
+		{
+			"type": "login",
+			"data":
+			{
+				"name": username,
+				"password": password
+			}
+		});
+	}
+	
 	private post(data:object)
 	{		
 		return Observable.create(observer =>
 		{
 			this.progressor.addLoading();
-			
-			window.obs = observer;
 			
 			var thing = this.http
 				.post("SampleServlet", JSON.stringify(data))
