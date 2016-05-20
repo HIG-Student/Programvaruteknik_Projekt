@@ -224,13 +224,13 @@ public class TestDatabaseDataHandler
 
 	DataSource dataSource = mock(DataSource.class);
 
-	doReturn(makeLoadStatement()).when(connection, "prepareStatement", "SELECT * FROM data WHERE id = ?");
+	doReturn(makeLoadStatement()).when(connection, "prepareStatement", "SELECT * FROM saves WHERE id = ?");
 	doReturn(makeSaveStatement()).when(
 		connection,
 		"prepareStatement",
-		"INSERT INTO data(title, data) VALUES (?, ?) RETURNING id;");
-	doReturn(makeDeleteStatement()).when(connection, "prepareStatement", "DELETE FROM data WHERE id = ?");
-	doReturn(makeListStatement()).when(connection, "prepareStatement", "SELECT id,title FROM data");
+		"INSERT INTO saves(title, data) VALUES (?, ?) RETURNING id;");
+	doReturn(makeDeleteStatement()).when(connection, "prepareStatement", "DELETE FROM saves WHERE id = ?");
+	doReturn(makeListStatement()).when(connection, "prepareStatement", "SELECT id,title FROM saves");
 
 	when(dataSource.getConnection()).thenReturn(connection);
 
