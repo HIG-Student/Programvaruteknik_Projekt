@@ -42,7 +42,7 @@ public class DatabaseDataHandler extends DataHandler
 	try (Connection connection = dataSource.getConnection())
 	{
 	    PreparedStatement statement = connection
-		    .prepareStatement("INSERT INTO data(title, data) VALUES (?, ?) RETURNING id;");
+		    .prepareStatement("INSERT INTO saves(title, data) VALUES (?, ?) RETURNING id;");
 	    statement.setString(1, title);
 	    statement.setString(2, data);
 	    ResultSet result = statement.executeQuery();
@@ -60,7 +60,7 @@ public class DatabaseDataHandler extends DataHandler
     {
 	try (Connection connection = dataSource.getConnection())
 	{
-	    PreparedStatement statement = connection.prepareStatement("SELECT * FROM data WHERE id = ?");
+	    PreparedStatement statement = connection.prepareStatement("SELECT * FROM saves WHERE id = ?");
 	    statement.setLong(1, i);
 	    ResultSet result = statement.executeQuery();
 	    if (!result.next()) throw new DatabaseDataHandlerException("No data found for index " + i);
@@ -77,7 +77,7 @@ public class DatabaseDataHandler extends DataHandler
     {
 	try (Connection connection = dataSource.getConnection())
 	{
-	    PreparedStatement statement = connection.prepareStatement("DELETE FROM data WHERE id = ?");
+	    PreparedStatement statement = connection.prepareStatement("DELETE FROM saves WHERE id = ?");
 	    statement.setLong(1, index);
 	    if (statement
 		    .executeUpdate() != 1) throw new DatabaseDataHandlerException("No data found for index " + index);
@@ -95,7 +95,7 @@ public class DatabaseDataHandler extends DataHandler
 	List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
 	try (Connection connection = dataSource.getConnection())
 	{
-	    ResultSet result = connection.prepareStatement("SELECT id,title FROM data").executeQuery();
+	    ResultSet result = connection.prepareStatement("SELECT id,title FROM saves").executeQuery();
 	    while (result.next())
 	    {
 		Map<String, Object> entry = new TreeMap<>();
