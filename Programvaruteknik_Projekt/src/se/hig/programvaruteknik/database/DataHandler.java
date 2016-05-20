@@ -42,7 +42,25 @@ public abstract class DataHandler
 
     public abstract List<Map<String, Object>> getList();
 
-    @SuppressWarnings("serial")
+    public final boolean validateLogin(String username, String password)
+    {
+	if (username == null || password == null) return false;
+
+	return validateCredentials(username.toLowerCase(), password);
+    }
+
+    protected abstract boolean validateCredentials(String username, String password);
+
+    public final void createLogin(String username, String password) throws DataHandlerCannotCreateLoginException
+    {
+	if (username == null || password == null) throw new DataHandlerCannotCreateLoginException(
+		"Name and password cannot be null!");
+
+	createCredentials(username.toLowerCase(), password);
+    }
+
+    protected abstract void createCredentials(String username, String password) throws DataHandlerCannotCreateLoginException;
+
     public class DataHandlerException extends RuntimeException
     {
 	public DataHandlerException()
@@ -56,6 +74,24 @@ public abstract class DataHandler
 	}
 
 	public DataHandlerException(Throwable throwable)
+	{
+	    super(throwable);
+	}
+    }
+
+    public class DataHandlerCannotCreateLoginException extends DataHandlerException
+    {
+	public DataHandlerCannotCreateLoginException()
+	{
+
+	}
+
+	public DataHandlerCannotCreateLoginException(String message)
+	{
+	    super(message);
+	}
+
+	public DataHandlerCannotCreateLoginException(Throwable throwable)
 	{
 	    super(throwable);
 	}

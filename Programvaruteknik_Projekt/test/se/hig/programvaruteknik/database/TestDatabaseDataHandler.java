@@ -10,6 +10,8 @@ import org.mockito.Matchers;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import se.hig.programvaruteknik.database.DatabaseDataHandler.DataConnection;
+
 import static org.powermock.api.mockito.PowerMockito.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertArrayEquals;
@@ -36,7 +38,9 @@ import javax.sql.DataSource;
 @SuppressWarnings("javadoc")
 public class TestDatabaseDataHandler
 {
-    private Map<Long, String[]> database;
+    private Map<Long, String[]> data_database;
+    private Map<String, byte[][]> user_database;
+
     private DatabaseDataHandler databaseHandler;
 
     private PreparedStatement makeDeleteStatement() throws SQLException
@@ -55,8 +59,8 @@ public class TestDatabaseDataHandler
 	{
 	    if (index.value == null) throw new SQLException();
 
-	    if (!database.containsKey(index.value)) throw new SQLException();
-	    database.remove(index.value);
+	    if (!data_database.containsKey(index.value)) throw new SQLException();
+	    data_database.remove(index.value);
 
 	    Long i = index.value;
 	    ResultSet resultSet = mock(ResultSet.class);
@@ -111,8 +115,8 @@ public class TestDatabaseDataHandler
 	    doAnswer(b ->
 	    {
 		if (first.value) throw new SQLException();
-		if (!database.containsKey(i)) throw new SQLException();
-		return database.get(i)[1];
+		if (!data_database.containsKey(i)) throw new SQLException();
+		return data_database.get(i)[1];
 	    }).when(resultSet).getString("data");
 
 	    return resultSet;
@@ -148,9 +152,9 @@ public class TestDatabaseDataHandler
 	    String title_value = title.value;
 	    String data_value = data.value;
 
-	    Long index = (long) (database.size() + 1);
+	    Long index = (long) (data_database.size() + 1);
 
-	    database.put(index, new String[]
+	    data_database.put(index, new String[]
 	    {
 		    title_value,
 		    data_value
@@ -188,7 +192,7 @@ public class TestDatabaseDataHandler
 	    Store<Integer> index = new Store<Integer>(-1);
 
 	    List<Entry<Long, String[]>> list = new ArrayList<>();
-	    for (Entry<Long, String[]> entry : database.entrySet())
+	    for (Entry<Long, String[]> entry : data_database.entrySet())
 		list.add(entry);
 
 	    doAnswer(b ->
@@ -212,31 +216,74 @@ public class TestDatabaseDataHandler
 	return statement;
     }
 
+    private PreparedStatement makeCreateCredentialsStatement() throws SQLException
+    {
+	PreparedStatement statement = mock(PreparedStatement.class);
+
+	Store<String> name = new Store<String>(null);
+	Store<byte[]> hash = new Store<byte[]>(null);
+	Store<byte[]> salt = new Store<byte[]>(null);
+
+	doAnswer(invocation ->
+	{
+	    name.value = invocation.getArgumentAt(1, String.class);
+	    return null;
+	}).when(statement).setString(Matchers.eq(1), Matchers.anyString());
+
+	doAnswer(invocation ->
+	{
+	    hash.value = invocation.getArgumentAt(1, byte[].class);
+	    return null;
+	}).when(statement).setBytes(Matchers.eq(2), Matchers.any(byte[].class));
+
+	doAnswer(invocation ->
+	{
+	    salt.value = invocation.getArgumentAt(1, byte[].class);
+	    return null;
+	}).when(statement).setBytes(Matchers.eq(3), Matchers.any(byte[].class));
+
+	doAnswer(a ->
+	{
+	    if (name.value == null) throw new SQLException();
+	    if (hash.value == null) throw new SQLException();
+	    if (salt.value == null) throw new SQLException();
+
+	    user_database.put(name.value, new byte[][]
+	    {
+		    hash.value,
+		    salt.value
+	    });
+
+	    return 1;
+	}).when(statement).executeUpdate();
+
+	return statement;
+    }
+
     @Before
     public void setUp() throws Exception
     {
-	database = new TreeMap<Long, String[]>();
-
-	suppress(method(DatabaseDataHandler.class, "createDataSource"));
-	databaseHandler = spy(new DatabaseDataHandler());
+	data_database = new TreeMap<Long, String[]>();
 
 	Connection connection = mock(Connection.class);
 
-	DataSource dataSource = mock(DataSource.class);
+	doReturn(makeCreateCredentialsStatement()).when(
+		connection,
+		"prepareStatement",
+		"INSERT INTO users(name, hash, salt) VALUES (?, ?, ?)");
 
-	doReturn(makeLoadStatement()).when(connection, "prepareStatement", "SELECT * FROM data WHERE id = ?");
+	doReturn(makeLoadStatement()).when(connection, "prepareStatement", "SELECT * FROM saves WHERE id = ?");
 	doReturn(makeSaveStatement()).when(
 		connection,
 		"prepareStatement",
-		"INSERT INTO data(title, data) VALUES (?, ?) RETURNING id;");
-	doReturn(makeDeleteStatement()).when(connection, "prepareStatement", "DELETE FROM data WHERE id = ?");
-	doReturn(makeListStatement()).when(connection, "prepareStatement", "SELECT id,title FROM data");
+		"INSERT INTO saves(title, data) VALUES (?, ?) RETURNING id;");
+	doReturn(makeDeleteStatement()).when(connection, "prepareStatement", "DELETE FROM saves WHERE id = ?");
+	doReturn(makeListStatement()).when(connection, "prepareStatement", "SELECT id,title FROM saves");
 
-	when(dataSource.getConnection()).thenReturn(connection);
+	DataConnection dataConnection = mock(DataConnection.class);
+	when(dataConnection.getConnection()).thenReturn(connection);
 
-	Field f = DatabaseDataHandler.class.getDeclaredField("dataSource");
-	f.setAccessible(true);
-	f.set(databaseHandler, dataSource);
+	databaseHandler = spy(new DatabaseDataHandler(dataConnection));
     }
 
     @Test
@@ -245,38 +292,38 @@ public class TestDatabaseDataHandler
 	assertEquals(new Long(1), databaseHandler.saveData("a", "aa"));
 	assertEquals(new Long(2), databaseHandler.saveData("b", "bb"));
 	assertEquals(new Long(3), databaseHandler.saveData("c", "cc"));
-	assertEquals(new Integer(3), (Integer) database.size());
+	assertEquals(new Integer(3), (Integer) data_database.size());
 	assertArrayEquals(new String[]
 	{
 		"a",
 		"aa"
-	}, database.get(1L));
+	}, data_database.get(1L));
 	assertArrayEquals(new String[]
 	{
 		"b",
 		"bb"
-	}, database.get(2L));
+	}, data_database.get(2L));
 	assertArrayEquals(new String[]
 	{
 		"c",
 		"cc"
-	}, database.get(3L));
+	}, data_database.get(3L));
     }
 
     @Test
     public void testLoad() throws Exception
     {
-	database.put(1L, new String[]
+	data_database.put(1L, new String[]
 	{
 		"a",
 		"aa"
 	});
-	database.put(2L, new String[]
+	data_database.put(2L, new String[]
 	{
 		"b",
 		"bb"
 	});
-	database.put(3L, new String[]
+	data_database.put(3L, new String[]
 	{
 		"c",
 		"cc"
@@ -296,7 +343,7 @@ public class TestDatabaseDataHandler
     @Test(expected = DatabaseDataHandler.DatabaseDataHandlerException.class)
     public void testLoadOutOfIndex() throws Exception
     {
-	database.put(1L, new String[]
+	data_database.put(1L, new String[]
 	{
 		"a",
 		"aa"
@@ -308,17 +355,17 @@ public class TestDatabaseDataHandler
     @Test
     public void testDelete() throws Exception
     {
-	database.put(1L, new String[]
+	data_database.put(1L, new String[]
 	{
 		"a",
 		"aa"
 	});
-	database.put(2L, new String[]
+	data_database.put(2L, new String[]
 	{
 		"b",
 		"bb"
 	});
-	database.put(3L, new String[]
+	data_database.put(3L, new String[]
 	{
 		"c",
 		"cc"
@@ -327,7 +374,7 @@ public class TestDatabaseDataHandler
 	assertEquals(new Long(1L), databaseHandler.deleteData(1L));
 	assertEquals(new Long(3L), databaseHandler.deleteData(3L));
 	assertEquals(new Long(2L), databaseHandler.deleteData(2L));
-	assertEquals(0, database.size());
+	assertEquals(0, data_database.size());
     }
 
     @Test(expected = DatabaseDataHandler.DatabaseDataHandlerException.class)
@@ -339,7 +386,7 @@ public class TestDatabaseDataHandler
     @Test(expected = DatabaseDataHandler.DatabaseDataHandlerException.class)
     public void testDeleteOutOfIndex() throws Exception
     {
-	database.put(1L, new String[]
+	data_database.put(1L, new String[]
 	{
 		"a",
 		"aa"
@@ -358,7 +405,7 @@ public class TestDatabaseDataHandler
     public void testList()
     {
 	List<Map<String, Object>> result = new ArrayList<Map<String, Object>>();
-	for (Entry<Long, String[]> entry : database.entrySet())
+	for (Entry<Long, String[]> entry : data_database.entrySet())
 	{
 	    Map<String, Object> value = new TreeMap<>();
 	    value.put("id", entry.getKey());
@@ -367,6 +414,15 @@ public class TestDatabaseDataHandler
 	}
 
 	assertEquals(result, databaseHandler.getList());
+    }
+
+    @Test
+    public void testCreateLogin()
+    {
+	databaseHandler.createLogin("something", "something_p");
+	assertEquals(1, user_database.size());
+	assertEquals(true, user_database.containsKey("something"));
+	assertEquals("something_p", user_database.get("something"));
     }
 
     class Store<T>

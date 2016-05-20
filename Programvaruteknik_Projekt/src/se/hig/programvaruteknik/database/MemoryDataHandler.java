@@ -14,13 +14,14 @@ import java.util.TreeMap;
 
 public class MemoryDataHandler extends DataHandler
 {
-    private Map<Long, String[]> database = new TreeMap<Long, String[]>();
+    private Map<Long, String[]> data_database = new TreeMap<Long, String[]>();
+    private Map<String, String> user_database = new TreeMap<String, String>();
 
     @Override
     protected Long saveData(String title, String json)
     {
-	Long index = (long) database.size() + 1;
-	database.put(index, new String[]
+	Long index = (long) data_database.size() + 1;
+	data_database.put(index, new String[]
 	{
 		title,
 		json
@@ -32,11 +33,12 @@ public class MemoryDataHandler extends DataHandler
     @Override
     protected String loadData(Long index)
     {
-	if (!database.containsKey(index)) throw new MemoryDataHandlerException("No value at index [" + index + "]");
+	if (!data_database
+		.containsKey(index)) throw new MemoryDataHandlerException("No value at index [" + index + "]");
 
 	try
 	{
-	    return database.get(index)[1];
+	    return data_database.get(index)[1];
 	}
 	catch (Throwable t)
 	{
@@ -47,11 +49,12 @@ public class MemoryDataHandler extends DataHandler
     @Override
     protected Long deleteData(Long index)
     {
-	if (!database.containsKey(index)) throw new MemoryDataHandlerException("No value at index [" + index + "]");
+	if (!data_database
+		.containsKey(index)) throw new MemoryDataHandlerException("No value at index [" + index + "]");
 
 	try
 	{
-	    database.remove(index);
+	    data_database.remove(index);
 	    return index;
 	}
 	catch (Throwable t)
@@ -64,7 +67,7 @@ public class MemoryDataHandler extends DataHandler
     public List<Map<String, Object>> getList()
     {
 	List<Map<String, Object>> result = new ArrayList<Map<String, Object>>();
-	for (Entry<Long, String[]> database_entry : database.entrySet())
+	for (Entry<Long, String[]> database_entry : data_database.entrySet())
 	{
 	    Map<String, Object> entry = new TreeMap<>();
 	    entry.put("id", database_entry.getKey());
@@ -72,6 +75,21 @@ public class MemoryDataHandler extends DataHandler
 	    result.add(entry);
 	}
 	return result;
+    }
+
+    @Override
+    protected boolean validateCredentials(String username, String password)
+    {
+	if (!user_database.containsKey(username)) return false;
+
+	return user_database.get(username).equals(password);
+    }
+
+    @Override
+    protected void createCredentials(String username, String password) throws DataHandlerCannotCreateLoginException
+    {
+	if (user_database.containsKey(username)) throw new DataHandlerCannotCreateLoginException("User already exsist");
+	user_database.put(username, password);
     }
 
     public class MemoryDataHandlerException extends DataHandlerException
