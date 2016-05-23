@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import se.hig.programvaruteknik.JSONFormatter;
 import se.hig.programvaruteknik.data.StockSourceBuilder.StockInfo;
+import se.hig.programvaruteknik.data.StockSourceBuilder.StockName;
 import se.hig.programvaruteknik.model.DataSource;
 import se.hig.programvaruteknik.model.DataSource.DataSourceException;
 
@@ -120,7 +121,7 @@ public class TestStockSourceBuilder
     {
     	StockSourceBuilder builder = new StockSourceBuilder(StockInfo.FLUCTUATION);
     	JSONFormatter formatter = new JSONFormatter();
-    	builder.setStock("TEST", 0);
+    	builder.setStock(StockName.BAC, 0);
     	builder.setSourceSupplier(DataSupplierFactory.createFileFetcher("data/test/TestStockData.txt"));
     	Exception ex = new Exception("aa");
     	DataSourceException source = new DataSourceException(ex);
