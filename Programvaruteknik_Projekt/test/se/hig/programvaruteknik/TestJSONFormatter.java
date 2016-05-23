@@ -11,11 +11,6 @@ import junit.framework.TestCase;
 public class TestJSONFormatter extends TestCase {
 
 	@Override
-	protected void setUp() {
-		super.setUp();
-	}
-
-	@Override
 	protected void tearDown() throws Exception {
 		super.tearDown();
 	}
