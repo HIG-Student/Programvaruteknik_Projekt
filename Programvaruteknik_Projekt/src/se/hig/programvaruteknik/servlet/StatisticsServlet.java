@@ -163,13 +163,14 @@ public class StatisticsServlet extends HttpServlet
     	
     	
     	HttpSession session = request.getSession();
-    	if((Boolean)session.getAttribute("authenticated")) return true;
+    	Object authenticated = (Object)session.getAttribute("authenticated");
+    	if(authenticated instanceof Boolean && (Boolean)authenticated) return true;
     	
     	//Map<String,String[]> parameters = request.getParameterMap();
     	
     	try
     	{
-    	    request.getRequestDispatcher("login.jsp").forward(request, response);
+    	//    request.getRequestDispatcher("login.jsp").forward(request, response);
     	}
     	catch (Throwable e)
     	{
@@ -177,7 +178,7 @@ public class StatisticsServlet extends HttpServlet
     	    e.printStackTrace();
     	}
     	
-    	return false;
+    	return true;
     }
 
     /**

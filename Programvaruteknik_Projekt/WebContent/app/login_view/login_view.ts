@@ -23,13 +23,16 @@ export class LoginView
 	
 	public login()
 	{
-		console.log("Trying to login with", this.username);
+		this.message = "";
 		
-		this.dataLoader.login(this.username,this.password).subscribe(function(data)
+		this.dataLoader.offlineLogin(this.username,this.password).subscribe(data =>
 		{
-			this.router.navigate(["/Statistics"]);
+			if(data.success)
+				this.router.navigate(["/Statistics"]);
+			else
+				this.message = data.message || "Authentication failed!";
 		},
-		function(error)
+		error =>
 		{
 			this.message = error;
 		});

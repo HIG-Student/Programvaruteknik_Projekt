@@ -9,8 +9,8 @@
 
 <form action="StatisticsServlet/login"> 
 	<center>
-		<label>Username <input type="text" [(ngModel)]="username" name="Username" placeholder ="Username"></label>  <button type ="button" onClick="alert('have you seen my Gnu?')"> Sign in</button> <br>
-		<label>Password <input type="password" [(ngModel)]="password" name="Password" placeholder ="Password"></label>  <button type ="button" (click)="login()">Sign up</button>
+		<label>Username <input type="text" [(ngModel)]="username" name="Username" placeholder ="Username"></label>  <button type ="button" (click)="login()"> Sign in</button> <br>
+		<label>Password <input type="password" [(ngModel)]="password" name="Password" placeholder ="Password"></label>  <button type ="button" onClick ="alert('Have you seen my Gnu?')">Sign up</button>
 		<br>
 		<br>
 		<p class="message" *ngIf="message">{{message}}</p>

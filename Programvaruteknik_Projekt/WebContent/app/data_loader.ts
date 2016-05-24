@@ -90,8 +90,42 @@ export class DataLoader
 		});
 	}
 	
+	
+	
+	
+	offlineLogin(username:String,password:String):Observable
+	{
+		console.log("Have you seen my Gnu hjahjk?");
+		
+		return Observable.create(observer =>
+		{
+			this.progressor.addLoading();
+			
+			var thing = this.http
+				.get("example_login.json")
+				.map(res => res.json().data)
+				.do(data =>
+					{
+						observer.next(data);
+					},
+					error =>
+					{
+						observer.error(error);
+						this.progressor.removeLoading();
+					},
+					data =>
+					{
+						observer.complete();
+						this.progressor.removeLoading();
+					})
+				.subscribe();
+		});
+	}
+	
+	
 	login(username:String,password:String):Observable
 	{
+		console.log("Have you seen my Gnu?");
 		return this.post(
 		{
 			"type": "login",
@@ -116,7 +150,7 @@ export class DataLoader
 					{
 						observer.next(data);
 					},
-					data =>
+					error =>
 					{
 						observer.error(error);
 						this.progressor.removeLoading();
