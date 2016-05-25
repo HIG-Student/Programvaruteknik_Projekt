@@ -97,10 +97,6 @@ public class DatabaseDataHandler extends DataHandler
 	}
     }
     
-    /**
-     * 
-     *
-     */
     @Override
     public List<Map<String, Object>> getList()
     {

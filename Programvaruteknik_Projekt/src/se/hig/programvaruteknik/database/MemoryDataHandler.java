@@ -11,6 +11,7 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 
 /**
+ * Class handles data that is stored in database
  * docs Fredrik
  *
  */

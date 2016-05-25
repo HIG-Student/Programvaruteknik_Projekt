@@ -14,13 +14,19 @@ import se.hig.programvaruteknik.model.SourceGenerator;
  * Building data from Quandl
  * <a href="https://www.quandl.com/browse">Quandl</a>
  * 
- * @author Miran Batti (kommer)
+ * @author Miran Batti (ofk14mbi@student.hig.se)
  * @author Fredrik Lindorf (ntn13flf@student.hig.se)
  * docs Fredrik
  */
 public class QuandlDataSourceBuilder extends JSONDataSourceBuilder
 {
 
+    /**
+     * The location to get Quandl data from<br>
+     * <br>
+     * The name of the Quandl data
+     *
+     */
     public static enum SourceType
     {
 	DEATH_RATE_CIRRHOSIS_USA("Cirrhosis", "Rate", "Death rate from liver cirrhosis", "https://www.quandl.com/api/v3/datasets/NIAAA/CIRRHOSIS.json"),
@@ -103,7 +109,7 @@ public class QuandlDataSourceBuilder extends JSONDataSourceBuilder
     }
     
     /**
-     * Builds specific data sources for example
+     * Builds specific data sources like
      * QuandlDataSource DEATH_RATE_CIRRHOSIS_USA
      * 
      * @param source
@@ -155,6 +161,7 @@ public class QuandlDataSourceBuilder extends JSONDataSourceBuilder
      * <br>
      * based on matching parameters
      * @param type
+     * 		Which Quandl data to generate
      * @return QuandlDataSourceBuilder
      */
     @SourceGenerator("Quandl data")
