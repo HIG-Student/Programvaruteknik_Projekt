@@ -21,7 +21,9 @@ public class TestMemoryDataHandler
 {
     private MemoryDataHandler memoryDataHandler;
     private Map<Long, String[]> data_database;
+
     private Map<String, String> user_database;
+    private Map<String, Long> user_id_database;
 
     @Before
     public void setUp() throws Exception
@@ -39,14 +41,20 @@ public class TestMemoryDataHandler
 	    f.setAccessible(true);
 	    user_database = (Map<String, String>) f.get(memoryDataHandler);
 	}
+
+	{
+	    Field f = MemoryDataHandler.class.getDeclaredField("user_id_database");
+	    f.setAccessible(true);
+	    user_id_database = (Map<String, Long>) f.get(memoryDataHandler);
+	}
     }
 
     @Test
     public void testSave() throws Exception
     {
-	assertEquals(new Long(1), memoryDataHandler.saveData("a", "aa"));
-	assertEquals(new Long(2), memoryDataHandler.saveData("b", "bb"));
-	assertEquals(new Long(3), memoryDataHandler.saveData("c", "cc"));
+	assertEquals(new Long(1), memoryDataHandler._saveData("a", "aa"));
+	assertEquals(new Long(2), memoryDataHandler._saveData("b", "bb"));
+	assertEquals(new Long(3), memoryDataHandler._saveData("c", "cc"));
 	assertEquals(new Integer(3), (Integer) data_database.size());
 	assertArrayEquals(new String[]
 	{
@@ -84,15 +92,15 @@ public class TestMemoryDataHandler
 		"cc"
 	});
 
-	assertEquals("aa", memoryDataHandler.loadData(1L));
-	assertEquals("bb", memoryDataHandler.loadData(2L));
-	assertEquals("cc", memoryDataHandler.loadData(3L));
+	assertEquals("aa", memoryDataHandler._loadData(1L));
+	assertEquals("bb", memoryDataHandler._loadData(2L));
+	assertEquals("cc", memoryDataHandler._loadData(3L));
     }
 
     @Test(expected = MemoryDataHandler.MemoryDataHandlerException.class)
     public void testLoadWhenNone() throws Exception
     {
-	memoryDataHandler.loadData(1L);
+	memoryDataHandler._loadData(1L);
     }
 
     @Test(expected = MemoryDataHandler.MemoryDataHandlerException.class)
@@ -104,7 +112,7 @@ public class TestMemoryDataHandler
 		"aa"
 	});
 
-	assertEquals("aa", memoryDataHandler.loadData(2L));
+	assertEquals("aa", memoryDataHandler._loadData(2L));
     }
 
     @Test
@@ -126,16 +134,16 @@ public class TestMemoryDataHandler
 		"cc"
 	});
 
-	assertEquals(new Long(1L), memoryDataHandler.deleteData(1L));
-	assertEquals(new Long(3L), memoryDataHandler.deleteData(3L));
-	assertEquals(new Long(2L), memoryDataHandler.deleteData(2L));
+	assertEquals(new Long(1L), memoryDataHandler._deleteData(1L));
+	assertEquals(new Long(3L), memoryDataHandler._deleteData(3L));
+	assertEquals(new Long(2L), memoryDataHandler._deleteData(2L));
 	assertEquals(0, data_database.size());
     }
 
     @Test(expected = MemoryDataHandler.MemoryDataHandlerException.class)
     public void testDeleteWhenNone() throws Exception
     {
-	memoryDataHandler.delete(1L);
+	memoryDataHandler.deleteData(1L);
     }
 
     @Test(expected = MemoryDataHandler.MemoryDataHandlerException.class)
@@ -147,7 +155,7 @@ public class TestMemoryDataHandler
 		"aa"
 	});
 
-	memoryDataHandler.loadData(2L);
+	memoryDataHandler._loadData(2L);
     }
 
     @Test
@@ -174,21 +182,21 @@ public class TestMemoryDataHandler
     @Test
     public void testInvalidUserLogin()
     {
-	assertEquals(false, memoryDataHandler.validateCredentials("something", "something"));
+	assertEquals(false, memoryDataHandler._validateLogin("something", "something"));
     }
 
     @Test
     public void testInvalidPasswordLogin()
     {
 	user_database.put("something", "nothing");
-	assertEquals(false, memoryDataHandler.validateCredentials("something", "something"));
+	assertEquals(false, memoryDataHandler._validateLogin("something", "something"));
     }
 
     @Test
     public void testValidLogin()
     {
 	user_database.put("something", "something");
-	assertEquals(true, memoryDataHandler.validateCredentials("something", "something"));
+	assertEquals(true, memoryDataHandler._validateLogin("something", "something"));
     }
 
     @Test
@@ -203,5 +211,24 @@ public class TestMemoryDataHandler
     {
 	user_database.put("something", "something_p");
 	memoryDataHandler.createLogin("something", "something_p");
+    }
+
+    @Test(expected = MemoryDataHandler.MemoryDataHandlerException.class)
+    public void testGetUserIdNoUser()
+    {
+	memoryDataHandler._getUserId("IAmNotAUser");
+    }
+
+    @Test
+    public void testGetUserId()
+    {
+	memoryDataHandler._createLogin("user_A", "NoPass");
+	assertEquals(1L, memoryDataHandler._getUserId("user_A"));
+
+	memoryDataHandler._createLogin("user_B", "NoPass");
+	assertEquals(2L, memoryDataHandler._getUserId("user_B"));
+
+	memoryDataHandler._createLogin("user_C", "NoPass");
+	assertEquals(3L, memoryDataHandler._getUserId("user_C"));
     }
 }

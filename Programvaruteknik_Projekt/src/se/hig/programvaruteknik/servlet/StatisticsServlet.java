@@ -198,13 +198,77 @@ public class StatisticsServlet extends HttpServlet
 
 	    JSONOutputter outputter;
 
-	    if ("save".equalsIgnoreCase(actionType))
+	    System.out.println("AT: " + actionType);
+
+	    if ("login".equalsIgnoreCase(actionType))
+	    {
+		Map<String, Object> raw_json = getValue(body, "data");
+
+		System.out.println("Yo");
+		System.out.println(raw_json.toString());
+
+		String username = getValue(raw_json, "username");
+		String password = getValue(raw_json, "password");
+
+		outputter = new JSONOutputter()
+		{
+		    @Override
+		    public String asJSON(JSONFormatter formatter)
+		    {
+			Map<String, Object> result = new TreeMap<>();
+			Map<String, Object> data = new TreeMap<>();
+			data.put("success", dataHandler.validateLogin(username, password));
+			result.put("data", data);
+			return formatter.format(new Genson().serialize(result));
+		    }
+		};
+	    }
+	    else if ("register".equalsIgnoreCase(actionType))
+	    {
+		Map<String, Object> raw_json = getValue(body, "data");
+
+		String username = getValue(raw_json, "username");
+		String password = getValue(raw_json, "password");
+
+		try
+		{
+		    dataHandler.createLogin(username, password);
+		    outputter = new JSONOutputter()
+		    {
+			@Override
+			public String asJSON(JSONFormatter formatter)
+			{
+			    Map<String, Object> result = new TreeMap<>();
+			    Map<String, Object> data = new TreeMap<>();
+			    data.put("success", true);
+			    result.put("data", data);
+			    return formatter.format(new Genson().serialize(result));
+			}
+		    };
+		}
+		catch (Exception e)
+		{
+		    outputter = new JSONOutputter()
+		    {
+			@Override
+			public String asJSON(JSONFormatter formatter)
+			{
+			    Map<String, Object> result = new TreeMap<>();
+			    Map<String, Object> data = new TreeMap<>();
+			    data.put("success", false);
+			    result.put("data", data);
+			    return formatter.format(new Genson().serialize(result));
+			}
+		    };
+		}
+	    }
+	    else if ("save".equalsIgnoreCase(actionType))
 	    {
 		Map<String, Object> raw_json = getValue(body, "data");
 		String json = new Genson().serialize(raw_json);
 		String title = getValue(raw_json, "title");
 
-		Long savedAt_Index = dataHandler.save(title, json);
+		Long savedAt_Index = dataHandler.saveData(title, json);
 
 		outputter = new JSONOutputter()
 		{
@@ -235,7 +299,7 @@ public class StatisticsServlet extends HttpServlet
 		    public String asJSON(JSONFormatter formatter)
 		    {
 			Map<String, Object> result = new TreeMap<>();
-			result.put("data", dataHandler.delete(index));
+			result.put("data", dataHandler.deleteData(index));
 			return formatter.format(new Genson().serialize(result));
 		    }
 		};
@@ -249,7 +313,7 @@ public class StatisticsServlet extends HttpServlet
 		else
 		    index = (Long) longing;
 
-		Object loaded_data = new Genson().deserialize(dataHandler.load(index), TreeMap.class);
+		Object loaded_data = new Genson().deserialize(dataHandler.loadData(index), TreeMap.class);
 
 		outputter = new JSONOutputter()
 		{

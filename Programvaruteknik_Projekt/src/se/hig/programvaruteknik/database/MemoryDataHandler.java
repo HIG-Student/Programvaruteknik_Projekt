@@ -15,10 +15,14 @@ import java.util.TreeMap;
 public class MemoryDataHandler extends DataHandler
 {
     private Map<Long, String[]> data_database = new TreeMap<Long, String[]>();
+
     private Map<String, String> user_database = new TreeMap<String, String>();
+    private Map<String, Long> user_id_database = new TreeMap<String, Long>();
+
+    private Long current_user_id = 1L;
 
     @Override
-    protected Long saveData(String title, String json)
+    protected Long _saveData(String title, String json)
     {
 	Long index = (long) data_database.size() + 1;
 	data_database.put(index, new String[]
@@ -31,7 +35,7 @@ public class MemoryDataHandler extends DataHandler
     }
 
     @Override
-    protected String loadData(Long index)
+    protected String _loadData(Long index)
     {
 	if (!data_database
 		.containsKey(index)) throw new MemoryDataHandlerException("No value at index [" + index + "]");
@@ -47,7 +51,7 @@ public class MemoryDataHandler extends DataHandler
     }
 
     @Override
-    protected Long deleteData(Long index)
+    protected Long _deleteData(Long index)
     {
 	if (!data_database
 		.containsKey(index)) throw new MemoryDataHandlerException("No value at index [" + index + "]");
@@ -78,7 +82,7 @@ public class MemoryDataHandler extends DataHandler
     }
 
     @Override
-    protected boolean validateCredentials(String username, String password)
+    protected boolean _validateLogin(String username, String password)
     {
 	if (!user_database.containsKey(username)) return false;
 
@@ -86,10 +90,18 @@ public class MemoryDataHandler extends DataHandler
     }
 
     @Override
-    protected void createCredentials(String username, String password) throws DataHandlerCannotCreateLoginException
+    protected void _createLogin(String username, String password) throws DataHandlerCannotCreateLoginException
     {
 	if (user_database.containsKey(username)) throw new DataHandlerCannotCreateLoginException("User already exsist");
 	user_database.put(username, password);
+	user_id_database.put(username, current_user_id++);
+    }
+
+    @Override
+    protected long _getUserId(String username) throws MemoryDataHandlerException
+    {
+	if (!user_id_database.containsKey(username)) throw new MemoryDataHandlerException("User does not exsist");
+	return user_id_database.get(username);
     }
 
     public class MemoryDataHandlerException extends DataHandlerException

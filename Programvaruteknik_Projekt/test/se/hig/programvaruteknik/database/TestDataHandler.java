@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import se.hig.programvaruteknik.database.DataHandler.DataHandlerCannotCreateLoginException;
+import se.hig.programvaruteknik.database.DataHandler.DataHandlerException;
 
 @SuppressWarnings("javadoc")
 public class TestDataHandler
@@ -25,19 +26,19 @@ public class TestDataHandler
 	dataHandler = new DataHandler()
 	{
 	    @Override
-	    protected Long saveData(String title, String json)
+	    protected Long _saveData(String title, String json)
 	    {
 		return 42L;
 	    }
 
 	    @Override
-	    protected String loadData(Long index)
+	    protected String _loadData(Long index)
 	    {
 		return "[data]";
 	    }
 
 	    @Override
-	    protected Long deleteData(Long index)
+	    protected Long _deleteData(Long index)
 	    {
 		return index;
 	    }
@@ -49,15 +50,21 @@ public class TestDataHandler
 	    }
 
 	    @Override
-	    protected boolean validateCredentials(String username, String password)
+	    protected boolean _validateLogin(String username, String password)
 	    {
 		return (username == "gnu" && password == "gnu");
 	    }
 
 	    @Override
-	    protected void createCredentials(String username, String password) throws DataHandlerCannotCreateLoginException
+	    protected void _createLogin(String username, String password)
 	    {
-		
+
+	    }
+
+	    @Override
+	    protected long _getUserId(String username)
+	    {
+		return 42;
 	    }
 	};
     }
@@ -65,55 +72,55 @@ public class TestDataHandler
     @Test(expected = DataHandler.DataHandlerException.class)
     public void testSaveWithNullTitle()
     {
-	dataHandler.save(null, "[json]");
+	dataHandler.saveData(null, "[json]");
     }
 
     @Test(expected = DataHandler.DataHandlerException.class)
     public void testSaveWithNullData()
     {
-	dataHandler.save("[title]", null);
+	dataHandler.saveData("[title]", null);
     }
 
     @Test(expected = DataHandler.DataHandlerException.class)
     public void testLoadWhenNegativeInParameter()
     {
-	dataHandler.load(-1L);
+	dataHandler.loadData(-1L);
     }
 
     @Test(expected = DataHandler.DataHandlerException.class)
     public void testLoadWhenNullInParameter()
     {
-	dataHandler.load(null);
+	dataHandler.loadData(null);
     }
 
     @Test
     public void testLoad()
     {
-	assertEquals("[data]", dataHandler.load(42L));
+	assertEquals("[data]", dataHandler.loadData(42L));
     }
 
     @Test
     public void testDelete()
     {
-	assertEquals(new Long(1L), dataHandler.delete(1L));
+	assertEquals(new Long(1L), dataHandler.deleteData(1L));
     }
 
     @Test(expected = DataHandler.DataHandlerException.class)
     public void testDeleteWhenNegativeInParameter()
     {
-	dataHandler.delete(-1L);
+	dataHandler.deleteData(-1L);
     }
 
     @Test(expected = DataHandler.DataHandlerException.class)
     public void testDeleteWhenNullInParameter()
     {
-	dataHandler.delete(null);
+	dataHandler.deleteData(null);
     }
 
     @Test
     public void testSave()
     {
-	assertEquals(new Long(42L), dataHandler.save("[title]", "[data]"));
+	assertEquals(new Long(42L), dataHandler.saveData("[title]", "[data]"));
     }
 
     @Test
@@ -156,5 +163,17 @@ public class TestDataHandler
     public void testCreateLoginNullPassword()
     {
 	dataHandler.createLogin("something", null);
+    }
+
+    @Test
+    public void testGetUserId()
+    {
+	assertEquals(42L, dataHandler.getUserId("something"));
+    }
+
+    @Test(expected = DataHandlerException.class)
+    public void testGetUserIdNameNull()
+    {
+	dataHandler.getUserId(null);
     }
 }

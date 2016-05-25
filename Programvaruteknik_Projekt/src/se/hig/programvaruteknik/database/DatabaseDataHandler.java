@@ -1,6 +1,5 @@
 package se.hig.programvaruteknik.database;
 
-import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
@@ -24,6 +23,9 @@ import javax.sql.DataSource;
 
 public class DatabaseDataHandler extends DataHandler
 {
+    private static int ITERATION_COUNT_FOR_HASH = 20000;
+    private static int KEY_LENGTH_FOR_HASH = 256;
+
     public interface DataConnection
     {
 	Connection getConnection() throws SQLException;
@@ -51,7 +53,7 @@ public class DatabaseDataHandler extends DataHandler
 		}
 		catch (Exception e)
 		{
-		    throw new DatabaseDataHandlerException(e);
+		    throw new DatabaseException(e);
 		}
 	    }
 
@@ -76,7 +78,7 @@ public class DatabaseDataHandler extends DataHandler
     }
 
     @Override
-    protected Long saveData(String title, String data)
+    protected Long _saveData(String title, String data)
     {
 	try (Connection connection = dataConnection.getConnection())
 	{
@@ -85,46 +87,45 @@ public class DatabaseDataHandler extends DataHandler
 	    statement.setString(1, title);
 	    statement.setString(2, data);
 	    ResultSet result = statement.executeQuery();
-	    if (!result.next()) throw new DatabaseDataHandlerException("Cannot save data");
+	    if (!result.next()) throw new DatabaseException("Cannot save data");
 	    return result.getLong("id");
 	}
 	catch (SQLException e)
 	{
-	    throw new DatabaseDataHandlerException(e);
+	    throw new DatabaseException(e);
 	}
     }
 
     @Override
-    protected String loadData(Long i)
+    protected String _loadData(Long i)
     {
 	try (Connection connection = dataConnection.getConnection())
 	{
 	    PreparedStatement statement = connection.prepareStatement("SELECT * FROM saves WHERE id = ?");
 	    statement.setLong(1, i);
 	    ResultSet result = statement.executeQuery();
-	    if (!result.next()) throw new DatabaseDataHandlerException("No data found for index " + i);
+	    if (!result.next()) throw new DatabaseException("No data found for index " + i);
 	    return result.getString("data");
 	}
 	catch (SQLException e)
 	{
-	    throw new DatabaseDataHandlerException(e);
+	    throw new DatabaseException(e);
 	}
     }
 
     @Override
-    protected Long deleteData(Long index)
+    protected Long _deleteData(Long index)
     {
 	try (Connection connection = dataConnection.getConnection())
 	{
 	    PreparedStatement statement = connection.prepareStatement("DELETE FROM saves WHERE id = ?");
 	    statement.setLong(1, index);
-	    if (statement
-		    .executeUpdate() != 1) throw new DatabaseDataHandlerException("No data found for index " + index);
+	    if (statement.executeUpdate() != 1) throw new DatabaseException("No data found for index " + index);
 	    return index;
 	}
 	catch (SQLException e)
 	{
-	    throw new DatabaseDataHandlerException(e);
+	    throw new DatabaseException(e);
 	}
     }
 
@@ -145,17 +146,21 @@ public class DatabaseDataHandler extends DataHandler
 	}
 	catch (SQLException e)
 	{
-	    throw new DatabaseDataHandlerException(e);
+	    throw new DatabaseException(e);
 	}
 
 	return list;
     }
 
     @Override
-    protected void createCredentials(String username, String password)
+    protected void _createLogin(String username, String password)
     {
 	try (Connection connection = dataConnection.getConnection())
 	{
+	    DatabaseUser user = getUser(connection, username);
+
+	    if (user != null) throw new UserAlreadyExistsException("User '" + username + "' does already exist");
+
 	    PreparedStatement statement = connection
 		    .prepareStatement("INSERT INTO users(name, hash, salt) VALUES (?, ?, ?)");
 
@@ -169,7 +174,11 @@ public class DatabaseDataHandler extends DataHandler
 	    try
 	    {
 		SecretKeyFactory skf = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA512");
-		PBEKeySpec spec = new PBEKeySpec(password.toCharArray(), salt, 2, 256);
+		PBEKeySpec spec = new PBEKeySpec(
+			password.toCharArray(),
+			salt,
+			ITERATION_COUNT_FOR_HASH,
+			KEY_LENGTH_FOR_HASH);
 		SecretKey key = skf.generateSecret(spec);
 		byte[] hash = key.getEncoded();
 
@@ -190,23 +199,16 @@ public class DatabaseDataHandler extends DataHandler
     }
 
     @Override
-    protected boolean validateCredentials(String username, String password)
+    protected boolean _validateLogin(String username, String password)
     {
-	try (Connection connection = dataConnection.getConnection())
+	try
 	{
-	    PreparedStatement statement = connection.prepareStatement("SELECT * from users WHERE name = ?");
-	    statement.setString(1, username);
-
-	    ResultSet result = statement.executeQuery();
-	    if (!result.next()) return false;
+	    DatabaseUser user = getUser(username);
+	    if (user == null) return false;
 
 	    try
 	    {
-		SecretKeyFactory skf = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA512");
-		PBEKeySpec spec = new PBEKeySpec(password.toCharArray(), result.getBytes("salt"), 2, 256);
-		SecretKey key = skf.generateSecret(spec);
-		byte[] hash = key.getEncoded();
-		return Arrays.equals(result.getBytes("hash"), hash);
+		return Arrays.equals(user.hash, hashPassword(password, user.salt));
 	    }
 	    catch (NoSuchAlgorithmException | InvalidKeySpecException e)
 	    {
@@ -214,39 +216,142 @@ public class DatabaseDataHandler extends DataHandler
 		return false;
 	    }
 	}
-	catch (SQLException e)
+	catch (UserDoesNotExistsException e)
 	{
-	    e.printStackTrace();
 	    return false;
 	}
     }
 
-    public static void main(String... args)
+    @Override
+    protected long _getUserId(String username)
     {
-	// "jdbc:mysql://localhost:3306/mysql"
-	System.out.println(
-		new DatabaseDataHandler("jdbc:postgresql://localhost:5432/statistics", "kaka", "kaka")
-			.validateCredentials("TesAccount", "ThisPasswordIsValid"));
+	DatabaseUser user = getUser(username);
+	if (user == null)
+	    throw new DatabaseException("No user with name '" + username + "'");
+	else
+	    return getUser(username).id;
     }
 
-    public class DatabaseDataHandlerException extends DataHandlerException
+    private DatabaseUser getUser(String username)
+    {
+	try (Connection connection = dataConnection.getConnection())
+	{
+	    return getUser(connection, username);
+	}
+	catch (SQLException e)
+	{
+	    throw new DatabaseException(e);
+	}
+    }
+
+    private DatabaseUser getUser(Connection connection, String username) throws SQLException
+    {
+	PreparedStatement statement = connection.prepareStatement("SELECT * from users WHERE name = ?");
+	statement.setString(1, username);
+
+	ResultSet result = statement.executeQuery();
+	if (!result.next()) return null;
+
+	DatabaseUser user = new DatabaseUser(
+		result.getLong("id"),
+		result.getString("name"),
+		result.getBytes("hash"),
+		result.getBytes("salt"));
+
+	if (result.next()) throw new DatabaseException("Too many users with name " + username + " found");
+
+	return user;
+    }
+
+    private byte[] hashPassword(String password, byte[] salt) throws NoSuchAlgorithmException, InvalidKeySpecException
+    {
+	SecretKeyFactory skf = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA512");
+	PBEKeySpec spec = new PBEKeySpec(password.toCharArray(), salt, ITERATION_COUNT_FOR_HASH, KEY_LENGTH_FOR_HASH);
+	SecretKey key = skf.generateSecret(spec);
+	return key.getEncoded();
+    }
+
+    private class DatabaseUser
+    {
+	private long id;
+	private String name;
+
+	private byte[] hash;
+	private byte[] salt;
+
+	private DatabaseUser(long id, String name, byte[] hash, byte[] salt)
+	{
+	    this.id = id;
+	    this.name = name;
+	    this.hash = hash;
+	    this.salt = salt;
+	}
+    }
+
+    public class UserAlreadyExistsException extends DatabaseException
     {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public DatabaseDataHandlerException()
+	public UserAlreadyExistsException()
 	{
 
 	}
 
-	public DatabaseDataHandlerException(String message)
+	public UserAlreadyExistsException(String message)
 	{
 	    super(message);
 	}
 
-	public DatabaseDataHandlerException(Throwable throwable)
+	public UserAlreadyExistsException(Throwable throwable)
+	{
+	    super(throwable);
+	}
+    }
+
+    public class UserDoesNotExistsException extends DatabaseException
+    {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public UserDoesNotExistsException()
+	{
+
+	}
+
+	public UserDoesNotExistsException(String message)
+	{
+	    super(message);
+	}
+
+	public UserDoesNotExistsException(Throwable throwable)
+	{
+	    super(throwable);
+	}
+    }
+
+    public class DatabaseException extends DataHandlerException
+    {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public DatabaseException()
+	{
+
+	}
+
+	public DatabaseException(String message)
+	{
+	    super(message);
+	}
+
+	public DatabaseException(Throwable throwable)
 	{
 	    super(throwable);
 	}
