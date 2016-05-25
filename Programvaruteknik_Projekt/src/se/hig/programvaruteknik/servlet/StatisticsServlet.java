@@ -63,7 +63,7 @@ public class StatisticsServlet extends HttpServlet
 			ConstantSourceBuilder.class,
 			StockSourceBuilder.class,
 			QuandlDataSourceBuilder.class),
-		new MemoryDataHandler());
+		new DatabaseDataHandler());
     }
 
     /**
@@ -156,29 +156,27 @@ public class StatisticsServlet extends HttpServlet
 
 	throw new RequestException("Unknown 'source-type': " + sourceType);
     }
-    
+
     protected boolean authenticate(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
     {
-    	System.out.println("YOYOY!");
-    	
-    	
-    	HttpSession session = request.getSession();
-    	Object authenticated = (Object)session.getAttribute("authenticated");
-    	if(authenticated instanceof Boolean && (Boolean)authenticated) return true;
-    	
-    	//Map<String,String[]> parameters = request.getParameterMap();
-    	
-    	try
-    	{
-    	//    request.getRequestDispatcher("login.jsp").forward(request, response);
-    	}
-    	catch (Throwable e)
-    	{
-    	    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Unexpected error!");
-    	    e.printStackTrace();
-    	}
-    	
-    	return true;
+	HttpSession session = request.getSession();
+	Object authenticated = (Object) session.getAttribute("authenticated");
+	if (authenticated instanceof Boolean && (Boolean) authenticated) return true;
+
+	// Map<String,String[]> parameters = request.getParameterMap();
+
+	try
+	{
+	    // request.getRequestDispatcher("login.jsp").forward(request,
+	    // response);
+	}
+	catch (Throwable e)
+	{
+	    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Unexpected error!");
+	    e.printStackTrace();
+	}
+
+	return true;
     }
 
     /**
@@ -188,8 +186,8 @@ public class StatisticsServlet extends HttpServlet
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
     {
-    	if(!authenticate(request,response)) return;
-    	
+	if (!authenticate(request, response)) return;
+
 	response.setCharacterEncoding("UTF-8");
 
 	try
@@ -210,8 +208,8 @@ public class StatisticsServlet extends HttpServlet
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
     {
-    	if(!authenticate(request,response)) return;
-    	
+	if (!authenticate(request, response)) return;
+
 	response.setCharacterEncoding("UTF-8");
 	response.setContentType("application/json;charset=UTF-8");
 
@@ -227,14 +225,9 @@ public class StatisticsServlet extends HttpServlet
 
 	    JSONOutputter outputter;
 
-	    System.out.println("AT: " + actionType);
-
 	    if ("login".equalsIgnoreCase(actionType))
 	    {
 		Map<String, Object> raw_json = getValue(body, "data");
-
-		System.out.println("Yo");
-		System.out.println(raw_json.toString());
 
 		String username = getValue(raw_json, "username");
 		String password = getValue(raw_json, "password");
