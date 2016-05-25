@@ -25,12 +25,30 @@ export class LoginView
 	{
 		this.message = "";
 		
-		this.dataLoader.offlineLogin(this.username,this.password).subscribe(data =>
+		this.dataLoader.login(this.username,this.password).subscribe(data =>
 		{
 			if(data.success)
 				this.router.navigate(["/Statistics"]);
 			else
 				this.message = data.message || "Authentication failed!";
+		},
+		error =>
+		{
+			this.message = error;
+		});
+	}
+	
+	
+	public register()
+	{
+		this.message = "";
+		
+		this.dataLoader.register(this.username,this.password).subscribe(data =>
+		{
+			if(data.success)
+				this.router.navigate(["/Statistics"]);
+			else
+				this.message = data.message || "Registration failed!";
 		},
 		error =>
 		{

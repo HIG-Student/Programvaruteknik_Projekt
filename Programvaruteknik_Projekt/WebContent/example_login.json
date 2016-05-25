@@ -2,7 +2,7 @@
 	"type": "verification",
 	"data":
 	{
-		"success": false,
-		"message": "Gnu ate the user!"
+		"id":42,
+		"success": true
 	}
 }
