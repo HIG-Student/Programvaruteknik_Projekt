@@ -1,0 +1,31 @@
+.title
+{	
+	font-size:xx-large;
+	font-style: oblique;
+}
+
+.message
+{
+	width: 374px;
+	
+	
+	
+	position:relative;
+	padding:15px;
+	margin:1em 0 3em;
+	color:#fff;
+	background:#c81e2b;
+	/* css3 */
+	background:-webkit-gradient(linear, 0 0, 0 100%, from(#f04349), to(#c81e2b));
+	background:-moz-linear-gradient(#f04349, #c81e2b);
+	background:-o-linear-gradient(#f04349, #c81e2b);
+	background:linear-gradient(#f04349, #c81e2b);
+	-webkit-border-radius:10px;
+	-moz-border-radius:10px;
+	border-radius:10px;
+	
+	background:-webkit-gradient(linear, 0 0, 0 100%, from(#c81e2b), to(#f04349));
+	background:-moz-linear-gradient(#c81e2b, #f04349);
+	background:-o-linear-gradient(#c81e2b, #f04349);
+	background:linear-gradient(#c81e2b, #f04349);
+}

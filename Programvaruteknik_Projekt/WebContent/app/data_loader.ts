@@ -40,11 +40,7 @@ export class DataLoader
 		
 		if(!data["data"])
 			data["data"] = { };
-		
-		//data["resolution"] = "YEAR";
-		//data["merge-type-x"] = "AVERAGE";
-		//data["merge-type-y"] = "AVERAGE";
-		
+
 		if(source)
 			data.data.source = source;
 		
@@ -94,13 +90,58 @@ export class DataLoader
 		});
 	}
 	
+	
+	
+	
+	offlineLogin(username:String,password:String):Observable
+	{
+		console.log("Have you seen my Gnu hjahjk?");
+		
+		return Observable.create(observer =>
+		{
+			this.progressor.addLoading();
+			
+			var thing = this.http
+				.get("example_login.json")
+				.map(res => res.json().data)
+				.do(data =>
+					{
+						observer.next(data);
+					},
+					error =>
+					{
+						observer.error(error);
+						this.progressor.removeLoading();
+					},
+					data =>
+					{
+						observer.complete();
+						this.progressor.removeLoading();
+					})
+				.subscribe();
+		});
+	}
+	
+	
+	login(username:String,password:String):Observable
+	{
+		console.log("Have you seen my Gnu?");
+		return this.post(
+		{
+			"type": "login",
+			"data":
+			{
+				"name": username,
+				"password": password
+			}
+		});
+	}
+	
 	private post(data:object)
 	{		
 		return Observable.create(observer =>
 		{
 			this.progressor.addLoading();
-			
-			window.obs = observer;
 			
 			var thing = this.http
 				.post("StatisticsServlet", JSON.stringify(data))
@@ -109,7 +150,7 @@ export class DataLoader
 					{
 						observer.next(data);
 					},
-					data =>
+					error =>
 					{
 						observer.error(error);
 						this.progressor.removeLoading();

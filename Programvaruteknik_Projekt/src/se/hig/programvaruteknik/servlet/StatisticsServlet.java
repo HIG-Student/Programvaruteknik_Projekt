@@ -12,6 +12,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import com.owlike.genson.Genson;
 
@@ -62,7 +63,7 @@ public class StatisticsServlet extends HttpServlet
 			ConstantSourceBuilder.class,
 			StockSourceBuilder.class,
 			QuandlDataSourceBuilder.class),
-		new DatabaseDataHandler());
+		new MemoryDataHandler());
     }
 
     /**
@@ -155,6 +156,30 @@ public class StatisticsServlet extends HttpServlet
 
 	throw new RequestException("Unknown 'source-type': " + sourceType);
     }
+    
+    protected boolean authenticate(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
+    {
+    	System.out.println("YOYOY!");
+    	
+    	
+    	HttpSession session = request.getSession();
+    	Object authenticated = (Object)session.getAttribute("authenticated");
+    	if(authenticated instanceof Boolean && (Boolean)authenticated) return true;
+    	
+    	//Map<String,String[]> parameters = request.getParameterMap();
+    	
+    	try
+    	{
+    	//    request.getRequestDispatcher("login.jsp").forward(request, response);
+    	}
+    	catch (Throwable e)
+    	{
+    	    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Unexpected error!");
+    	    e.printStackTrace();
+    	}
+    	
+    	return true;
+    }
 
     /**
      * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
@@ -163,6 +188,8 @@ public class StatisticsServlet extends HttpServlet
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
     {
+    	if(!authenticate(request,response)) return;
+    	
 	response.setCharacterEncoding("UTF-8");
 
 	try
@@ -183,6 +210,8 @@ public class StatisticsServlet extends HttpServlet
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
     {
+    	if(!authenticate(request,response)) return;
+    	
 	response.setCharacterEncoding("UTF-8");
 	response.setContentType("application/json;charset=UTF-8");
 

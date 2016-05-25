@@ -1,0 +1,18 @@
+<div>
+	<center>
+		<div class="title"> Welcome to Statistic correlation</div>
+	</center>
+</div>
+
+<br>
+<br>
+
+<form action="StatisticsServlet/login"> 
+	<center>
+		<label>Username <input type="text" [(ngModel)]="username" name="Username" placeholder ="Username"></label>  <button type ="button" (click)="login()"> Sign in</button> <br>
+		<label>Password <input type="password" [(ngModel)]="password" name="Password" placeholder ="Password"></label>  <button type ="button" onClick ="alert('Have you seen my Gnu?')">Sign up</button>
+		<br>
+		<br>
+		<p class="message" *ngIf="message">{{message}}</p>
+	</center>
+</form>
