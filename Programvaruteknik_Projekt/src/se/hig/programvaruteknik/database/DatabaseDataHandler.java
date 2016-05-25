@@ -13,15 +13,23 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
 
+/**
+ * @author Viktor Hanstorp
+ * docs by Fredrik
+ */
 public class DatabaseDataHandler extends DataHandler
 {
     private DataSource dataSource;
 
+    /**
+     * Creates data source and sets it to the variable data source
+     *
+     */
     public DatabaseDataHandler()
     {
 	dataSource = createDataSource();
     }
-
+    
     private DataSource createDataSource()
     {
 	try
@@ -88,7 +96,11 @@ public class DatabaseDataHandler extends DataHandler
 	    throw new DatabaseDataHandlerException(e);
 	}
     }
-
+    
+    /**
+     * 
+     *
+     */
     @Override
     public List<Map<String, Object>> getList()
     {
@@ -111,7 +123,11 @@ public class DatabaseDataHandler extends DataHandler
 
 	return list;
     }
-
+    
+    /**
+     * Exception class that extends DataHandlerException
+     *
+     */
     public class DatabaseDataHandlerException extends DataHandlerException
     {
 	/**

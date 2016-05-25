@@ -25,7 +25,6 @@ import se.hig.programvaruteknik.data.StockSourceBuilder;
 import se.hig.programvaruteknik.data.StockSourceBuilder.StockInfo;
 import se.hig.programvaruteknik.database.DataHandler;
 import se.hig.programvaruteknik.database.DatabaseDataHandler;
-import se.hig.programvaruteknik.database.MemoryDataHandler;
 import se.hig.programvaruteknik.model.DataCollectionBuilder;
 import se.hig.programvaruteknik.model.DataSourceBuilder;
 import se.hig.programvaruteknik.model.MergeType;

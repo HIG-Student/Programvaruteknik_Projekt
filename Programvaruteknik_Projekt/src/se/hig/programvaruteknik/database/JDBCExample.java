@@ -99,10 +99,6 @@ public class JDBCExample
 	{
 	    System.out.println("You made it, take control of your database now!");
 	}
-	else
-	{
-	    System.out.println("Failed to make connection!");
-	}
     }
 
 }

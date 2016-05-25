@@ -8,10 +8,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import se.hig.programvaruteknik.database.DataHandler.DataHandlerException;
-
 import java.util.TreeMap;
 
+/**
+ * docs Fredrik
+ *
+ */
 public class MemoryDataHandler extends DataHandler
 {
     private Map<Long, String[]> database = new TreeMap<Long, String[]>();
@@ -43,7 +45,7 @@ public class MemoryDataHandler extends DataHandler
 	    throw new MemoryDataHandlerException(t);
 	}
     }
-
+    
     @Override
     protected Long deleteData(Long index)
     {
@@ -73,7 +75,12 @@ public class MemoryDataHandler extends DataHandler
 	}
 	return result;
     }
-
+    
+    
+    /**
+     * Exception class that extends DataHandlerException
+     *
+     */
     public class MemoryDataHandlerException extends DataHandlerException
     {
 	/**

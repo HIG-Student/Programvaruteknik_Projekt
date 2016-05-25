@@ -8,7 +8,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.function.Function;
 
 import se.hig.programvaruteknik.Utils;
-import se.hig.programvaruteknik.model.DataSource;
 import se.hig.programvaruteknik.model.DataSourceBuilder;
 import se.hig.programvaruteknik.model.Param;
 import se.hig.programvaruteknik.model.SourceGenerator;
@@ -20,6 +19,7 @@ import static se.hig.programvaruteknik.Utils.*;
  * <a href="http://www.kibot.com/api/historical_data_api_sdk.aspx">kibot</a>
  * 
  * @author Viktor Hanstorp (ndi14vhp@student.hig.se)
+ * docs Fredrik
  */
 public class StockSourceBuilder extends CSVDataSourceBuilder
 {

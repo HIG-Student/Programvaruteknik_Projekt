@@ -1,5 +1,7 @@
 /**
+ * Interface that converts strings into JSon strings
  * 
+ * @author Viktor Hanstorp (ndi14vhp@student.hig.se)
  */
 package se.hig.programvaruteknik;
 
