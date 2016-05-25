@@ -95,7 +95,6 @@ export class DataLoader
 	
 	offlineLogin(username:String,password:String):Observable
 	{
-		console.log("Have you seen my Gnu hjahjk?");
 		
 		return Observable.create(observer =>
 		{
@@ -125,18 +124,35 @@ export class DataLoader
 	
 	login(username:String,password:String):Observable
 	{
-		console.log("Have you seen my Gnu?");
+
 		return this.post(
 		{
 			"type": "login",
 			"data":
 			{
-				"name": username,
+				"username": username,
 				"password": password
 			}
 		});
 	}
-	
+
+
+
+
+	register(username:String,password:String):Observable
+	{
+
+		return this.post(
+		{
+			"type": "register",
+			"data":
+			{
+				"username": username,
+				"password": password
+			}
+		});
+	}
+		
 	private post(data:object)
 	{		
 		return Observable.create(observer =>
@@ -144,7 +160,7 @@ export class DataLoader
 			this.progressor.addLoading();
 			
 			var thing = this.http
-				.post("SampleServlet", JSON.stringify(data))
+				.post("StatisticsServlet", JSON.stringify(data))
 				.map(res => res.json().data)
 				.do(data =>
 					{
