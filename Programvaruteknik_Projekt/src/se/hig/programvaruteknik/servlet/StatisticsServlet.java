@@ -264,7 +264,7 @@ public class StatisticsServlet extends HttpServlet
 			if (loggedIn)
 			{
 			    session.setAttribute("authenticated", true);
-
+			    session.setAttribute("user-id", dataHandler.getUserId(username));
 			}
 			data.put("success", loggedIn);
 		    }
@@ -315,6 +315,7 @@ public class StatisticsServlet extends HttpServlet
 			{
 			    dataHandler.createLogin(username, password);
 			    session.setAttribute("authenticated", true);
+			    session.setAttribute("user-id", dataHandler.getUserId(username));
 			    data.put("success", true);
 			}
 			catch (Exception e)
@@ -355,7 +356,7 @@ public class StatisticsServlet extends HttpServlet
 		String json = new Genson().serialize(raw_json);
 		String title = getValue(raw_json, "title");
 
-		Long savedAt_Index = dataHandler.saveData(title, json);
+		Long savedAt_Index = dataHandler.saveData((Long) session.getAttribute("user-id"), title, json);
 
 		outputter = new JSONOutputter()
 		{
@@ -386,7 +387,7 @@ public class StatisticsServlet extends HttpServlet
 		    public String asJSON(JSONFormatter formatter)
 		    {
 			Map<String, Object> result = new TreeMap<>();
-			result.put("data", dataHandler.deleteData(index));
+			result.put("data", dataHandler.deleteData((Long) session.getAttribute("user-id"), index));
 			return formatter.format(new Genson().serialize(result));
 		    }
 		};
@@ -400,7 +401,9 @@ public class StatisticsServlet extends HttpServlet
 		else
 		    index = (Long) longing;
 
-		Object loaded_data = new Genson().deserialize(dataHandler.loadData(index), TreeMap.class);
+		Object loaded_data = new Genson().deserialize(
+			dataHandler.loadData((Long) session.getAttribute("user-id"), index),
+			TreeMap.class);
 
 		outputter = new JSONOutputter()
 		{
@@ -421,7 +424,7 @@ public class StatisticsServlet extends HttpServlet
 		    public String asJSON(JSONFormatter formatter)
 		    {
 			Map<String, Object> result = new TreeMap<>();
-			result.put("data", dataHandler.getList());
+			result.put("data", dataHandler.getList((Long) session.getAttribute("user-id")));
 			return formatter.format(new Genson().serialize(result));
 		    }
 		};

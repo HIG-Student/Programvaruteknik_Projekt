@@ -49,10 +49,65 @@ public class TestDatabaseDataHandler
     private static int ITERATION_COUNT_FOR_HASH = 1;
     private static int KEY_LENGTH_FOR_HASH = 10;
 
-    private Map<Long, String[]> data_database;
-    private Map<String, byte[][]> user_database;
-    private Map<String, Long> user_id_mapping;
-    private Long next_user_id = 1L;
+    private class DatabaseUser
+    {
+	public Long id;
+	public String name;
+	public byte[] hash;
+	public byte[] salt;
+
+	public Long current_database_id = 1L;
+	public Map<Long, String[]> data_database = new TreeMap<Long, String[]>();
+    }
+
+    private DatabaseUser __createUser(String username, String password) throws NoSuchAlgorithmException, InvalidKeySpecException
+    {
+	return __createUser(username, password, current_user_id++);
+    }
+
+    private DatabaseUser __createUser(String username, String password, Long user_id) throws NoSuchAlgorithmException, InvalidKeySpecException
+    {
+	return new DatabaseUser()
+	{
+	    {
+		this.id = user_id;
+
+		this.name = username;
+
+		SecureRandom random = new SecureRandom();
+		this.salt = new byte[64];
+		random.nextBytes(this.salt);
+
+		SecretKeyFactory skf = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA512");
+		PBEKeySpec spec = new PBEKeySpec(
+			password.toCharArray(),
+			salt,
+			ITERATION_COUNT_FOR_HASH,
+			KEY_LENGTH_FOR_HASH);
+		SecretKey key = skf.generateSecret(spec);
+		this.hash = key.getEncoded();
+
+		user_name_database.put(this.name, this);
+		user_id_database.put(this.id, this);
+	    }
+	};
+    }
+
+    private DatabaseUser __getUser(String name)
+    {
+	return user_name_database.get(name);
+    }
+
+    private DatabaseUser __getUser(Long id)
+    {
+	return user_id_database.get(id);
+    }
+
+    private Map<String, DatabaseUser> user_name_database;
+    private Map<Long, DatabaseUser> user_id_database;
+    private Long current_user_id;
+
+    DatabaseUser testUser;
 
     private DatabaseDataHandler databaseHandler;
 
@@ -60,6 +115,7 @@ public class TestDatabaseDataHandler
     {
 	PreparedStatement statement = mock(PreparedStatement.class);
 
+	Store<Long> user_id = new Store<Long>(null);
 	Store<Long> index = new Store<Long>(null);
 
 	doAnswer(invocation ->
@@ -68,12 +124,21 @@ public class TestDatabaseDataHandler
 	    return null;
 	}).when(statement).setLong(Matchers.eq(1), Matchers.anyInt());
 
+	doAnswer(invocation ->
+	{
+	    user_id.value = invocation.getArgumentAt(1, Long.class);
+	    return null;
+	}).when(statement).setLong(Matchers.eq(2), Matchers.anyInt());
+
 	doAnswer(a ->
 	{
+	    if (user_id.value == null) throw new SQLException();
 	    if (index.value == null) throw new SQLException();
 
-	    if (!data_database.containsKey(index.value)) throw new SQLException();
-	    data_database.remove(index.value);
+	    DatabaseUser user = __getUser(user_id.value);
+	    if (user == null) throw new SQLException("No such user, have the Gnu been eating them again?");
+
+	    user.data_database.remove(index.value);
 
 	    Long i = index.value;
 	    ResultSet resultSet = mock(ResultSet.class);
@@ -102,17 +167,27 @@ public class TestDatabaseDataHandler
     {
 	PreparedStatement statement = mock(PreparedStatement.class);
 
+	Store<Long> user_id = new Store<Long>(null);
 	Store<Long> index = new Store<Long>(null);
-
 	doAnswer(invocation ->
 	{
 	    index.value = invocation.getArgumentAt(1, Long.class);
 	    return null;
 	}).when(statement).setLong(Matchers.eq(1), Matchers.anyInt());
 
+	doAnswer(invocation ->
+	{
+	    user_id.value = invocation.getArgumentAt(1, Long.class);
+	    return null;
+	}).when(statement).setLong(Matchers.eq(2), Matchers.anyInt());
+
 	doAnswer(a ->
 	{
+	    if (user_id.value == null) throw new SQLException();
 	    if (index.value == null) throw new SQLException();
+
+	    DatabaseUser user = __getUser(user_id.value);
+	    if (user == null) throw new SQLException("No such user, have the Gnu been eating them again?");
 
 	    Long i = index.value;
 	    ResultSet resultSet = mock(ResultSet.class);
@@ -128,8 +203,8 @@ public class TestDatabaseDataHandler
 	    doAnswer(b ->
 	    {
 		if (first.value) throw new SQLException();
-		if (!data_database.containsKey(i)) throw new SQLException();
-		return data_database.get(i)[1];
+		if (!user.data_database.containsKey(i)) throw new SQLException();
+		return user.data_database.get(i)[1];
 	    }).when(resultSet).getString("data");
 
 	    return resultSet;
@@ -142,32 +217,44 @@ public class TestDatabaseDataHandler
     {
 	PreparedStatement statement = mock(PreparedStatement.class);
 
+	Store<Long> user_id = new Store<Long>(null);
 	Store<String> title = new Store<String>(null);
 	Store<String> data = new Store<String>(null);
 
 	doAnswer(invocation ->
 	{
+	    user_id.value = invocation.getArgumentAt(1, Long.class);
+	    return null;
+	}).when(statement).setLong(Matchers.eq(1), Matchers.anyLong());
+
+	doAnswer(invocation ->
+	{
 	    title.value = invocation.getArgumentAt(1, String.class);
 	    return null;
-	}).when(statement).setString(Matchers.eq(1), Matchers.anyString());
+	}).when(statement).setString(Matchers.eq(2), Matchers.anyString());
 
 	doAnswer(invocation ->
 	{
 	    data.value = invocation.getArgumentAt(1, String.class);
 	    return null;
-	}).when(statement).setString(Matchers.eq(2), Matchers.anyString());
+	}).when(statement).setString(Matchers.eq(3), Matchers.anyString());
 
 	doAnswer(a ->
 	{
+	    if (user_id.value == null) throw new SQLException();
 	    if (title.value == null) throw new SQLException();
 	    if (data.value == null) throw new SQLException();
 
+	    Long user_id_value = user_id.value;
 	    String title_value = title.value;
 	    String data_value = data.value;
 
-	    Long index = (long) (data_database.size() + 1);
+	    DatabaseUser user = __getUser(user_id.value);
+	    if (user == null) throw new SQLException("No such user, have the Gnu been eating them again?");
 
-	    data_database.put(index, new String[]
+	    Long index = user.current_database_id++;
+
+	    user.data_database.put(index, new String[]
 	    {
 		    title_value,
 		    data_value
@@ -199,13 +286,24 @@ public class TestDatabaseDataHandler
     {
 	PreparedStatement statement = mock(PreparedStatement.class);
 
+	Store<Long> user_id = new Store<Long>(null);
+
+	doAnswer(invocation ->
+	{
+	    user_id.value = invocation.getArgumentAt(1, Long.class);
+	    return null;
+	}).when(statement).setLong(Matchers.eq(1), Matchers.anyLong());
+
 	doAnswer(a ->
 	{
 	    ResultSet resultSet = mock(ResultSet.class);
 	    Store<Integer> index = new Store<Integer>(-1);
 
+	    DatabaseUser user = __getUser(user_id.value);
+	    if (user == null) throw new SQLException("No such user, have the Gnu been eating them again?");
+
 	    List<Entry<Long, String[]>> list = new ArrayList<>();
-	    for (Entry<Long, String[]> entry : data_database.entrySet())
+	    for (Entry<Long, String[]> entry : user.data_database.entrySet())
 		list.add(entry);
 
 	    doAnswer(b ->
@@ -233,40 +331,42 @@ public class TestDatabaseDataHandler
     {
 	PreparedStatement statement = mock(PreparedStatement.class);
 
-	Store<String> name = new Store<String>(null);
-	Store<byte[]> hash = new Store<byte[]>(null);
-	Store<byte[]> salt = new Store<byte[]>(null);
+	Store<String> _name = new Store<String>(null);
+	Store<byte[]> _hash = new Store<byte[]>(null);
+	Store<byte[]> _salt = new Store<byte[]>(null);
 
 	doAnswer(invocation ->
 	{
-	    name.value = invocation.getArgumentAt(1, String.class);
+	    _name.value = invocation.getArgumentAt(1, String.class);
 	    return null;
 	}).when(statement).setString(Matchers.eq(1), Matchers.anyString());
 
 	doAnswer(invocation ->
 	{
-	    hash.value = invocation.getArgumentAt(1, byte[].class);
+	    _hash.value = invocation.getArgumentAt(1, byte[].class);
 	    return null;
 	}).when(statement).setBytes(Matchers.eq(2), Matchers.any(byte[].class));
 
 	doAnswer(invocation ->
 	{
-	    salt.value = invocation.getArgumentAt(1, byte[].class);
+	    _salt.value = invocation.getArgumentAt(1, byte[].class);
 	    return null;
 	}).when(statement).setBytes(Matchers.eq(3), Matchers.any(byte[].class));
 
 	doAnswer(a ->
 	{
-	    if (name.value == null) throw new SQLException();
-	    if (hash.value == null) throw new SQLException();
-	    if (salt.value == null) throw new SQLException();
+	    if (_name.value == null) throw new SQLException();
+	    if (_hash.value == null) throw new SQLException();
+	    if (_salt.value == null) throw new SQLException();
 
-	    user_id_mapping.put(name.value, next_user_id++);
-	    user_database.put(name.value, new byte[][]
-	    {
-		    hash.value,
-		    salt.value
-	    });
+	    DatabaseUser user = new DatabaseUser();
+	    user.id = current_user_id++;
+	    user.name = _name.value;
+	    user.hash = _hash.value;
+	    user.salt = _salt.value;
+
+	    user_name_database.put(user.name, user);
+	    user_id_database.put(user.id, user);
 
 	    return 1;
 	}).when(statement).executeUpdate();
@@ -289,11 +389,12 @@ public class TestDatabaseDataHandler
 	doAnswer(a ->
 	{
 	    if (name.value == null) throw new SQLException();
-	    String username = name.value;
 
 	    ResultSet resultSet = mock(ResultSet.class);
 
-	    if (!user_database.containsKey(username))
+	    DatabaseUser user = __getUser(name.value);
+
+	    if (user == null)
 	    {
 		doAnswer(b ->
 		{
@@ -314,25 +415,25 @@ public class TestDatabaseDataHandler
 		doAnswer(b ->
 		{
 		    if (first.value) throw new SQLException();
-		    return user_id_mapping.get(username);
+		    return user.id;
 		}).when(resultSet).getLong("id");
 
 		doAnswer(b ->
 		{
 		    if (first.value) throw new SQLException();
-		    return username;
+		    return user.name;
 		}).when(resultSet).getString("name");
 
 		doAnswer(b ->
 		{
 		    if (first.value) throw new SQLException();
-		    return user_database.get(username)[0];
+		    return user.hash;
 		}).when(resultSet).getBytes("hash");
 
 		doAnswer(b ->
 		{
-		    if (first.value) throw new SQLException();
-		    return user_database.get(username)[1];
+		    if (first.value) throw new SQLException("No name set!");
+		    return user.salt;
 		}).when(resultSet).getBytes("salt");
 	    }
 	    return resultSet;
@@ -344,11 +445,11 @@ public class TestDatabaseDataHandler
     @Before
     public void setUp() throws Exception
     {
-	next_user_id = 1L;
+	user_id_database = new TreeMap<>();
+	user_name_database = new TreeMap<>();
+	current_user_id = 1L;
 
-	data_database = new TreeMap<Long, String[]>();
-	user_database = new TreeMap<String, byte[][]>();
-	user_id_mapping = new TreeMap<String, Long>();
+	testUser = __createUser("GNU", "GNU is not my password");
 
 	Connection connection = mock(Connection.class);
 
@@ -357,13 +458,25 @@ public class TestDatabaseDataHandler
 		"prepareStatement",
 		"INSERT INTO users(name, hash, salt) VALUES (?, ?, ?)");
 
-	doReturn(makeLoadStatement()).when(connection, "prepareStatement", "SELECT * FROM saves WHERE id = ?");
+	doReturn(makeLoadStatement()).when(
+		connection,
+		"prepareStatement",
+		"SELECT * FROM saves WHERE id = ? AND author = ?");
+
 	doReturn(makeSaveStatement()).when(
 		connection,
 		"prepareStatement",
-		"INSERT INTO saves(title, data) VALUES (?, ?) RETURNING id;");
-	doReturn(makeDeleteStatement()).when(connection, "prepareStatement", "DELETE FROM saves WHERE id = ?");
-	doReturn(makeListStatement()).when(connection, "prepareStatement", "SELECT id,title FROM saves");
+		"INSERT INTO saves(author, title, data) VALUES (?, ?, ?) RETURNING id;");
+
+	doReturn(makeDeleteStatement()).when(
+		connection,
+		"prepareStatement",
+		"DELETE FROM saves WHERE id = ? AND author = ?");
+
+	doReturn(makeListStatement()).when(
+		connection,
+		"prepareStatement",
+		"SELECT id,title FROM saves WHERE author = ?");
 
 	doReturn(makeGetUserStatement()).when(connection, "prepareStatement", "SELECT * from users WHERE name = ?");
 
@@ -376,126 +489,143 @@ public class TestDatabaseDataHandler
 	Whitebox.setInternalState(DatabaseDataHandler.class, "KEY_LENGTH_FOR_HASH", KEY_LENGTH_FOR_HASH);
     }
 
+    @Test(expected = DatabaseException.class)
+    public void testSaveNoUser() throws Exception
+    {
+	databaseHandler._saveData(5L, "a", "aa");
+    }
+
     @Test
     public void testSave() throws Exception
     {
-	assertEquals(new Long(1), databaseHandler._saveData("a", "aa"));
-	assertEquals(new Long(2), databaseHandler._saveData("b", "bb"));
-	assertEquals(new Long(3), databaseHandler._saveData("c", "cc"));
-	assertEquals(new Integer(3), (Integer) data_database.size());
+	assertEquals(new Long(1), databaseHandler._saveData(testUser.id, "a", "aa"));
+	assertEquals(new Long(2), databaseHandler._saveData(testUser.id, "b", "bb"));
+	assertEquals(new Long(3), databaseHandler._saveData(testUser.id, "c", "cc"));
+	assertEquals(new Integer(3), (Integer) testUser.data_database.size());
+
 	assertArrayEquals(new String[]
 	{
 		"a",
 		"aa"
-	}, data_database.get(1L));
+	}, testUser.data_database.get(1L));
 	assertArrayEquals(new String[]
 	{
 		"b",
 		"bb"
-	}, data_database.get(2L));
+	}, testUser.data_database.get(2L));
 	assertArrayEquals(new String[]
 	{
 		"c",
 		"cc"
-	}, data_database.get(3L));
+	}, testUser.data_database.get(3L));
+    }
+
+    @Test(expected = Throwable.class)
+    public void testLoadNoUser() throws Exception
+    {
+	databaseHandler._loadData(5L, 1L);
     }
 
     @Test
     public void testLoad() throws Exception
     {
-	data_database.put(1L, new String[]
+	testUser.data_database.put(1L, new String[]
 	{
 		"a",
 		"aa"
 	});
-	data_database.put(2L, new String[]
+	testUser.data_database.put(2L, new String[]
 	{
 		"b",
 		"bb"
 	});
-	data_database.put(3L, new String[]
+	testUser.data_database.put(3L, new String[]
 	{
 		"c",
 		"cc"
 	});
 
-	assertEquals("aa", databaseHandler._loadData(1L));
-	assertEquals("bb", databaseHandler._loadData(2L));
-	assertEquals("cc", databaseHandler._loadData(3L));
-    }
-
-    @Test(expected = DatabaseDataHandler.DatabaseException.class)
-    public void testLoadWhenNone() throws Exception
-    {
-	assertEquals("aa", databaseHandler._loadData(1L));
+	assertEquals("aa", databaseHandler._loadData(testUser.id, 1L));
+	assertEquals("bb", databaseHandler._loadData(testUser.id, 2L));
+	assertEquals("cc", databaseHandler._loadData(testUser.id, 3L));
     }
 
     @Test(expected = DatabaseDataHandler.DatabaseException.class)
     public void testLoadOutOfIndex() throws Exception
     {
-	data_database.put(1L, new String[]
-	{
-		"a",
-		"aa"
-	});
+	databaseHandler._loadData(testUser.id, 1L);
+    }
 
-	assertEquals("aa", databaseHandler._loadData(2L));
+    @Test(expected = Throwable.class)
+    public void testDeleteNoUser() throws Exception
+    {
+	databaseHandler._deleteData(5L, 1L);
     }
 
     @Test
     public void testDelete() throws Exception
     {
-	data_database.put(1L, new String[]
+	testUser.data_database.put(1L, new String[]
 	{
 		"a",
 		"aa"
 	});
-	data_database.put(2L, new String[]
+	testUser.data_database.put(2L, new String[]
 	{
 		"b",
 		"bb"
 	});
-	data_database.put(3L, new String[]
+	testUser.data_database.put(3L, new String[]
 	{
 		"c",
 		"cc"
 	});
 
-	assertEquals(new Long(1L), databaseHandler._deleteData(1L));
-	assertEquals(new Long(3L), databaseHandler._deleteData(3L));
-	assertEquals(new Long(2L), databaseHandler._deleteData(2L));
-	assertEquals(0, data_database.size());
+	assertEquals(new Long(1L), databaseHandler._deleteData(testUser.id, 1L));
+	assertEquals(new Long(3L), databaseHandler._deleteData(testUser.id, 3L));
+	assertEquals(new Long(2L), databaseHandler._deleteData(testUser.id, 2L));
+	assertEquals(0, testUser.data_database.size());
     }
 
     @Test(expected = DatabaseDataHandler.DatabaseException.class)
     public void testDeleteWhenNone() throws Exception
     {
-	databaseHandler.deleteData(1L);
+	databaseHandler.deleteData(5L, 1L);
     }
 
-    @Test(expected = DatabaseDataHandler.DatabaseException.class)
-    public void testDeleteOutOfIndex() throws Exception
+    @Test(expected = Throwable.class)
+    public void testGetListNoUser()
     {
-	data_database.put(1L, new String[]
-	{
-		"a",
-		"aa"
-	});
-
-	databaseHandler._loadData(2L);
+	databaseHandler.getList(5L);
     }
 
     @Test
     public void testEmptyGetList()
     {
-	assertEquals(new ArrayList<Map<String, Object>>(), databaseHandler.getList());
+	assertEquals(new ArrayList<Map<String, Object>>(), databaseHandler.getList(testUser.id));
     }
 
     @Test
     public void testList()
     {
+	testUser.data_database.put(1L, new String[]
+	{
+		"a",
+		"aa"
+	});
+	testUser.data_database.put(2L, new String[]
+	{
+		"b",
+		"bb"
+	});
+	testUser.data_database.put(3L, new String[]
+	{
+		"c",
+		"cc"
+	});
+
 	List<Map<String, Object>> result = new ArrayList<Map<String, Object>>();
-	for (Entry<Long, String[]> entry : data_database.entrySet())
+	for (Entry<Long, String[]> entry : testUser.data_database.entrySet())
 	{
 	    Map<String, Object> value = new TreeMap<>();
 	    value.put("id", entry.getKey());
@@ -503,7 +633,7 @@ public class TestDatabaseDataHandler
 	    result.add(value);
 	}
 
-	assertEquals(result, databaseHandler.getList());
+	assertEquals(result, databaseHandler.getList(testUser.id));
     }
 
     @Test
@@ -512,21 +642,21 @@ public class TestDatabaseDataHandler
 	String password = "something_p";
 
 	databaseHandler.createLogin("something", password);
-	assertEquals(1, user_database.size());
-	assertEquals(true, user_database.containsKey("something"));
+	assertEquals(2, user_name_database.size());
+	assertEquals(true, user_name_database.containsKey("something"));
 
 	// Test hashing
 
-	byte[][] user_data = user_database.get("something");
+	DatabaseUser user = user_name_database.get("something");
 
-	byte[] salt = user_data[1];
+	byte[] salt = user.salt;
 
 	SecretKeyFactory skf = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA512");
 	PBEKeySpec spec = new PBEKeySpec(password.toCharArray(), salt, ITERATION_COUNT_FOR_HASH, KEY_LENGTH_FOR_HASH);
 	SecretKey key = skf.generateSecret(spec);
 	byte[] hash = key.getEncoded();
 
-	assertArrayEquals(hash, user_data[0]);
+	assertArrayEquals(hash, user.hash);
     }
 
     @Test(expected = DatabaseDataHandler.UserAlreadyExistsException.class)
@@ -552,20 +682,20 @@ public class TestDatabaseDataHandler
     @Test(expected = DatabaseDataHandler.DatabaseException.class)
     public void testGetUserIdNoUser()
     {
-	databaseHandler._getUserId("GNU");
+	databaseHandler._getUserId("This is not a valid username?");
     }
 
     @Test
     public void testGetUserIdOk()
     {
 	databaseHandler._createLogin("Ok", "NoPass");
-	assertEquals(1L, databaseHandler._getUserId("Ok"));
+	assertEquals(2L, databaseHandler._getUserId("Ok"));
 
 	databaseHandler._createLogin("Ok2", "NoPass");
-	assertEquals(2L, databaseHandler._getUserId("Ok2"));
+	assertEquals(3L, databaseHandler._getUserId("Ok2"));
 
 	databaseHandler._createLogin("Ok3", "NoPass");
-	assertEquals(3L, databaseHandler._getUserId("Ok3"));
+	assertEquals(4L, databaseHandler._getUserId("Ok3"));
     }
 
     class Store<T>

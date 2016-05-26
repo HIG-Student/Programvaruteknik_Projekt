@@ -78,14 +78,15 @@ public class DatabaseDataHandler extends DataHandler
     }
 
     @Override
-    protected Long _saveData(String title, String data)
+    protected Long _saveData(Long userId, String title, String data)
     {
 	try (Connection connection = dataConnection.getConnection())
 	{
 	    PreparedStatement statement = connection
-		    .prepareStatement("INSERT INTO saves(title, data) VALUES (?, ?) RETURNING id;");
-	    statement.setString(1, title);
-	    statement.setString(2, data);
+		    .prepareStatement("INSERT INTO saves(author, title, data) VALUES (?, ?, ?) RETURNING id;");
+	    statement.setLong(1, userId);
+	    statement.setString(2, title);
+	    statement.setString(3, data);
 	    ResultSet result = statement.executeQuery();
 	    if (!result.next()) throw new DatabaseException("Cannot save data");
 	    return result.getLong("id");
@@ -97,15 +98,19 @@ public class DatabaseDataHandler extends DataHandler
     }
 
     @Override
-    protected String _loadData(Long i)
+    protected String _loadData(Long userId, Long i)
     {
 	try (Connection connection = dataConnection.getConnection())
 	{
-	    PreparedStatement statement = connection.prepareStatement("SELECT * FROM saves WHERE id = ?");
+	    PreparedStatement statement = connection
+		    .prepareStatement("SELECT * FROM saves WHERE id = ? AND author = ?");
 	    statement.setLong(1, i);
+	    statement.setLong(2, userId);
 	    ResultSet result = statement.executeQuery();
 	    if (!result.next()) throw new DatabaseException("No data found for index " + i);
-	    return result.getString("data");
+	    String data = result.getString("data");
+	    if (result.next()) throw new DatabaseException("Found more than one entry!");
+	    return data;
 	}
 	catch (SQLException e)
 	{
@@ -114,13 +119,16 @@ public class DatabaseDataHandler extends DataHandler
     }
 
     @Override
-    protected Long _deleteData(Long index)
+    protected Long _deleteData(Long userId, Long index)
     {
 	try (Connection connection = dataConnection.getConnection())
 	{
-	    PreparedStatement statement = connection.prepareStatement("DELETE FROM saves WHERE id = ?");
+	    PreparedStatement statement = connection.prepareStatement("DELETE FROM saves WHERE id = ? AND author = ?");
 	    statement.setLong(1, index);
-	    if (statement.executeUpdate() != 1) throw new DatabaseException("No data found for index " + index);
+	    statement.setLong(2, userId);
+	    int updates = statement.executeUpdate();
+	    if (updates == 0) throw new DatabaseException("No data found for index " + index);
+	    if (updates > 1) throw new DatabaseException("Ooops, deleted too much for index " + index);
 	    return index;
 	}
 	catch (SQLException e)
@@ -130,12 +138,15 @@ public class DatabaseDataHandler extends DataHandler
     }
 
     @Override
-    public List<Map<String, Object>> getList()
+    public List<Map<String, Object>> getList(Long userId)
     {
 	List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
 	try (Connection connection = dataConnection.getConnection())
 	{
-	    ResultSet result = connection.prepareStatement("SELECT id,title FROM saves").executeQuery();
+	    PreparedStatement statement = connection.prepareStatement("SELECT id,title FROM saves WHERE author = ?");
+	    statement.setLong(1, userId);
+
+	    ResultSet result = statement.executeQuery();
 	    while (result.next())
 	    {
 		Map<String, Object> entry = new TreeMap<>();

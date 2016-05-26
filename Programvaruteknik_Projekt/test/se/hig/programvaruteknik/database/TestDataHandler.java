@@ -26,25 +26,25 @@ public class TestDataHandler
 	dataHandler = new DataHandler()
 	{
 	    @Override
-	    protected Long _saveData(String title, String json)
+	    protected Long _saveData(Long userId, String title, String json)
 	    {
 		return 42L;
 	    }
 
 	    @Override
-	    protected String _loadData(Long index)
+	    protected String _loadData(Long userId, Long index)
 	    {
 		return "[data]";
 	    }
 
 	    @Override
-	    protected Long _deleteData(Long index)
+	    protected Long _deleteData(Long userId, Long index)
 	    {
 		return index;
 	    }
 
 	    @Override
-	    public List<Map<String, Object>> getList()
+	    public List<Map<String, Object>> getList(Long userId)
 	    {
 		return list;
 	    }
@@ -70,57 +70,75 @@ public class TestDataHandler
     }
 
     @Test(expected = DataHandler.DataHandlerException.class)
+    public void testSaveWithNullUserId()
+    {
+	dataHandler.saveData(null, "[title]", "[json]");
+    }
+
+    @Test(expected = DataHandler.DataHandlerException.class)
     public void testSaveWithNullTitle()
     {
-	dataHandler.saveData(null, "[json]");
+	dataHandler.saveData(1L, null, "[json]");
     }
 
     @Test(expected = DataHandler.DataHandlerException.class)
     public void testSaveWithNullData()
     {
-	dataHandler.saveData("[title]", null);
+	dataHandler.saveData(1L, "[title]", null);
+    }
+
+    @Test(expected = DataHandler.DataHandlerException.class)
+    public void testLoadWhenNullUserId()
+    {
+	dataHandler.loadData(null, -1L);
     }
 
     @Test(expected = DataHandler.DataHandlerException.class)
     public void testLoadWhenNegativeInParameter()
     {
-	dataHandler.loadData(-1L);
+	dataHandler.loadData(1L, -1L);
     }
 
     @Test(expected = DataHandler.DataHandlerException.class)
     public void testLoadWhenNullInParameter()
     {
-	dataHandler.loadData(null);
+	dataHandler.loadData(1L, null);
     }
 
     @Test
     public void testLoad()
     {
-	assertEquals("[data]", dataHandler.loadData(42L));
+	assertEquals("[data]", dataHandler.loadData(1L, 42L));
     }
 
     @Test
     public void testDelete()
     {
-	assertEquals(new Long(1L), dataHandler.deleteData(1L));
+	assertEquals(new Long(1L), dataHandler.deleteData(1L, 1L));
+    }
+
+    @Test(expected = DataHandler.DataHandlerException.class)
+    public void testDeleteWhenNullUserId()
+    {
+	dataHandler.deleteData(null, -1L);
     }
 
     @Test(expected = DataHandler.DataHandlerException.class)
     public void testDeleteWhenNegativeInParameter()
     {
-	dataHandler.deleteData(-1L);
+	dataHandler.deleteData(1L, -1L);
     }
 
     @Test(expected = DataHandler.DataHandlerException.class)
     public void testDeleteWhenNullInParameter()
     {
-	dataHandler.deleteData(null);
+	dataHandler.deleteData(1L, null);
     }
 
     @Test
     public void testSave()
     {
-	assertEquals(new Long(42L), dataHandler.saveData("[title]", "[data]"));
+	assertEquals(new Long(42L), dataHandler.saveData(1L, "[title]", "[data]"));
     }
 
     @Test
