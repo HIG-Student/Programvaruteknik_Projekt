@@ -11,8 +11,7 @@ import {DateView} from "app/date_view/date_view";
 	selector: "graph-view",
 	templateUrl: "app/graphs/graph_view/graph_view.html",
 	styleUrls: ["app/graphs/graph_view/graph_view.css"],
-	directives: [DataView,CorrView,PickSourceView,DatePickerView,DateView],
-	providers:[DataBridgeService]	
+	directives: [DataView,CorrView,PickSourceView,DatePickerView,DateView]
 })
 export class GraphView 
 {

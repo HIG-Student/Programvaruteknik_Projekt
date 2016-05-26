@@ -1,6 +1,7 @@
 import {Component,Output,EventEmitter} from "angular2/core";
 import {RouteConfig, Router, ROUTER_DIRECTIVES} from 'angular2/router';
 import {DataLoader} from "app/data_loader";
+import {DataBridgeService} from "app/data_bridge_service";
 
 @Component({
 	selector: "login-view",
@@ -14,7 +15,7 @@ export class LoginView
 	private password:String;
 	private message:String;
 	
-	constructor(private router: Router, private dataLoader: DataLoader) 
+	constructor(private router: Router, private dataLoader: DataLoader,private dataBridge:DataBridgeService) 
 	{
 	
 	}
@@ -28,7 +29,10 @@ export class LoginView
 		this.dataLoader.login(this.username,this.password).subscribe(data =>
 		{
 			if(data.success)
+			{
+				this.dataBridge.username = this.username;
 				this.router.navigate(["/Statistics"]);
+			}
 			else
 				this.message = data.message || "Authentication failed!";
 		},

@@ -5,6 +5,7 @@ import {LoginView} from "app/login_view/login_view";
 import {DataLoader} from "app/data_loader";
 import {ProgressService} from "app/progress_service";
 import {HTTP_PROVIDERS} from 'angular2/http';
+import {DataBridgeService} from "app/data_bridge_service";
 
 
 
@@ -14,7 +15,7 @@ import {HTTP_PROVIDERS} from 'angular2/http';
 	templateUrl: "app/statistics.html",
 	styleUrls: ["app/statistics.css"],
 	directives: [GraphView,LoginView,ROUTER_DIRECTIVES],
-	providers: [ProgressService,DataLoader,HTTP_PROVIDERS]
+	providers: [ProgressService,DataLoader,HTTP_PROVIDERS,DataBridgeService]
 })
 @RouteConfig(
 [

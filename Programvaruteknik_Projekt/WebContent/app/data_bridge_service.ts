@@ -11,6 +11,8 @@ export class DataBridgeService
 	
 	@Output() dataLoaded: EventEmitter<any> = new EventEmitter();
 	
+	public username: String = null;
+	
 	public saveData: object = 
 	{
 		"title":"",
