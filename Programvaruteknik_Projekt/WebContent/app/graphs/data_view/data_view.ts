@@ -63,8 +63,6 @@ export class DataView
 	@Input()
 	set data(data:object)
 	{
-		console.log("GNUUUUUU",data);
-		
 		this._data = data;
 		if(data == null)
 		{
