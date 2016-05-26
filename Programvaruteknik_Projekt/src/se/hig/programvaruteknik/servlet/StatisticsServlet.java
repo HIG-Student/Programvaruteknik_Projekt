@@ -14,8 +14,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang3.ArrayUtils;
-
 import com.owlike.genson.Genson;
 
 import se.hig.programvaruteknik.data.ConstantSourceBuilder;
@@ -32,7 +30,6 @@ import se.hig.programvaruteknik.model.DataCollectionBuilder;
 import se.hig.programvaruteknik.model.DataSourceBuilder;
 import se.hig.programvaruteknik.model.MergeType;
 import se.hig.programvaruteknik.model.Resolution;
-import sun.reflect.generics.tree.ArrayTypeSignature;
 import se.hig.programvaruteknik.JSONFormatter;
 import se.hig.programvaruteknik.JSONOutputter;
 
