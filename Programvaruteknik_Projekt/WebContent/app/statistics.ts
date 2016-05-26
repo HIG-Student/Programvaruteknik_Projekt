@@ -31,14 +31,19 @@ import {HTTP_PROVIDERS} from 'angular2/http';
 ])
 export class Statistics implements OnInit
 {
-	constructor(private router: Router, private progressor: ProgressService) 
+	constructor(private router: Router, private progressor: ProgressService,private dataLoader: DataLoader) 
 	{
 		
 	}
 	
 	ngOnInit() 
 	{
-		console.log("G");
-		this.router.navigate(['/Login']);
+		this.dataLoader.isLoggedIn().subscribe(data =>
+		{
+			if(data["logged-in"])
+				this.router.navigate(['/Statistics']);
+			else
+				this.router.navigate(['/Login']);
+		});
 	}
 }

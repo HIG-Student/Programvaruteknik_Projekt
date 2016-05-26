@@ -9,7 +9,7 @@ export class DataLoader
 {
 	constructor(private http: Http, private progressor: ProgressService) { }
 	
-	getCorrData(data,sourceA,sourceB)
+	public getCorrData(data,sourceA,sourceB)
 	{
 		if(!data)
 			data = { };
@@ -34,7 +34,7 @@ export class DataLoader
 		return this.post(data);
 	}
 	
-	getSourceData(data,source)
+	public getSourceData(data,source)
 	{
 		data["type"] = "data-source";
 		
@@ -47,7 +47,7 @@ export class DataLoader
 		return this.post(data);
 	}
 	
-	getSources()
+	public getSources()
 	{
 		return this.post(
 		{
@@ -55,7 +55,7 @@ export class DataLoader
 		});
 	}
 	
-	sendSaveData(data:object)
+	public sendSaveData(data:object)
 	{
 		return this.post(
 		{
@@ -64,7 +64,7 @@ export class DataLoader
 		});
 	}
 	
-	getSavedData(id:number)
+	public getSavedData(id:number)
 	{	
 		return this.post(
 		{
@@ -73,7 +73,7 @@ export class DataLoader
 		});
 	}
 	
-	deleteData(id:number)
+	public deleteData(id:number)
 	{	
 		return this.post(
 		{
@@ -82,7 +82,7 @@ export class DataLoader
 		});
 	}
 	
-	getSaveList()
+	public getSaveList()
 	{
 		return this.post(
 		{
@@ -90,41 +90,8 @@ export class DataLoader
 		});
 	}
 	
-	
-	
-	
-	offlineLogin(username:String,password:String):Observable
+	public login(username:String,password:String):Observable
 	{
-		
-		return Observable.create(observer =>
-		{
-			this.progressor.addLoading();
-			
-			var thing = this.http
-				.get("example_login.json")
-				.map(res => res.json().data)
-				.do(data =>
-					{
-						observer.next(data);
-					},
-					error =>
-					{
-						observer.error(error);
-						this.progressor.removeLoading();
-					},
-					data =>
-					{
-						observer.complete();
-						this.progressor.removeLoading();
-					})
-				.subscribe();
-		});
-	}
-	
-	
-	login(username:String,password:String):Observable
-	{
-
 		return this.post(
 		{
 			"type": "login",
@@ -136,12 +103,8 @@ export class DataLoader
 		});
 	}
 
-
-
-
-	register(username:String,password:String):Observable
+	public register(username:String,password:String):Observable
 	{
-
 		return this.post(
 		{
 			"type": "register",
@@ -150,6 +113,14 @@ export class DataLoader
 				"username": username,
 				"password": password
 			}
+		});
+	}
+	
+	private isLoggedIn()
+	{
+		return this.post(
+		{
+			"type": "login-status"
 		});
 	}
 		
