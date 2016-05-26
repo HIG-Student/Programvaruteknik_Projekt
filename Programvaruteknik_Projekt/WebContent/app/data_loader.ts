@@ -9,7 +9,7 @@ export class DataLoader
 {
 	constructor(private http: Http, private progressor: ProgressService) { }
 	
-	getCorrData(data,sourceA,sourceB)
+	public getCorrData(data,sourceA,sourceB)
 	{
 		if(!data)
 			data = { };
@@ -34,24 +34,20 @@ export class DataLoader
 		return this.post(data);
 	}
 	
-	getSourceData(data,source)
+	public getSourceData(data,source)
 	{
 		data["type"] = "data-source";
 		
 		if(!data["data"])
 			data["data"] = { };
-		
-		//data["resolution"] = "YEAR";
-		//data["merge-type-x"] = "AVERAGE";
-		//data["merge-type-y"] = "AVERAGE";
-		
+
 		if(source)
 			data.data.source = source;
 		
 		return this.post(data);
 	}
 	
-	getSources()
+	public getSources()
 	{
 		return this.post(
 		{
@@ -59,7 +55,7 @@ export class DataLoader
 		});
 	}
 	
-	sendSaveData(data:object)
+	public sendSaveData(data:object)
 	{
 		return this.post(
 		{
@@ -68,7 +64,7 @@ export class DataLoader
 		});
 	}
 	
-	getSavedData(id:number)
+	public getSavedData(id:number)
 	{	
 		return this.post(
 		{
@@ -77,7 +73,7 @@ export class DataLoader
 		});
 	}
 	
-	deleteData(id:number)
+	public deleteData(id:number)
 	{	
 		return this.post(
 		{
@@ -86,7 +82,7 @@ export class DataLoader
 		});
 	}
 	
-	getSaveList()
+	public getSaveList()
 	{
 		return this.post(
 		{
@@ -94,13 +90,45 @@ export class DataLoader
 		});
 	}
 	
+	public login(username:String,password:String):Observable
+	{
+		return this.post(
+		{
+			"type": "login",
+			"data":
+			{
+				"username": username,
+				"password": password
+			}
+		});
+	}
+
+	public register(username:String,password:String):Observable
+	{
+		return this.post(
+		{
+			"type": "register",
+			"data":
+			{
+				"username": username,
+				"password": password
+			}
+		});
+	}
+	
+	private isLoggedIn()
+	{
+		return this.post(
+		{
+			"type": "login-status"
+		});
+	}
+		
 	private post(data:object)
 	{		
 		return Observable.create(observer =>
 		{
 			this.progressor.addLoading();
-			
-			window.obs = observer;
 			
 			var thing = this.http
 				.post("StatisticsServlet", JSON.stringify(data))
