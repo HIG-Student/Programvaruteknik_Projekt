@@ -61,9 +61,13 @@ public interface DataSource extends JSONOutputter
     /**
      * Represent an error related to the datasource
      */
-    @SuppressWarnings("serial")
     public class DataSourceException extends Exception
     {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * Create an exception
 	 * 
@@ -110,9 +114,19 @@ public interface DataSource extends JSONOutputter
 
 	return formatter.format(new Genson().serialize(new TreeMap<String, Object>()
 	{
+	    /**
+	     * 
+	     */
+	    private static final long serialVersionUID = 1L;
+
 	    {
 		put("data", new TreeMap<String, Object>()
 		{
+		    /**
+		     * 
+		     */
+		    private static final long serialVersionUID = 1L;
+
 		    {
 			put("name", getName());
 			put("unit", getUnit());
@@ -120,6 +134,11 @@ public interface DataSource extends JSONOutputter
 			put("source_link", getSourceLink());
 			put("data", new TreeMap<String, Double>()
 			{
+			    /**
+			     * 
+			     */
+			    private static final long serialVersionUID = 1L;
+
 			    {
 				for (Entry<LocalDate, Double> entry : getData().entrySet())
 				    put(entry.getKey().toString(), entry.getValue());

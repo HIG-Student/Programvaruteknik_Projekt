@@ -8,23 +8,24 @@ import java.util.Map;
 
 /**
  * @author Viktor Hanstorp
- *         docs by Fredrik
  */
 public abstract class DataHandler
 {
 
     /**
-     * Method controls the title and data value if not correct<br>
-     * an exception is thrown
+     * Save data as a user
      * 
      * @param userId
-     *            user id
+     *            the user that saves the data
      * @param title
      *            the title that the save should have
      * @param data
      *            the data to save
      * 
      * @return saveData the id of the entry
+     * 
+     * @throws DataHandlerException
+     *             if any parameter is null
      */
     public final Long saveData(Long userId, String title, String data)
     {
@@ -38,12 +39,17 @@ public abstract class DataHandler
     protected abstract Long _saveData(Long userId, String title, String json);
 
     /**
-     * Method controls the index value if not correct<br>
-     * an exception is thrown
+     * Load data as a user
      * 
+     * @param userId
+     *            the user that loads the data
      * @param index
-     *            containing data
-     * @return loadData and index content
+     *            the index of the data to load
+     * 
+     * @return the loaded data
+     * 
+     * @throws DataHandlerException
+     *             if any parameter is null
      */
     public final String loadData(Long userId, Long index)
     {
@@ -57,12 +63,17 @@ public abstract class DataHandler
     protected abstract String _loadData(Long userId, Long index);
 
     /**
-     * Method controls the index value if not correct<br>
-     * an exception is thrown
+     * Delete data as user
      * 
+     * @param userId
+     *            the user that deletes the data
      * @param index
-     *            containing data
-     * @return deleteData and index content
+     *            the index of the data to delete
+     * 
+     * @return the index of the deleted data
+     * 
+     * @throws DataHandlerException
+     *             if any parameter is null
      */
     public final Long deleteData(Long userId, Long index)
     {
@@ -75,10 +86,25 @@ public abstract class DataHandler
 
     protected abstract Long _deleteData(Long userId, Long index);
 
+    /**
+     * Get saved data as a user
+     * 
+     * @param userId
+     *            the user to load data
+     * 
+     * @return the saved data
+     */
     public abstract List<Map<String, Object>> getList(Long userId);
 
     /**
-     * Exception class that extends RuntimeException
+     * Validating login
+     * 
+     * @param username
+     *            the user name to validate
+     * @param password
+     *            the password to validate
+     * 
+     * @return the validity of the credentials
      *
      */
     public final boolean validateLogin(String username, String password)
@@ -90,6 +116,18 @@ public abstract class DataHandler
 
     protected abstract boolean _validateLogin(String username, String password);
 
+    /**
+     * Create a login
+     * 
+     * @param username
+     *            the username to use
+     * @param password
+     *            the password to use
+     * 
+     * @throws DataHandlerCannotCreateLoginException
+     *             if parameters are null or if the login cannot otherwise be
+     *             created
+     */
     public final void createLogin(String username, String password) throws DataHandlerCannotCreateLoginException
     {
 	if (username == null) throw new DataHandlerCannotCreateLoginException("Name cannot be null!");
@@ -100,6 +138,17 @@ public abstract class DataHandler
 
     protected abstract void _createLogin(String username, String password);
 
+    /**
+     * Get the if of a user
+     * 
+     * @param username
+     *            the user to get id from
+     * 
+     * @return the id of the user
+     * 
+     * @throws DataHandlerException
+     *             if username is null
+     */
     public final long getUserId(String username)
     {
 	if (username == null) throw new DataHandlerException("Name cannot be null!");
@@ -109,36 +158,88 @@ public abstract class DataHandler
 
     protected abstract long _getUserId(String username);
 
+    /**
+     * An exception related to the database handler
+     */
     public class DataHandlerException extends RuntimeException
     {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
+	 * An exception that indicates that there was an error with the data
+	 * handler
+	 */
 	public DataHandlerException()
 	{
 
 	}
 
+	/**
+	 * An exception that indicates that there was an error with the data
+	 * handler
+	 * 
+	 * @param message
+	 *            the information about the exception
+	 */
 	public DataHandlerException(String message)
 	{
 	    super(message);
 	}
 
+	/**
+	 * An exception that indicates that there was an error with the data
+	 * handler
+	 * 
+	 * @param throwable
+	 *            the throwable that evoked this exception
+	 */
 	public DataHandlerException(Throwable throwable)
 	{
 	    super(throwable);
 	}
     }
 
+    /**
+     * An exception that indicates that the data handelr cannot create a login
+     */
     public class DataHandlerCannotCreateLoginException extends DataHandlerException
     {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
+	 * An exception that indicates that the data handelr cannot create a
+	 * login
+	 */
 	public DataHandlerCannotCreateLoginException()
 	{
 
 	}
 
+	/**
+	 * An exception that indicates that the data handelr cannot create a
+	 * login
+	 * 
+	 * @param message
+	 *            additional information
+	 */
 	public DataHandlerCannotCreateLoginException(String message)
 	{
 	    super(message);
 	}
 
+	/**
+	 * An exception that indicates that the data handelr cannot create a
+	 * login
+	 * 
+	 * @param throwable
+	 *            the throwable that evoked this exception
+	 */
 	public DataHandlerCannotCreateLoginException(Throwable throwable)
 	{
 	    super(throwable);

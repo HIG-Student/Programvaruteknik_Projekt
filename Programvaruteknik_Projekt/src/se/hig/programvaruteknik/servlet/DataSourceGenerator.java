@@ -17,6 +17,9 @@ import se.hig.programvaruteknik.model.Param;
 import se.hig.programvaruteknik.model.SourceGenerator;
 
 /**
+ * A generator that generates a JSON stucture that can be used by clients to
+ * list sources from data sources on the server side
+ * 
  * @author Viktor Hanstorp (ndi14vhp@student.hig.se)
  */
 public class DataSourceGenerator
@@ -209,6 +212,5 @@ public class DataSourceGenerator
 	}
 
 	return list;
-
     }
 }

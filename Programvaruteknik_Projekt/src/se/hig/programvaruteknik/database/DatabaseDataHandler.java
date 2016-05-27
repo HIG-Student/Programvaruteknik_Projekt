@@ -21,23 +21,54 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
 
+/**
+ * A data handler that works against a database
+ * 
+ * @author Viktor Hanstorp
+ */
 public class DatabaseDataHandler extends DataHandler
 {
     private static int ITERATION_COUNT_FOR_HASH = 20000;
     private static int KEY_LENGTH_FOR_HASH = 256;
 
+    /**
+     * An abstraction of a entity that can return a connection
+     */
     public interface DataConnection
     {
+	/**
+	 * Get a connection
+	 * 
+	 * @return the connection
+	 * 
+	 * @throws SQLException
+	 *             if error occurs
+	 */
 	Connection getConnection() throws SQLException;
     }
 
     private DataConnection dataConnection;
 
+    /**
+     * Creates a database data handler that uses a specific data-connection
+     * 
+     * @param dataConnection
+     *            the data-connection to use
+     */
     public DatabaseDataHandler(DataConnection dataConnection)
     {
 	this.dataConnection = dataConnection;
     }
 
+    /**
+     * Creates a database data handler<br>
+     * <br>
+     * Tries to look for a connection to use in the server context by the name
+     * "jdbc/Kaka"
+     * 
+     * @throws DatabaseException
+     *             if cannot find the connection in the context
+     */
     public DatabaseDataHandler()
     {
 	dataConnection = new DataConnection()
@@ -65,6 +96,16 @@ public class DatabaseDataHandler extends DataHandler
 	};
     }
 
+    /**
+     * Creates a database data handler
+     * 
+     * @param url
+     *            the url to use
+     * @param user
+     *            the user to use
+     * @param password
+     *            the password to use
+     */
     public DatabaseDataHandler(String url, String user, String password)
     {
 	dataConnection = new DataConnection()
@@ -299,6 +340,10 @@ public class DatabaseDataHandler extends DataHandler
 	}
     }
 
+    /**
+     * Exception that indicates that there already exists a user with the
+     * supplied name
+     */
     public class UserAlreadyExistsException extends DatabaseException
     {
 	/**
@@ -306,22 +351,44 @@ public class DatabaseDataHandler extends DataHandler
 	 */
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * Creates an exception that indicates that there already exists a user
+	 * with the supplied name
+	 */
 	public UserAlreadyExistsException()
 	{
 
 	}
 
+	/**
+	 * Creates an exception that indicates that there already exists a user
+	 * with the supplied name
+	 * 
+	 * @param message
+	 *            additional inforamtion
+	 */
 	public UserAlreadyExistsException(String message)
 	{
 	    super(message);
 	}
 
+	/**
+	 * Creates an exception that indicates that there already exists a user
+	 * with the supplied name
+	 * 
+	 * @param throwable
+	 *            the throwable that evoked this exception
+	 */
 	public UserAlreadyExistsException(Throwable throwable)
 	{
 	    super(throwable);
 	}
     }
 
+    /**
+     * Exception that indicates that the user that is requested does not
+     * exist
+     */
     public class UserDoesNotExistsException extends DatabaseException
     {
 	/**
@@ -329,22 +396,43 @@ public class DatabaseDataHandler extends DataHandler
 	 */
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * Creates an exception that indicates that the user that is requested
+	 * does not exist
+	 */
 	public UserDoesNotExistsException()
 	{
 
 	}
 
+	/**
+	 * Creates an exception that indicates that the user that is requested
+	 * does not exist
+	 * 
+	 * @param message
+	 *            additional inforamtion
+	 */
 	public UserDoesNotExistsException(String message)
 	{
 	    super(message);
 	}
 
+	/**
+	 * Creates an exception that indicates that the user that is requested
+	 * does not exist
+	 * 
+	 * @param throwable
+	 *            the throwable that evoked this exception
+	 */
 	public UserDoesNotExistsException(Throwable throwable)
 	{
 	    super(throwable);
 	}
     }
 
+    /**
+     * Exception that indicates that there were an error related to the database
+     */
     public class DatabaseException extends DataHandlerException
     {
 	/**
@@ -352,16 +440,34 @@ public class DatabaseDataHandler extends DataHandler
 	 */
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * Creates an exception that indicates that there was an error related
+	 * to the database
+	 */
 	public DatabaseException()
 	{
 
 	}
 
+	/**
+	 * Creates an exception that indicates that there was an error related
+	 * to the database
+	 * 
+	 * @param message
+	 *            additional information
+	 */
 	public DatabaseException(String message)
 	{
 	    super(message);
 	}
 
+	/**
+	 * Creates an exception that indicates that there was an error related
+	 * to the database
+	 * 
+	 * @param throwable
+	 *            the throwable that evoked this exception
+	 */
 	public DatabaseException(Throwable throwable)
 	{
 	    super(throwable);
