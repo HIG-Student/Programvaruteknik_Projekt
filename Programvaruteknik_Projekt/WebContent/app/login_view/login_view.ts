@@ -22,11 +22,11 @@ export class LoginView
 	
 	public @Output("onLogin") loginEvent: EventEmitter<String> = new EventEmitter();
 	
-	public login()
-	{
+	private callDirector(serverCaller,alternateErrorMessage:String)
+	{ 
 		this.message = "";
 		
-		this.dataLoader.login(this.username,this.password).subscribe(data =>
+		serverCaller.bind(this.dataLoader)(this.username,this.password).subscribe(data =>
 		{
 			if(data.success)
 			{
@@ -34,7 +34,7 @@ export class LoginView
 				this.router.navigate(["/Statistics"]);
 			}
 			else
-				this.message = data.message || "Authentication failed!";
+				this.message = data.message || alternateErrorMessage;
 		},
 		error =>
 		{
@@ -42,21 +42,14 @@ export class LoginView
 		});
 	}
 	
+	public login()
+	{
+		this.callDirector(this.dataLoader.login,"Authentication failed!");
+	}
+	
 	
 	public register()
 	{
-		this.message = "";
-		
-		this.dataLoader.register(this.username,this.password).subscribe(data =>
-		{
-			if(data.success)
-				this.router.navigate(["/Statistics"]);
-			else
-				this.message = data.message || "Registration failed!";
-		},
-		error =>
-		{
-			this.message = error;
-		});
+		this.callDirector(this.dataLoader.register,"Registration failed!");
 	}
 }
