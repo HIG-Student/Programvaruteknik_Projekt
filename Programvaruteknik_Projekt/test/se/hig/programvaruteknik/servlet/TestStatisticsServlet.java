@@ -2,7 +2,6 @@ package se.hig.programvaruteknik.servlet;
 
 import junit.framework.TestCase;
 import se.hig.programvaruteknik.JSONFormatter;
-import se.hig.programvaruteknik.model.DataCollection;
 import se.hig.programvaruteknik.model.DataCollectionBuilder;
 import se.hig.programvaruteknik.model.DataSource;
 import se.hig.programvaruteknik.model.DataSourceBuilder;
@@ -18,18 +17,13 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.function.Function;
 
-import javax.servlet.Servlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.powermock.api.mockito.expectation.WithOrWithoutExpectedArguments;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.*;
 import static org.powermock.api.mockito.PowerMockito.*;
 
-import static org.junit.Assert.*;
-import org.junit.Before;
 import org.junit.Ignore;
 
 @SuppressWarnings(

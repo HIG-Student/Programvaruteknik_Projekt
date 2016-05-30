@@ -2,13 +2,8 @@ package se.hig.programvaruteknik.servlet;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
-import java.time.LocalDate;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.Map.Entry;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -17,6 +12,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import com.owlike.genson.Genson;
 
@@ -28,23 +24,21 @@ import se.hig.programvaruteknik.data.SMHISourceBuilder.DataType;
 import se.hig.programvaruteknik.data.SMHISourceBuilder.Period;
 import se.hig.programvaruteknik.data.StockSourceBuilder;
 import se.hig.programvaruteknik.data.StockSourceBuilder.StockInfo;
-import se.hig.programvaruteknik.data.StockSourceBuilder.StockName;
+import se.hig.programvaruteknik.database.DataHandler;
+import se.hig.programvaruteknik.database.DatabaseDataHandler;
 import se.hig.programvaruteknik.model.DataCollectionBuilder;
 import se.hig.programvaruteknik.model.DataSourceBuilder;
 import se.hig.programvaruteknik.model.MergeType;
-import se.hig.programvaruteknik.model.Param;
 import se.hig.programvaruteknik.model.Resolution;
-import se.hig.programvaruteknik.model.SourceGenerator;
 import se.hig.programvaruteknik.JSONFormatter;
 import se.hig.programvaruteknik.JSONOutputter;
-import se.hig.programvaruteknik.Utils;
 
 /**
- * Servlet implementation class SampleServlet
+ * Servlet implementation class StatisticsServlet
  * 
  * @author Viktor Hanstorp (ndi14vhp@student.hig.se)
  */
-@WebServlet("/SampleServlet")
+@WebServlet("/StatisticsServlet")
 public class StatisticsServlet extends HttpServlet
 {
     private static final long serialVersionUID = 1L;
@@ -53,6 +47,7 @@ public class StatisticsServlet extends HttpServlet
     protected JSONFormatter JSON_Formatter;
     protected Function<InputStream, Map<String, Object>> JSONConverter;
     protected DataSourceGenerator dataSourceGenerator;
+    protected DataHandler dataHandler;
 
     /**
      * Server entry-point
@@ -62,11 +57,12 @@ public class StatisticsServlet extends HttpServlet
 	this(
 		new JSONFormatter(),
 		new DataCollectionBuilder(),
-		(stream) -> new Genson().deserialize(stream, Map.class),
+		(stream) -> new Genson().deserialize(stream, TreeMap.class),
 		new DataSourceGenerator(
 			ConstantSourceBuilder.class,
 			StockSourceBuilder.class,
-			QuandlDataSourceBuilder.class));
+			QuandlDataSourceBuilder.class),
+		new DatabaseDataHandler());
     }
 
     /**
@@ -79,13 +75,17 @@ public class StatisticsServlet extends HttpServlet
      * @param JSONConverter
      *            A function that can convert a JSON InputStream to a Map
      *            <String,Object>
+     * @param dataSaver
+     *            A datasaver that saves data
+     * 
      */
-    public StatisticsServlet(JSONFormatter JSONFormatter, DataCollectionBuilder builder, Function<InputStream, Map<String, Object>> JSONConverter, DataSourceGenerator dataSourceGenerator)
+    public StatisticsServlet(JSONFormatter JSONFormatter, DataCollectionBuilder builder, Function<InputStream, Map<String, Object>> JSONConverter, DataSourceGenerator dataSourceGenerator, DataHandler dataSaver)
     {
 	this.JSON_Formatter = JSONFormatter;
 	this.builder = builder;
 	this.JSONConverter = JSONConverter;
 	this.dataSourceGenerator = dataSourceGenerator;
+	this.dataHandler = dataSaver;
     }
 
     @Override
@@ -156,6 +156,14 @@ public class StatisticsServlet extends HttpServlet
 	throw new RequestException("Unknown 'source-type': " + sourceType);
     }
 
+    protected boolean authenticate(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
+    {
+	HttpSession session = request.getSession();
+	Object authenticated = (Object) session.getAttribute("authenticated");
+
+	return (authenticated instanceof Boolean && (Boolean) authenticated);
+    }
+
     /**
      * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
      *      response)
@@ -163,6 +171,8 @@ public class StatisticsServlet extends HttpServlet
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
     {
+	if (!authenticate(request, response)) return;
+
 	response.setCharacterEncoding("UTF-8");
 
 	try
@@ -183,6 +193,8 @@ public class StatisticsServlet extends HttpServlet
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
     {
+	HttpSession session = request.getSession();
+
 	response.setCharacterEncoding("UTF-8");
 	response.setContentType("application/json;charset=UTF-8");
 
@@ -194,11 +206,245 @@ public class StatisticsServlet extends HttpServlet
 
 	    Boolean pretty = getValue(body, "pretty", (String str) -> "true".equalsIgnoreCase(str), false);
 
-	    String sourceType = getValue(body, "type");
+	    String actionType = getValue(body, "type");
 
 	    JSONOutputter outputter;
 
-	    if ("sources".equalsIgnoreCase(sourceType))
+	    boolean isAuthenticated = authenticate(request, response);
+
+	    if ("login-status".equalsIgnoreCase(actionType))
+	    {
+		outputter = new JSONOutputter()
+		{
+		    @Override
+		    public String asJSON(JSONFormatter formatter)
+		    {
+			Map<String, Object> result = new TreeMap<>();
+			Map<String, Object> data = new TreeMap<>();
+			data.put("logged-in", isAuthenticated);
+			result.put("data", data);
+			return formatter.format(new Genson().serialize(result));
+		    }
+		};
+	    }
+	    else if (!isAuthenticated)
+	    {
+		if ("login".equalsIgnoreCase(actionType))
+		{
+		    Map<String, Object> raw_json = getValue(body, "data");
+		    Map<String, Object> data = new TreeMap<>();
+
+		    String username = getValue(raw_json, "username", "");
+		    String password = getValue(raw_json, "password", "");
+
+		    if (username.equals("") || password.equals(""))
+		    {
+			data.put("success", false);
+			String message = "Missing ";
+
+			if (username.equals(""))
+			{
+			    message += "username";
+			}
+
+			if (password.equals(""))
+			{
+			    if (username.equals(""))
+			    {
+				message += " and ";
+			    }
+			    message += "password";
+			}
+
+			data.put("message", message);
+		    }
+		    else
+		    {
+			boolean loggedIn = dataHandler.validateLogin(username, password);
+			if (loggedIn)
+			{
+			    session.setAttribute("authenticated", true);
+			    session.setAttribute("user-id", dataHandler.getUserId(username));
+			}
+			data.put("success", loggedIn);
+		    }
+
+		    outputter = new JSONOutputter()
+		    {
+			@Override
+			public String asJSON(JSONFormatter formatter)
+			{
+			    Map<String, Object> result = new TreeMap<>();
+			    result.put("data", data);
+			    return formatter.format(new Genson().serialize(result));
+			}
+		    };
+		}
+		else if ("register".equalsIgnoreCase(actionType))
+		{
+		    Map<String, Object> raw_json = getValue(body, "data");
+		    Map<String, Object> data = new TreeMap<>();
+
+		    String username = getValue(raw_json, "username", "");
+		    String password = getValue(raw_json, "password", "");
+
+		    if (username.equals("") || password.equals(""))
+		    {
+			data.put("success", false);
+			String message = "Missing ";
+
+			if (username.equals(""))
+			{
+			    message += "username";
+			}
+
+			if (password.equals(""))
+			{
+			    if (username.equals(""))
+			    {
+				message += " and ";
+			    }
+			    message += "password";
+			}
+
+			data.put("message", message);
+		    }
+		    else
+		    {
+			try
+			{
+			    dataHandler.createLogin(username, password);
+			    session.setAttribute("authenticated", true);
+			    session.setAttribute("user-id", dataHandler.getUserId(username));
+			    data.put("success", true);
+			}
+			catch (Exception e)
+			{
+			    data.put("success", false);
+			}
+		    }
+
+		    outputter = new JSONOutputter()
+		    {
+			@Override
+			public String asJSON(JSONFormatter formatter)
+			{
+			    Map<String, Object> result = new TreeMap<>();
+			    result.put("data", data);
+			    return formatter.format(new Genson().serialize(result));
+			}
+		    };
+		}
+		else
+		{
+		    response.sendError(HttpServletResponse.SC_FORBIDDEN, "Not allowed!");
+		    outputter = new JSONOutputter()
+		    {
+			@Override
+			public String asJSON(JSONFormatter formatter)
+			{
+			    Map<String, Object> result = new TreeMap<>();
+			    result.put("error", "You need to log in!");
+			    return formatter.format(new Genson().serialize(result));
+			}
+		    };
+		}
+	    }
+	    else if ("logout".equalsIgnoreCase(actionType))
+	    {
+		session.invalidate();
+
+		outputter = new JSONOutputter()
+		{
+		    @Override
+		    public String asJSON(JSONFormatter formatter)
+		    {
+			Map<String, Object> result = new TreeMap<>();
+			result.put("message", "logged out!");
+			return formatter.format(new Genson().serialize(result));
+		    }
+		};
+	    }
+	    else if ("save".equalsIgnoreCase(actionType))
+	    {
+		Map<String, Object> raw_json = getValue(body, "data");
+		String json = new Genson().serialize(raw_json);
+		String title = getValue(raw_json, "title");
+
+		Long savedAt_Index = dataHandler.saveData((Long) session.getAttribute("user-id"), title, json);
+
+		outputter = new JSONOutputter()
+		{
+		    @Override
+		    public String asJSON(JSONFormatter formatter)
+		    {
+			Map<String, Object> result = new TreeMap<>();
+			Map<String, Object> data = new TreeMap<>();
+			data.put("id", savedAt_Index);
+			data.put("title", title);
+			result.put("data", data);
+			return formatter.format(new Genson().serialize(result));
+		    }
+		};
+	    }
+	    else if ("delete".equalsIgnoreCase(actionType))
+	    {
+		Long index;
+		Object longing = getValue(body, "data");
+		if (longing instanceof String)
+		    index = Long.parseLong((String) longing);
+		else
+		    index = (Long) longing;
+
+		outputter = new JSONOutputter()
+		{
+		    @Override
+		    public String asJSON(JSONFormatter formatter)
+		    {
+			Map<String, Object> result = new TreeMap<>();
+			result.put("data", dataHandler.deleteData((Long) session.getAttribute("user-id"), index));
+			return formatter.format(new Genson().serialize(result));
+		    }
+		};
+	    }
+	    else if ("load".equalsIgnoreCase(actionType))
+	    {
+		Long index;
+		Object longing = getValue(body, "data");
+		if (longing instanceof String)
+		    index = Long.parseLong((String) longing);
+		else
+		    index = (Long) longing;
+
+		Object loaded_data = new Genson().deserialize(
+			dataHandler.loadData((Long) session.getAttribute("user-id"), index),
+			TreeMap.class);
+
+		outputter = new JSONOutputter()
+		{
+		    @Override
+		    public String asJSON(JSONFormatter formatter)
+		    {
+			Map<String, Object> result = new TreeMap<>();
+			result.put("data", loaded_data);
+			return formatter.format(new Genson().serialize(result));
+		    }
+		};
+	    }
+	    else if ("list".equalsIgnoreCase(actionType))
+	    {
+		outputter = new JSONOutputter()
+		{
+		    @Override
+		    public String asJSON(JSONFormatter formatter)
+		    {
+			Map<String, Object> result = new TreeMap<>();
+			result.put("data", dataHandler.getList((Long) session.getAttribute("user-id")));
+			return formatter.format(new Genson().serialize(result));
+		    }
+		};
+	    }
+	    else if ("sources".equalsIgnoreCase(actionType))
 	    {
 		outputter = new JSONOutputter()
 		{
@@ -212,53 +458,50 @@ public class StatisticsServlet extends HttpServlet
 		    }
 		};
 	    }
-	    else
+	    else if ("data-source".equalsIgnoreCase(actionType))
 	    {
 		Map<String, Object> data = getValue(body, "data");
-
+		DataSourceBuilder builder = dataSourceGenerator.getBuilder(getValue(data, "source"));
+		outputter = builder.build();
+	    }
+	    else if ("data-correlation".equalsIgnoreCase(actionType))
+	    {
+		Map<String, Object> data = getValue(body, "data");
 		Resolution resolution = getValue(
 			body,
 			"resolution",
 			(String str) -> Resolution.valueOf(str),
 			Resolution.DAY);
 
-		if ("data-source".equalsIgnoreCase(sourceType))
-		{
-		    DataSourceBuilder builder = dataSourceGenerator.getBuilder(getValue(data, "source"));
-		    outputter = builder.build();
-		}
-		else
-		    if ("data-correlation".equalsIgnoreCase(sourceType))
-		    {
-			MergeType mergeTypeX = getValue(
-				body,
-				"merge-type-x",
-				(String str) -> MergeType.fromString(str),
-				MergeType.AVERAGE);
+		MergeType mergeTypeX = getValue(
+			body,
+			"merge-type-x",
+			(String str) -> MergeType.fromString(str),
+			MergeType.AVERAGE);
 
-			MergeType mergeTypeY = getValue(
-				body,
-				"merge-type-y",
-				(String str) -> MergeType.fromString(str),
-				MergeType.AVERAGE);
+		MergeType mergeTypeY = getValue(
+			body,
+			"merge-type-y",
+			(String str) -> MergeType.fromString(str),
+			MergeType.AVERAGE);
 
-			DataSourceBuilder sourceA = dataSourceGenerator.getBuilder(getValue(data, "sourceA"));
-			DataSourceBuilder sourceB = dataSourceGenerator.getBuilder(getValue(data, "sourceB"));
+		DataSourceBuilder sourceA = dataSourceGenerator.getBuilder(getValue(data, "sourceA"));
+		DataSourceBuilder sourceB = dataSourceGenerator.getBuilder(getValue(data, "sourceB"));
 
-			builder.setXDatasource(sourceA.build());
-			builder.setYDatasource(sourceB.build());
+		builder.setXDatasource(sourceA.build());
+		builder.setYDatasource(sourceB.build());
 
-			builder.setXMergeType(mergeTypeX);
-			builder.setYMergeType(mergeTypeY);
-			builder.setResolution(resolution);
+		builder.setXMergeType(mergeTypeX);
+		builder.setYMergeType(mergeTypeY);
+		builder.setResolution(resolution);
 
-			outputter = builder.getResult();
-		    }
-		    else
-		    {
-			throw new RequestException("Unknown type!");
-		    }
+		outputter = builder.getResult();
 	    }
+	    else
+	    {
+		throw new RequestException("Unknown type!");
+	    }
+
 	    response.getWriter().append(outputter.asJSON(pretty ? JSON_Formatter : JSONFormatter.NONE));
 	}
 	catch (RequestException e)

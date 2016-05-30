@@ -213,9 +213,19 @@ public class DataCollection implements JSONOutputter
 
 	return formatter.format(new Genson().serialize(new TreeMap<String, Object>()
 	{
+	    /**
+	     * 
+	     */
+	    private static final long serialVersionUID = 1L;
+
 	    {
 		put("data", new TreeMap<String, Object>()
 		{
+		    /**
+		     * 
+		     */
+		    private static final long serialVersionUID = 1L;
+
 		    {
 			put("name", getTitle());
 			put("a_name", getXName());
@@ -228,10 +238,20 @@ public class DataCollection implements JSONOutputter
 			put("b_source_link", getYSourceLink());
 			put("data", new TreeMap<String, Object>()
 			{
+			    /**
+			     * 
+			     */
+			    private static final long serialVersionUID = 1L;
+
 			    {
 				for (Entry<String, MatchedDataPair> entry : getData().entrySet())
 				    put(entry.getKey(), new TreeMap<String, Object>()
 				    {
+					/**
+					 * 
+					 */
+					private static final long serialVersionUID = 1L;
+
 					{
 					    put("a", entry.getValue().getXValue());
 					    put("b", entry.getValue().getYValue());

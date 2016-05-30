@@ -70,7 +70,14 @@ export class DataView
 		}
 		else
 		{
-			var values = Object.keys(data.data).map(k=>[k,Date.parse(k),data.data[k]);
+			var keys =  Object.keys(data.data);
+			
+			keys.sort( (a, b) =>
+			{
+			    return (a<b?-1:(a>b?1:0));
+			});
+			
+			var values = keys.map(k=>[k,Date.parse(k),data.data[k]);
 
 			var first = values[0][1];
 			var last = values[values.length-1][1];
@@ -155,10 +162,10 @@ export class DataView
 			{
 				"labels":
 				[{
-					"text": "No values found",
+					"text": "Please insert value",
 					"font-family": "Georgia",
 					"font-size": "50",
-					"font-color":"red",
+					"font-color":"green",
 					"x": "20%",
 					"y": "40%"
 				}]

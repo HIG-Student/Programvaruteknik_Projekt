@@ -4,17 +4,29 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
-import se.hig.programvaruteknik.model.DataSource;
 import se.hig.programvaruteknik.model.DataSourceBuilder;
 import se.hig.programvaruteknik.model.Param;
 import se.hig.programvaruteknik.model.SourceGenerator;
 
+/**
+ * Building data from Quandl
+ * <a href="https://www.quandl.com/browse">Quandl</a>
+ * 
+ * @author Miran Batti (ofk14mbi@student.hig.se)
+ * @author Fredrik Lindorf (ntn13flf@student.hig.se)
+ * docs Fredrik
+ */
 public class QuandlDataSourceBuilder extends JSONDataSourceBuilder
 {
 
+    /**
+     * The location to get Quandl data from<br>
+     * <br>
+     * The name of the Quandl data
+     *
+     */
     public static enum SourceType
     {
 	DEATH_RATE_CIRRHOSIS_USA("Cirrhosis", "Rate", "Death rate from liver cirrhosis", "https://www.quandl.com/api/v3/datasets/NIAAA/CIRRHOSIS.json"),
@@ -44,38 +56,69 @@ public class QuandlDataSourceBuilder extends JSONDataSourceBuilder
 	    this.url = url;
 	}
 
+	/**
+	 * The name of the data source
+	 * 
+	 * @return the name
+	 */
 	public String getName()
 	{
 	    return name;
 	}
 
+	/**
+	 * The unit of the data source
+	 * 
+	 * @return the unit
+	 */
 	public String getUnit()
 	{
 	    return unit;
 	}
 
+	/**
+	 * The description of the data source
+	 * 
+	 * @return the description
+	 */
 	public String getDescription()
 	{
 	    return description;
 	}
 
+	/**
+	 * The url of the data source
+	 * 
+	 * @return the url
+	 */
 	public String getUrl()
 	{
 	    return url;
 	}
-
     }
 
+    public SourceType source;
+
+    /**
+     * Builder for quandl data sources
+     */
     public QuandlDataSourceBuilder()
     {
 	setSourceName("quandl");
 	setSourceLink("http://www.quandl.com");
     }
-
+    
+    /**
+     * Builds specific data sources like
+     * QuandlDataSource DEATH_RATE_CIRRHOSIS_USA
+     * 
+     * @param source
+     */
     public QuandlDataSourceBuilder(SourceType source)
     {
 	this();
-	setSourceSupplier(DataSupplierFactory.createURLFetcher(source.getUrl() + "?api_key=aS5eE67bVGDB2snkV9Wc"));
+	this.source = source;
+	setFetchFromWebsite(""); // required, but should be removed
 	setListExtractor(
 		(data) -> listToMap((((List<List<Object>>) ((Map<String, Object>) data.get("dataset")).get("data")))));
 	setDataExtractor(
@@ -84,18 +127,43 @@ public class QuandlDataSourceBuilder extends JSONDataSourceBuilder
 	setUnit(source.getUnit());
     }
 
-    @SuppressWarnings("serial")
-    public List<Map<String, Object>> listToMap(List<List<Object>> list)
+    /**
+     * Sets the data fetched from www.quandl.com
+     * 
+     * @param apiKey
+     */
+    public void setFetchFromWebsite(String apiKey)
+    {
+	if (apiKey == null || apiKey == "") apiKey = "?api_key=aS5eE67bVGDB2snkV9Wc";
+
+	setSourceSupplier((DataSupplierFactory.createURLFetcher(source.getUrl() + apiKey)));
+    }
+    
+    private List<Map<String, Object>> listToMap(List<List<Object>> list)
     {
 	return list.stream().map((entry) -> new TreeMap<String, Object>()
 	{
+	    /**
+	     * 
+	     */
+	    private static final long serialVersionUID = 1L;
+
 	    {
 		put("0", entry.get(0));
 		put("1", entry.get(1));
 	    }
 	}).collect(Collectors.toList());
     }
-
+    
+    
+    /**
+     * special method for gathering data to dropdown boxes<br>
+     * <br>
+     * based on matching parameters
+     * @param type
+     * 		Which Quandl data to generate
+     * @return QuandlDataSourceBuilder
+     */
     @SourceGenerator("Quandl data")
     public static DataSourceBuilder generate(@Param(value = "type", name = "Type", suggestEnum = SourceType.class, onlyEnum = true) SourceType type)
     {

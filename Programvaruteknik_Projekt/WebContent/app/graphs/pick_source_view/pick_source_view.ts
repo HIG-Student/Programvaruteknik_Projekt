@@ -10,17 +10,17 @@ export class PickSourceView
 {
 	@Output() onPick: EventEmitter<any> = new EventEmitter();
 	
-	@Input() data: object;
+	private data:object;
 	
 	constructor(private dataLoader: DataLoader) { }
-	
+
 	pick()
 	{
 		this.onPick.emit(this.data);
 	}
 	
-	pickSelect(value)
-	{
+	selectedValueChange(value)
+	{	
 		this.inputs = this.builders[value];
 		
 		this.data = { };
@@ -41,7 +41,7 @@ export class PickSourceView
 		{
 			this.builders = data;
 			this.builders_keys = Object.keys(this.builders);
-			this.pickSelect(this.builders_keys[0]);
+			this.selectedValueChange(this.builders_keys[0]);		
 		});
 	}
 }

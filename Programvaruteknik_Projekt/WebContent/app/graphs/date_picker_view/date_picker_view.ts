@@ -1,4 +1,5 @@
 import {Component,Output,Input,EventEmitter} from "angular2/core";
+import {DataBridgeService} from "app/data_bridge_service";
 
 @Component({
 	selector: "date-picker-view",
@@ -7,6 +8,8 @@ import {Component,Output,Input,EventEmitter} from "angular2/core";
 })
 export class DatePickerView 
 {
+	constructor(private dataBridgeService: DataBridgeService) { }
+
 	public @Output() onPick: EventEmitter<any> = new EventEmitter();
 	public @Input() resolution:string;
 	
@@ -51,5 +54,5 @@ export class DatePickerView
 			"from": this.from,
 			"to": this.to
 		});
-	}
+	}	
 }

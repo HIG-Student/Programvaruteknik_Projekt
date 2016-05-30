@@ -1,21 +1,49 @@
-<center><input [(ngModel)]="title" class="title" placeholder="[Click to edit title]"></center>
+<center>
+	<input [(ngModel)]="dataBridgeService.saveData.title" class="title" placeholder="[Click to edit title]">
+</center>
 
-<table>
-	<tr>
-		<td>
-			<data-view [data]="sourceA"></data-view>
-			<pick-source-view (onPick)="setSourceA($event)"></pick-source-view>
-		</td>
+<div>
+	<select [(ngModel)]="pickedSave">
+		<option value="-1">NONE</option>
+		<option *ngFor="let save of savesList" [value]="save.id">{{save.title}}</option>
+	</select>
+	<button type="button" (click)="clickSave()">Save</button>
+	<button type="button" [disabled]="!(savesList && savesList.length > 0) || pickedSave == -1" (click)="clickLoad()">Load SaveData</button>
+	<button type="button" [disabled]="!(savesList && savesList.length > 0) || pickedSave == -1" (click)="clickDelete()">Delete SaveData</button>
+</div>
+
+<center>
+	<table>
+		<tr>
+			<td>
+				<data-view [data]="dataBridgeService.saveData.sourceA"></data-view>
+				<p *ngIf="sourceA_JSON">{{sourceA_JSON | json}}</p>
+				<pick-source-view (onPick)="setSourceA($event)"></pick-source-view>
+			</td>
+			<td>
+				<data-view [data]="dataBridgeService.saveData.sourceB"></data-view>
+				<p *ngIf="sourceB_JSON">{{sourceB_JSON | json}}</p>
+				<pick-source-view (onPick)="setSourceB($event)"></pick-source-view>
+			</td>
+		</tr>
 		
-		<td rowspan="2">
-			<corr-view [data]="sourceCorr" [from]="from" [to]="to"></corr-view>
-			<date-picker-view [resolution]="resolution" (onPick)="setResolution($event)"></date-picker-view>
-		</td>
-	</tr>
-	<tr>
-		<td>
-			<data-view [data]="sourceB"></data-view>
-			<pick-source-view (onPick)="setSourceB($event)"></pick-source-view>
-		</td>
-	</tr>
-</table>
+		<tr>
+			<td rowspan="2">
+				<corr-view [data]="dataBridgeService.saveData.sourceCorr" [from]="dataBridgeService.saveData.timeFilter.from" [to]="dataBridgeService.saveData.timeFilter.to"></corr-view>
+				<date-picker-view [resolution]="dataBridgeService.saveData.timeFilter.resolution" (onPick)="setTimeFilter($event)"></date-picker-view>
+			</td>
+			<td>
+				<textarea class="comment"  [(ngModel)]="dataBridgeService.saveData.comment" placeholder="Comment"></textarea>
+			</td>
+		</tr>
+		<tr>
+			Last save: 
+			<span *ngIf="!dataBridgeService.saveData.lastSaveDate">never</span>
+    		<date-view *ngIf="dataBridgeService.saveData.lastSaveDate" [date]="dataBridgeService.saveData.lastSaveDate"></date-view>	
+		</tr>
+	</table>
+</center>
+
+<p *ngIf="dataBridgeService.username">
+	Logged in as: {{dataBridgeService.username}}
+</p>
