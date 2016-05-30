@@ -350,6 +350,21 @@ public class StatisticsServlet extends HttpServlet
 		    };
 		}
 	    }
+	    else if ("logout".equalsIgnoreCase(actionType))
+	    {
+		session.invalidate();
+
+		outputter = new JSONOutputter()
+		{
+		    @Override
+		    public String asJSON(JSONFormatter formatter)
+		    {
+			Map<String, Object> result = new TreeMap<>();
+			result.put("message", "logged out!");
+			return formatter.format(new Genson().serialize(result));
+		    }
+		};
+	    }
 	    else if ("save".equalsIgnoreCase(actionType))
 	    {
 		Map<String, Object> raw_json = getValue(body, "data");

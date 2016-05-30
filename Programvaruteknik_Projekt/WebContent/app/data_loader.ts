@@ -123,6 +123,14 @@ export class DataLoader
 			"type": "login-status"
 		});
 	}
+	
+	private logout()
+	{
+		return this.post(
+		{
+			"type": "logout"
+		});
+	}
 		
 	private post(data:object)
 	{		

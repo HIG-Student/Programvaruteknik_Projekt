@@ -6,6 +6,7 @@ import {DataLoader} from "app/data_loader";
 import {DatePickerView} from "app/graphs/date_picker_view/date_picker_view";
 import {DataBridgeService} from "app/data_bridge_service";
 import {DateView} from "app/date_view/date_view";
+import {RouteConfig, Router, ROUTER_DIRECTIVES} from 'angular2/router';
 
 @Component({
 	selector: "graph-view",
@@ -15,7 +16,7 @@ import {DateView} from "app/date_view/date_view";
 })
 export class GraphView 
 {
-	constructor(private dataLoader: DataLoader, private dataBridgeService: DataBridgeService) 
+	constructor(private dataLoader: DataLoader, private dataBridgeService: DataBridgeService,private router: Router) 
 	{
 		this.updateSaveList();
 		
@@ -92,6 +93,14 @@ export class GraphView
 				this.sourceCorr = data;		
 			});
 		}
+	}
+
+	logout()
+	{
+		this.dataLoader.logout().subscribe(data=>
+		{
+			this.router.navigate(["/Login"]);
+		});
 	}
 
 	clickSave()
