@@ -126,12 +126,10 @@ export class DataLoader
 	
 	private logout()
 	{
-		console.log("Före");
 		return this.post(
 		{
 			"type": "logout"
 		});
-		console.log("Efter");
 	}
 		
 	private post(data:object)
