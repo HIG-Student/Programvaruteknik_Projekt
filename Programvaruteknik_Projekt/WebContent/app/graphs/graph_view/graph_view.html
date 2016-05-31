@@ -10,6 +10,10 @@
 	<button type="button" (click)="clickSave()">Save</button>
 	<button type="button" [disabled]="!(savesList && savesList.length > 0) || pickedSave == -1" (click)="clickLoad()">Load SaveData</button>
 	<button type="button" [disabled]="!(savesList && savesList.length > 0) || pickedSave == -1" (click)="clickDelete()">Delete SaveData</button>
+	<p align="right" *ngIf="dataBridgeService.username">
+	Logged in as: {{dataBridgeService.username}}
+	<button type="button" (click)="logout()">Logout</button>
+	</p>
 </div>
 
 <center>
@@ -43,7 +47,3 @@
 		</tr>
 	</table>
 </center>
-
-<p *ngIf="dataBridgeService.username">
-	Logged in as: {{dataBridgeService.username}}
-</p>
