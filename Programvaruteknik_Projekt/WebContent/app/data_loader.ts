@@ -126,10 +126,12 @@ export class DataLoader
 	
 	private logout()
 	{
+		console.log("Före");
 		return this.post(
 		{
 			"type": "logout"
 		});
+		console.log("Efter");
 	}
 		
 	private post(data:object)
@@ -139,7 +141,7 @@ export class DataLoader
 			this.progressor.addLoading();
 			
 			var thing = this.http
-				.post("StatisticsServlet", JSON.stringify(data))
+				.post("http://130.243.14.18:58080/Projekt/StatisticsServlet", JSON.stringify(data))
 				.map(res => res.json().data)
 				.do(data =>
 					{
