@@ -141,7 +141,7 @@ export class DataLoader
 			this.progressor.addLoading();
 			
 			var thing = this.http
-				.post("http://130.243.14.18:58080/Projekt/StatisticsServlet", JSON.stringify(data))
+				.post("StatisticsServlet", JSON.stringify(data))
 				.map(res => res.json().data)
 				.do(data =>
 					{
