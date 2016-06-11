@@ -50,6 +50,18 @@ public class TestDataSourceGenerator
     }
 
     @Test
+    public void testSetupNull()
+    {
+	new DataSourceGenerator(null);
+    }
+
+    @Test
+    public void testRegisterNull()
+    {
+	generator.registerBuilders(null);
+    }
+
+    @Test
     public void testGetEmptySource()
     {
 	generator.registerBuilders(ExampleEmptyBuilder.class);
@@ -171,6 +183,52 @@ public class TestDataSourceGenerator
 		put("value-b", "B");
 	    }
 	}));
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testCreateNoParamEmptySource() throws Exception
+    {
+	generator.registerBuilders(NoParamClassBuilder.class);
+
+	assertNotNull(generator.getBuilder(new TreeMap<String, Object>()
+	{
+	    {
+		put("source-type", "Example - Empty");
+	    }
+	}));
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testGetNoParamEmptySource()
+    {
+	generator.registerBuilders(NoParamClassBuilder.class);
+
+	assertEquals(new TreeMap<String, Object>()
+	{
+	    {
+		put("Example - Empty", new TreeMap<String, Object>()
+		{
+		    {
+			put("inputs", new ArrayList<Object>());
+		    }
+		});
+	    }
+	}, generator.getSources());
+    }
+
+    static class NoParamClassBuilder extends DataSourceBuilder
+    {
+	@Override
+	protected Map<LocalDate, List<Double>> generateData()
+	{
+	    return null;
+	}
+
+	@SourceGenerator("Example - Empty")
+	private static DataSourceBuilder generate(String noParamString)
+	{
+	    return new ExampleBuilder();
+	}
     }
 
     static class ExampleEmptyBuilder extends DataSourceBuilder

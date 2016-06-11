@@ -7,8 +7,11 @@ import java.util.TreeMap;
 
 import org.junit.Test;
 
+import se.hig.programvaruteknik.JSONFormatter;
 import se.hig.programvaruteknik.data.StockSourceBuilder.StockInfo;
+import se.hig.programvaruteknik.data.StockSourceBuilder.StockName;
 import se.hig.programvaruteknik.model.DataSource;
+import se.hig.programvaruteknik.model.DataSource.DataSourceException;
 
 @SuppressWarnings(
 {
@@ -100,5 +103,28 @@ public class TestStockSourceBuilder
 	});
 	assertEquals("TEST , Ostadighet", source.getName());
 	assertEquals("$", source.getUnit());
+    }
+    
+    @Test
+    public void testGetSourceAsJSON()
+    {
+    	StockSourceBuilder builder = new StockSourceBuilder(StockInfo.FLUCTUATION);
+    	JSONFormatter formatter = new JSONFormatter();
+    	builder.setStock("TEST", 0);
+    	builder.setSourceSupplier(DataSupplierFactory.createFileFetcher("data/test/TestStockData.txt"));
+    	DataSource source = builder.build();
+    	assertNotNull(source.asJSON(formatter));
+    	}
+    
+    @Test
+    public void testDataSourceException() 
+    {
+    	StockSourceBuilder builder = new StockSourceBuilder(StockInfo.FLUCTUATION);
+    	JSONFormatter formatter = new JSONFormatter();
+    	builder.setStock(StockName.BAC, 0);
+    	builder.setSourceSupplier(DataSupplierFactory.createFileFetcher("data/test/TestStockData.txt"));
+    	Exception ex = new Exception("aa");
+    	DataSourceException source = new DataSourceException(ex);
+    	source = new DataSourceException("aa");
     }
 }

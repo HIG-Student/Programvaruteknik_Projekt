@@ -72,9 +72,9 @@ public interface MergeType
 			.equalsIgnoreCase(name)) return (MergeType) field.get(null);
 	    }
 	}
-	catch (Exception e)
+	catch (IllegalAccessException e)
 	{
-	    throw new NotAMergeTypeException("'" + name + "' cannot be resolved to a MergeType");
+		
 	}
 	throw new NotAMergeTypeException("'" + name + "' is not a MergeType");
     }

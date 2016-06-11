@@ -11,6 +11,8 @@ import java.util.Map;
 
 import org.junit.Test;
 
+import se.hig.programvaruteknik.model.MergeType.NotAMergeTypeException;
+
 @SuppressWarnings("javadoc")
 public class TestDataCollectionBuilder
 {
@@ -142,7 +144,17 @@ public class TestDataCollectionBuilder
 	    assertTrue("Missing key", data.containsKey(key));
 	    MatchedDataPair pair = data.get(key);
 	    testCase.test(date, pair.getXValue(), pair.getYValue());
+	    assertNotNull(pair.toString());
 	}
+    }
+    
+    private static void testEmptyCollection(Resolution resolution, MergeType mergeType, testCollectionCase testCase) 
+    {
+    	DataCollectionBuilder builder = new DataCollectionBuilder(getDataSourceA(), getDataSourceB(), resolution);
+    	builder.setXMergeType(mergeType);
+    	builder.setYMergeType(mergeType);
+    	Map<String, MatchedDataPair> data = builder.getResult().getData();
+    	data.clear();
     }
 
     @Test
@@ -371,6 +383,16 @@ public class TestDataCollectionBuilder
 	    assertEquals("Incorrect value", new Double(2), y);
 	});
     }
+    
+    @Test 
+    public void testDay_MEDIANEmptyList() 
+    {
+    	testEmptyCollection(Resolution.DAY, MergeType.MEDIAN, (date, x, y) ->
+    	{
+    	    assertEquals("Incorrect value", new Double(1), x);
+    	    assertEquals("Incorrect value", new Double(2), y);
+    	});
+    }
 
     @Test
     public void testWeek_MEDIAN()
@@ -451,4 +473,49 @@ public class TestDataCollectionBuilder
 	    }
 	});
     }
+    
+    @Test
+	public void testYear_MedianFromString() 
+    {
+    	testCollection(Resolution.YEAR, MergeType.fromString("Median"), (date, x, y) ->
+    	{
+    	    switch (date.getYear())
+    	    {
+    	    case 2016:
+    		assertEquals(new Double(1), x);
+    		assertEquals(new Double(2), y);
+    		break;
+    	    case 2017:
+    		assertEquals(new Double(1), x);
+    		assertEquals(new Double(2), y);
+    		break;
+    	    default:
+    		fail("Unexpected year");
+    		break;
+    	    }
+    	});
+	}
+    
+    @Test (expected=NotAMergeTypeException.class)
+    public void testNotAMergeTypeException()
+    {
+    	testCollection(Resolution.YEAR, MergeType.fromString("does not exist"), (date, x, y) ->
+    	{
+    	    switch (date.getYear())
+    	    {
+    	    case 2016:
+    		assertEquals(new Double(1), x);
+    		assertEquals(new Double(2), y);
+    		break;
+    	    case 2017:
+    		assertEquals(new Double(1), x);
+    		assertEquals(new Double(2), y);
+    		break;
+    	    default:
+    		fail("Unexpected year");
+    		break;
+    	    }
+    	});
+    }
+    
 }
