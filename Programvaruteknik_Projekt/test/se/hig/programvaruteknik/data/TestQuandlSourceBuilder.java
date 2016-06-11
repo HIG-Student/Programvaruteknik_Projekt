@@ -4,13 +4,12 @@ import static org.junit.Assert.*;
 
 import java.time.LocalDate;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import se.hig.programvaruteknik.data.QuandlDataSourceBuilder.SourceType;
 import se.hig.programvaruteknik.model.DataSource;
 
-@Ignore("Should read ONLY from file!")
+@SuppressWarnings("javadoc")
 public class TestQuandlSourceBuilder
 {
 
@@ -20,7 +19,7 @@ public class TestQuandlSourceBuilder
 	QuandlDataSourceBuilder builder = new QuandlDataSourceBuilder(SourceType.DEATH_RATE_CIRRHOSIS_USA);
 	builder.setSourceSupplier(DataSupplierFactory.createFileFetcher("data/test/TestCirrhosisUsaData.json"));
 	DataSource source = builder.build();
-	
+
 	assertEquals(96, source.getData().size());
 
 	assertEquals(source.getData().get(LocalDate.of(2005, 1, 1)), new Double(9.2));

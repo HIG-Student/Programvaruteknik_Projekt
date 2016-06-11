@@ -53,6 +53,10 @@ public abstract class DataHandler
      */
     public final String loadData(Long userId, Long index)
     {
+	if (userId == null) throw new DataHandlerException("Load: Null is not a valid user index");
+	if (userId < 0) throw new DataHandlerException("Load: Negative user index is not valid");
+	if (userId == 0) throw new DataHandlerException("Load: User index begins at 1, not 0");
+
 	if (index == null) throw new DataHandlerException("Load: Null is not a valid index");
 	if (index < 0) throw new DataHandlerException("Load: Negative index is not valid");
 	if (index == 0) throw new DataHandlerException("Load: Index begins at 1, not 0");
@@ -77,6 +81,10 @@ public abstract class DataHandler
      */
     public final Long deleteData(Long userId, Long index)
     {
+	if (userId == null) throw new DataHandlerException("Delete: Null is not a valid user index");
+	if (userId < 0) throw new DataHandlerException("Delete: Negative user index is not valid");
+	if (userId == 0) throw new DataHandlerException("Delete: User index begins at 1, not 0");
+
 	if (index == null) throw new DataHandlerException("Delete: Null is not a valid index");
 	if (index < 0) throw new DataHandlerException("Delete: Negative index is not valid");
 	if (index == 0) throw new DataHandlerException("Delete: Index begins at 1, not 0");
@@ -168,37 +176,19 @@ public abstract class DataHandler
 	 */
 	private static final long serialVersionUID = 1L;
 
-	/**
-	 * An exception that indicates that there was an error with the data
-	 * handler
-	 */
-	public DataHandlerException()
+	protected DataHandlerException()
 	{
-
+	    super();
 	}
 
-	/**
-	 * An exception that indicates that there was an error with the data
-	 * handler
-	 * 
-	 * @param message
-	 *            the information about the exception
-	 */
-	public DataHandlerException(String message)
+	protected DataHandlerException(String message)
 	{
 	    super(message);
 	}
 
-	/**
-	 * An exception that indicates that there was an error with the data
-	 * handler
-	 * 
-	 * @param throwable
-	 *            the throwable that evoked this exception
-	 */
-	public DataHandlerException(Throwable throwable)
+	protected DataHandlerException(Throwable e)
 	{
-	    super(throwable);
+	    super(e);
 	}
     }
 
@@ -212,37 +202,19 @@ public abstract class DataHandler
 	 */
 	private static final long serialVersionUID = 1L;
 
-	/**
-	 * An exception that indicates that the data handelr cannot create a
-	 * login
-	 */
-	public DataHandlerCannotCreateLoginException()
+	protected DataHandlerCannotCreateLoginException()
 	{
-
+	    super();
 	}
 
-	/**
-	 * An exception that indicates that the data handelr cannot create a
-	 * login
-	 * 
-	 * @param message
-	 *            additional information
-	 */
-	public DataHandlerCannotCreateLoginException(String message)
+	protected DataHandlerCannotCreateLoginException(String message)
 	{
 	    super(message);
 	}
 
-	/**
-	 * An exception that indicates that the data handelr cannot create a
-	 * login
-	 * 
-	 * @param throwable
-	 *            the throwable that evoked this exception
-	 */
-	public DataHandlerCannotCreateLoginException(Throwable throwable)
+	protected DataHandlerCannotCreateLoginException(Throwable e)
 	{
-	    super(throwable);
+	    super(e);
 	}
     }
 }
