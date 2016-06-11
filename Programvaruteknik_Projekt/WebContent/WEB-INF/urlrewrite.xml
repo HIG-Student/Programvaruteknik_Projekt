@@ -1,0 +1,16 @@
+<urlrewrite>
+	<rule>
+		<note>
+			Login
+		</note>
+		<from>/login$</from>
+		<to type="redirect">%{context-path}</to>
+	</rule>
+	<rule>
+		<note>
+			Statistics
+		</note>
+		<from>/statistics$</from>
+		<to type="redirect">%{context-path}</to>
+	</rule>
+</urlrewrite>
