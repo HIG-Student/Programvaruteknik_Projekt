@@ -116,6 +116,8 @@ public class DataSourceGenerator
 		    arguments.add(JSONRequest.get(annotation.value()).toString());
 		}
 	    }
+	    else
+		throw new RuntimeException("Missing Param annotation in generator function");
 	}
 
 	return (DataSourceBuilder) generator.invoke(null, arguments.toArray(new Object[arguments.size()]));
@@ -177,6 +179,8 @@ public class DataSourceGenerator
 		paramInfo.put("values", getValues(annotation.suggestEnum()));
 		information.add(paramInfo);
 	    }
+	    else
+		throw new RuntimeException("Missing Param annotation in generator function");
 	}
 
 	return information;

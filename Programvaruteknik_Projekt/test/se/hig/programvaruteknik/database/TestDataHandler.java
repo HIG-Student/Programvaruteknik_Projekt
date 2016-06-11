@@ -94,6 +94,24 @@ public class TestDataHandler
     }
 
     @Test(expected = DataHandler.DataHandlerException.class)
+    public void testLoadWhenZero()
+    {
+	dataHandler.loadData(1L, 0L);
+    }
+    
+    @Test(expected = DataHandler.DataHandlerException.class)
+    public void testLoadWhenUseridNegative()
+    {
+	dataHandler.loadData(-11L, 0L);
+    }
+
+    @Test(expected = DataHandler.DataHandlerException.class)
+    public void testLoadWhenZeroUserId()
+    {
+	dataHandler.loadData(0L, 1L);
+    }
+
+    @Test(expected = DataHandler.DataHandlerException.class)
     public void testLoadWhenNegativeInParameter()
     {
 	dataHandler.loadData(1L, -1L);
@@ -128,12 +146,31 @@ public class TestDataHandler
     {
 	dataHandler.deleteData(1L, -1L);
     }
-
+    
+    @Test(expected = DataHandler.DataHandlerException.class)
+    public void testDeleteWhenZeroInParameter()
+    {
+	dataHandler.deleteData(1L, 0L);
+    }
+    
     @Test(expected = DataHandler.DataHandlerException.class)
     public void testDeleteWhenNullInParameter()
     {
 	dataHandler.deleteData(1L, null);
     }
+    
+    @Test(expected = DataHandler.DataHandlerException.class)
+    public void testDeleteWhenUseridNegative()
+    {
+	dataHandler.deleteData(-11L, 0L);
+    }
+
+    @Test(expected = DataHandler.DataHandlerException.class)
+    public void testDeleteWhenZeroUserId()
+    {
+	dataHandler.deleteData(0L, 1L);
+    }
+
 
     @Test
     public void testSave()
